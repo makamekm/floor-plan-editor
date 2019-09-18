@@ -1,11 +1,11 @@
-const withQuery = (url, params) => {
+function withQuery(url, params) {
   let query = Object.keys(params)
     .filter(k => params[k] !== undefined)
     .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
     .join("&");
   url += (url.indexOf("?") === -1 ? "?" : "&") + query;
   return url;
-};
+}
 
 export default function fetch2(url, options = {}) {
   options = {

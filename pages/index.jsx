@@ -12,12 +12,12 @@ const Page = () => {
 
   return (
     <>
-      <ThreeScene/>
-      <div className="cube">
+      <ThreeScene className="view"/>
+      {/* <div className="cube">
         <CubeView
           onUpdateAngles={updateAngles}
         />
-      </div>
+      </div> */}
   
       <style jsx>{`
         .cube {

@@ -2,6 +2,9 @@ import { FloorplannerView } from "./floorplanner.view";
 
 const snapTolerance = 25;
 
+/** 
+ * A Floorplan represents a number of Walls, Corners and Rooms.
+ */
 export class Floorplanner {
 
   /** */

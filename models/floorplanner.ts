@@ -1,87 +1,88 @@
-import { FloorplannerView } from "./floorplanner.view";
+import { FloorplannerView, floorplannerModes } from "./floorplanner-view";
+import { Floorplan } from "./floorplan";
+import { Corner } from "./corner";
+import { Wall } from "./wall";
 
+/** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
 
 /** 
- * A Floorplan represents a number of Walls, Corners and Rooms.
+ * The Floorplanner implements an interactive tool for creation of floorplans.
  */
 export class Floorplanner {
 
   /** */
-  mode = 0;
+  public mode = 0;
 
   /** */
-  activeWall = null;
+  public activeWall: Wall | null = null;
 
   /** */
-  activeCorner = null;
+  public activeCorner: Corner | null = null;
 
   /** */
-  originX = 0;
+  public originX = 0;
 
   /** */
-  originY = 0;
+  public originY = 0;
 
   /** drawing state */
-  targetX = 0;
+  public targetX = 0;
 
   /** drawing state */
-  targetY = 0;
+  public targetY = 0;
 
   /** drawing state */
-  lastNode = null;
+  public lastNode: Corner | null = null;
 
   /** */
-  wallWidth;
+  private wallWidth: number;
 
   /** */
-  modeResetCallbacks = $.Callbacks();
+  private canvasElement: HTMLCanvasElement;
 
   /** */
-  canvasElement;
+  private view: FloorplannerView;
 
   /** */
-  view;
+  private mouseDown = false;
 
   /** */
-  mouseDown = false;
-
-  /** */
-  mouseMoved = false;
+  private mouseMoved = false;
 
   /** in ThreeJS coords */
-  mouseX = 0;
+  private mouseX = 0;
 
   /** in ThreeJS coords */
-  mouseY = 0;
+  private mouseY = 0;
 
   /** in ThreeJS coords */
-  rawMouseX = 0;
+  private rawMouseX = 0;
 
   /** in ThreeJS coords */
-  rawMouseY = 0;
+  private rawMouseY = 0;
 
   /** mouse position at last click */
-  lastX = 0;
+  private lastX = 0;
 
   /** mouse position at last click */
-  lastY = 0;
+  private lastY = 0;
 
   /** */
-  cmPerPixel;
+  private cmPerPixel: number;
 
   /** */
-  pixelsPerCm;
+  private pixelsPerCm: number;
 
   /** */
-  constructor(canvas, floorplan) {
+  constructor(canvas: string, private floorplan: Floorplan) {
 
-    this.canvasElement = $("#" + canvas);
+    this.canvasElement = <HTMLCanvasElement>document.getElementById(canvas);
 
     this.view = new FloorplannerView(this.floorplan, this, canvas);
 
-    var cmPerFoot = 30.48;
-    var pixelsPerFoot = 15.0;
+    const cmPerFoot = 30.48;
+    const pixelsPerFoot = 15.0;
     this.cmPerPixel = cmPerFoot * (1.0 / pixelsPerFoot);
     this.pixelsPerCm = 1.0 / this.cmPerPixel;
 
@@ -91,39 +92,37 @@ export class Floorplanner {
 
     this.setMode(floorplannerModes.MOVE);
 
-    var scope = this;
-
-    this.canvasElement.mousedown(() => {
-      scope.mousedown();
+    this.canvasElement.addEventListener("mousedown", () => {
+      this.mousedown();
     });
-    this.canvasElement.mousemove((event) => {
-      scope.mousemove(event);
+    this.canvasElement.addEventListener("mousemove", (event) => {
+      this.mousemove(event);
     });
-    this.canvasElement.mouseup(() => {
-      scope.mouseup();
+    this.canvasElement.addEventListener("mouseup", () => {
+      this.mouseup();
     });
-    this.canvasElement.mouseleave(() => {
-      scope.mouseleave();
+    this.canvasElement.addEventListener("mouseleave", () => {
+      this.mouseleave();
     });
 
-    $(document).keyup((e) => {
+    document.addEventListener("keyup", (e) => {
       if (e.keyCode == 27) {
-        scope.escapeKey();
+        this.escapeKey();
       }
     });
 
     floorplan.roomLoadedCallbacks.add(() => {
-      scope.reset();
+      this.reset()
     });
   }
 
   /** */
-  escapeKey() {
+  private escapeKey() {
     this.setMode(floorplannerModes.MOVE);
   }
 
   /** */
-  updateTarget() {
+  private updateTarget() {
     if (this.mode == floorplannerModes.DRAW && this.lastNode) {
       if (Math.abs(this.mouseX - this.lastNode.x) < snapTolerance) {
         this.targetX = this.lastNode.x;
@@ -144,7 +143,7 @@ export class Floorplanner {
   }
 
   /** */
-  mousedown() {
+  private mousedown() {
     this.mouseDown = true;
     this.mouseMoved = false;
     this.lastX = this.rawMouseX;
@@ -152,7 +151,7 @@ export class Floorplanner {
 
     // delete
     if (this.mode == floorplannerModes.DELETE) {
-      if (this.activeCorner) {
+      if (this.activeCorner != null) {
         this.activeCorner.removeAll();
       } else if (this.activeWall) {
         this.activeWall.remove();
@@ -163,15 +162,15 @@ export class Floorplanner {
   }
 
   /** */
-  mousemove(event) {
+  private mousemove(event: MouseEvent) {
     this.mouseMoved = true;
 
     // update mouse
     this.rawMouseX = event.clientX;
     this.rawMouseY = event.clientY;
 
-    this.mouseX = (event.clientX - this.canvasElement.offset().left) * this.cmPerPixel + this.originX * this.cmPerPixel;
-    this.mouseY = (event.clientY - this.canvasElement.offset().top) * this.cmPerPixel + this.originY * this.cmPerPixel;
+    this.mouseX = (event.clientX - this.canvasElement.getBoundingClientRect().left) * this.cmPerPixel + this.originX * this.cmPerPixel;
+    this.mouseY = (event.clientY - this.canvasElement.getBoundingClientRect().top) * this.cmPerPixel + this.originY * this.cmPerPixel;
 
     // update target (snapped position of actual mouse)
     if (this.mode == floorplannerModes.DRAW || (this.mode == floorplannerModes.MOVE && this.mouseDown)) {
@@ -180,9 +179,9 @@ export class Floorplanner {
 
     // update object target
     if (this.mode != floorplannerModes.DRAW && !this.mouseDown) {
-      var hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
-      var hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
-      var draw = false;
+      const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
+      const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
+      let draw = false;
       if (hoverCorner != this.activeCorner) {
         this.activeCorner = hoverCorner;
         draw = true;
@@ -229,12 +228,12 @@ export class Floorplanner {
   }
 
   /** */
-  mouseup() {
+  private mouseup() {
     this.mouseDown = false;
 
     // drawing
     if (this.mode == floorplannerModes.DRAW && !this.mouseMoved) {
-      var corner = this.floorplan.newCorner(this.targetX, this.targetY);
+      const corner = this.floorplan.newCorner(this.targetX, this.targetY);
       if (this.lastNode != null) {
         this.floorplan.newWall(this.lastNode, corner);
       }
@@ -246,13 +245,13 @@ export class Floorplanner {
   }
 
   /** */
-  mouseleave() {
+  private mouseleave() {
     this.mouseDown = false;
     //scope.setMode(scope.modes.MOVE);
   }
 
   /** */
-  reset() {
+  private reset() {
     this.resizeView();
     this.setMode(floorplannerModes.MOVE);
     this.resetOrigin();
@@ -260,34 +259,33 @@ export class Floorplanner {
   }
 
   /** */
-  resizeView() {
+  private resizeView() {
     this.view.handleWindowResize();
   }
 
   /** */
-  setMode(mode) {
+  private setMode(mode: number) {
     this.lastNode = null;
     this.mode = mode;
-    this.modeResetCallbacks.fire(mode);
     this.updateTarget();
   }
 
   /** Sets the origin so that floorplan is centered */
-  resetOrigin() {
-    var centerX = this.canvasElement.innerWidth() / 2.0;
-    var centerY = this.canvasElement.innerHeight() / 2.0;
-    var centerFloorplan = this.floorplan.getCenter();
+  private resetOrigin() {
+    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
+    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
+    const centerFloorplan = this.floorplan.getCenter();
     this.originX = centerFloorplan.x * this.pixelsPerCm - centerX;
     this.originY = centerFloorplan.z * this.pixelsPerCm - centerY;
   }
 
   /** Convert from THREEjs coords to canvas coords. */
-  convertX(x) {
+  public convertX(x: number): number {
     return (x - this.originX * this.cmPerPixel) * this.pixelsPerCm;
   }
 
   /** Convert from THREEjs coords to canvas coords. */
-  convertY(y) {
+  public convertY(y: number): number {
     return (y - this.originY * this.cmPerPixel) * this.pixelsPerCm;
   }
 }

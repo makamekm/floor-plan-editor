@@ -1,11 +1,8 @@
-import { getNumericValue, configWallThickness, configWallHeight } from "../utils/configuration";
-import { pointDistanceFromLine } from "../utils/operations";
-
-const defaultWallTexture = {
-  url: "rooms/textures/wallmap.png",
-  stretch: true,
-  scale: 0
-}
+import { HalfEdge } from "./half_edge";
+import { Configuration, configWallThickness, configWallHeight } from "../utils/configuration";
+import { Corner } from "./corner";
+import { Callback } from "../utils/callback";
+import { Utils } from "../utils/operations";
 
 /** 
  * A Wall is the basic element to create Rooms.
@@ -15,108 +12,90 @@ const defaultWallTexture = {
 export class Wall {
 
   /** The unique id of each wall. */
-  id;
+  private id: string;
 
   /** Front is the plane from start to end. */
-  frontEdge = null;
+  public frontEdge: HalfEdge | null = null;
 
   /** Back is the plane from end to start. */
-  backEdge = null;
+  public backEdge: HalfEdge | null = null;
 
   /** */
-  orphan = false;
-
-  /** Items attached to this wall */
-  items = [];
-
-  /** */
-  onItems = [];
-
-  /** The front-side texture. */
-  frontTexture = defaultWallTexture;
-
-  /** The back-side texture. */
-  backTexture = defaultWallTexture;
+  public orphan = false;
 
   /** Wall thickness. */
-  thickness = getNumericValue(configWallThickness);
+  public thickness = Configuration.getNumericValue(configWallThickness);
 
   /** Wall height. */
-  height = getNumericValue(configWallHeight);
+  public height = Configuration.getNumericValue(configWallHeight);
 
   /** Actions to be applied after movement. */
-  moved_callbacks = $.Callbacks();
+  private moved_callbacks = new Callback();
 
   /** Actions to be applied on removal. */
-  deleted_callbacks = $.Callbacks();
+  private deleted_callbacks = new Callback<Wall>();
 
   /** Actions to be applied explicitly. */
-  action_callbacks = $.Callbacks();
-
-  start;
-  end;
+  private action_callbacks = new Callback<() => void>();
 
   /** 
    * Constructs a new wall.
    * @param start Start corner.
    * @param end End corner.
    */
-  constructor(start, end) {
-    this.start = start;
-    this.end = end;
-
+  constructor(private start: Corner, private end: Corner) {
     this.id = this.getUuid();
 
     this.start.attachStart(this)
     this.end.attachEnd(this);
   }
 
-  getUuid() {
+  private getUuid(): string {
     return [this.start.id, this.end.id].join();
   }
 
-  resetFrontBack() {
+  public resetFrontBack() {
     this.frontEdge = null;
     this.backEdge = null;
     this.orphan = false;
   }
 
-  snapToAxis(tolerance) {
+  public snapToAxis(tolerance: number) {
     // order here is important, but unfortunately arbitrary
     this.start.snapToAxis(tolerance);
     this.end.snapToAxis(tolerance);
   }
 
-  fireOnMove(func) {
+  public fireOnMove(func: () => void) {
     this.moved_callbacks.add(func);
   }
 
-  fireOnDelete(func) {
+  public fireOnDelete(func: () => void) {
     this.deleted_callbacks.add(func);
   }
 
-  dontFireOnDelete(func) {
+  public dontFireOnDelete(func: () => void) {
     this.deleted_callbacks.remove(func);
   }
 
-  fireOnAction(func) {
+  public fireOnAction(func: () => void) {
     this.action_callbacks.add(func)
   }
 
-  fireAction(action) {
-    this.action_callbacks.fire(action)
+  public fireAction(action: () => void) {
+    this.action_callbacks.fire(action);
   }
 
-  relativeMove(dx, dy) {
+  public relativeMove(dx: number, dy: number) {
     this.start.relativeMove(dx, dy);
     this.end.relativeMove(dx, dy);
   }
 
-  fireMoved() {
+  public fireMoved() {
     this.moved_callbacks.fire();
   }
 
-  fireRedraw() {
+  public fireRedraw() {
     if (this.frontEdge) {
       this.frontEdge.redrawCallbacks.fire();
     }
@@ -125,69 +104,53 @@ export class Wall {
     }
   }
 
-  getStart() {
+  public getStart(): Corner {
     return this.start;
   }
 
-  getEnd() {
+  public getEnd(): Corner {
     return this.end;
   }
 
-  getStartX() {
+  public getStartX(): number {
     return this.start.getX();
   }
 
-  getEndX() {
+  public getEndX(): number {
     return this.end.getX();
   }
 
-  getStartY() {
+  public getStartY(): number {
     return this.start.getY();
   }
 
-  getEndY() {
+  public getEndY(): number {
     return this.end.getY();
   }
 
-  remove() {
+  public remove() {
     this.start.detachWall(this);
     this.end.detachWall(this);
     this.deleted_callbacks.fire(this);
   }
 
-  setStart(corner) {
+  public setStart(corner: Corner) {
     this.start.detachWall(this);
     corner.attachStart(this);
     this.start = corner;
     this.fireMoved();
   }
 
-  setEnd(corner) {
+  public setEnd(corner: Corner) {
     this.end.detachWall(this);
     corner.attachEnd(this);
     this.end = corner;
     this.fireMoved();
   }
 
-  distanceFrom(x, y) {
-    return pointDistanceFromLine(
-      x, y,
+  public distanceFrom(x: number, y: number): number {
+    return Utils.pointDistanceFromLine(x, y,
       this.getStartX(), this.getStartY(),
-      this.getEndX(), this.getEndY(),
-    );
-  }
-
-  /** Return the corner opposite of the one provided.
-   * @param corner The given corner.
-   * @returns The opposite corner.
-   */
-  oppositeCorner(corner) {
-    if (this.start === corner) {
-      return this.end;
-    } else if (this.end === corner) {
-      return this.start;
-    } else {
-      console.log('Wall does not connect to corner');
-    }
+      this.getEndX(), this.getEndY());
   }
 }

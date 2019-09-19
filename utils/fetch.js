@@ -1,5 +1,5 @@
 function withQuery(url, params) {
-  let query = Object.keys(params)
+  const query = Object.keys(params)
     .filter(k => params[k] !== undefined)
     .map(k => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
     .join("&");

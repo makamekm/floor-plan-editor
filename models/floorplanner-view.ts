@@ -1,11 +1,16 @@
-import { map } from "../utils/operations";
-import { cmToMeasure } from "../utils/dimensioning";
+import { Floorplanner } from "./floorplanner";
+import { Floorplan } from "./floorplan";
+import { Wall } from "./wall";
+import { Dimensioning } from "../utils/dimensioning";
+import { HalfEdge } from "./half_edge";
+import { Room } from "./room";
+import { Corner } from "./corner";
 
 /** */
 export const floorplannerModes = {
   MOVE: 0,
   DRAW: 1,
-  DELETE: 2,
+  DELETE: 2
 };
 
 // grid parameters
@@ -19,19 +24,19 @@ const roomColor = "#f9f9f9";
 // wall config
 const wallWidth = 5;
 const wallWidthHover = 7;
-const wallColor = "#dddddd";
-const wallColorHover = "#008cba";
-const edgeColor = "#888888";
-const edgeColorHover = "#008cba";
-const edgeWidth = 1;
+const wallColor = "#dddddd"
+const wallColorHover = "#008cba"
+const edgeColor = "#888888"
+const edgeColorHover = "#008cba"
+const edgeWidth = 1
 
 const deleteColor = "#ff0000";
 
 // corner config
-const cornerRadius = 0;
-const cornerRadiusHover = 7;
-const cornerColor = "#cccccc";
-const cornerColorHover = "#008cba";
+const cornerRadius = 0
+const cornerRadiusHover = 7
+const cornerColor = "#cccccc"
+const cornerColorHover = "#008cba"
 
 /**
  * The View to be used by a Floorplanner to render in/interact with.
@@ -39,51 +44,43 @@ const cornerColorHover = "#008cba";
 export class FloorplannerView {
 
   /** The canvas element. */
-  canvasElement;
+  private canvasElement: HTMLCanvasElement;
 
   /** The 2D context. */
-  context;
-
-  floorplan;
-  viewmodel;
-  canvas;
+  private context: CanvasRenderingContext2D;
 
   /** */
-  constructor(floorplan, viewmodel, canvas) {
-    this.floorplan = floorplan;
-    this.viewmodel = viewmodel;
-    this.canvas = canvas;
+  constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvas: string) {
+    this.canvasElement = <HTMLCanvasElement>document.getElementById(canvas);
+    this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
 
-    this.canvasElement = document.getElementById(canvas);
-    this.context = this.canvasElement.getContext("2d");
-
-    var scope = this;
-    $(window).resize(() => {
-      scope.handleWindowResize();
+    window.addEventListener('resize', () => {
+      this.handleWindowResize();
     });
+
     this.handleWindowResize();
   }
 
   /** */
-  handleWindowResize() {
-    var canvasSel = $("#" + this.canvas);
-    var parent = canvasSel.parent();
-    canvasSel.height(parent.innerHeight());
-    canvasSel.width(parent.innerWidth());
-    this.canvasElement.height = parent.innerHeight();
-    this.canvasElement.width = parent.innerWidth();
+  public handleWindowResize() {
+    const canvasSel = <HTMLCanvasElement>document.getElementById(this.canvas);
+    const parent = <HTMLElement>canvasSel.parentElement;
+    canvasSel.style.height = `${parent.getBoundingClientRect().height}px`;
+    canvasSel.style.width = `${parent.getBoundingClientRect().width}px`;
+    canvasSel.height = parent.getBoundingClientRect().height;
+    canvasSel.width = parent.getBoundingClientRect().width;
     this.draw();
   }
 
   /** */
-  draw() {
+  public draw() {
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
     this.drawGrid();
 
     this.floorplan.getRooms().forEach((room) => {
       this.drawRoom(room);
-    });
+    })
 
     this.floorplan.getWalls().forEach((wall) => {
       this.drawWall(wall);
@@ -103,7 +100,7 @@ export class FloorplannerView {
   }
 
   /** */
-  drawWallLabels(wall) {
+  private drawWallLabels(wall: Wall) {
     // we'll just draw the shorter label... idk
     if (wall.backEdge && wall.frontEdge) {
       if (wall.backEdge.interiorDistance < wall.frontEdge.interiorDistance) {
@@ -119,9 +116,9 @@ export class FloorplannerView {
   }
 
   /** */
-  drawWall(wall) {
-    var hover = (wall === this.viewmodel.activeWall);
-    var color = wallColor;
+  private drawWall(wall: Wall) {
+    const hover = (wall === this.viewmodel.activeWall);
+    let color = wallColor;
     if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
       color = deleteColor;
     } else if (hover) {
@@ -144,9 +141,9 @@ export class FloorplannerView {
   }
 
   /** */
-  drawEdgeLabel(edge) {
-    var pos = edge.interiorCenter();
-    var length = edge.interiorDistance();
+  private drawEdgeLabel(edge: HalfEdge) {
+    const pos = edge.interiorCenter();
+    const length = edge.interiorDistance();
     if (length < 60) {
       // dont draw labels on walls this short
       return;
@@ -158,34 +155,33 @@ export class FloorplannerView {
     this.context.strokeStyle = "#ffffff";
     this.context.lineWidth = 4;
 
-    this.context.strokeText(cmToMeasure(length),
+    this.context.strokeText(Dimensioning.cmToMeasure(length),
       this.viewmodel.convertX(pos.x),
       this.viewmodel.convertY(pos.y));
-    this.context.fillText(cmToMeasure(length),
+    this.context.fillText(Dimensioning.cmToMeasure(length),
       this.viewmodel.convertX(pos.x),
       this.viewmodel.convertY(pos.y));
   }
 
   /** */
-  drawEdge(edge, hover) {
-    var color = edgeColor;
+  private drawEdge(edge: HalfEdge, hover: boolean) {
+    let color = edgeColor;
     if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = edgeColorHover;
     }
-    var corners = edge.corners();
+    const corners = edge.corners();
 
-    var scope = this;
     this.drawPolygon(
-      map(corners, function (corner) {
-        return scope.viewmodel.convertX(corner.x);
+      corners.map(corner => {
+        return this.viewmodel.convertX(corner.x);
       }),
-      map(corners, function (corner) {
-        return scope.viewmodel.convertY(corner.y);
+      corners.map(corner => {
+        return this.viewmodel.convertY(corner.y);
       }),
       false,
-      null,
+      undefined,
       true,
       color,
       edgeWidth
@@ -193,14 +189,13 @@ export class FloorplannerView {
   }
 
   /** */
-  drawRoom(room) {
-    var scope = this;
+  private drawRoom(room: Room) {
     this.drawPolygon(
-      map(room.corners, (corner) => {
-        return scope.viewmodel.convertX(corner.x);
+      room.corners.map(corner => {
+        return this.viewmodel.convertX(corner.x);
       }),
-      map(room.corners, (corner) =>  {
-        return scope.viewmodel.convertY(corner.y);
+      room.corners.map(corner =>  {
+        return this.viewmodel.convertY(corner.y);
       }),
       true,
       roomColor
@@ -208,9 +203,9 @@ export class FloorplannerView {
   }
 
   /** */
-  drawCorner(corner) {
-    var hover = (corner === this.viewmodel.activeCorner);
-    var color = cornerColor;
+  private drawCorner(corner: Corner) {
+    const hover = (corner === this.viewmodel.activeCorner);
+    let color = cornerColor;
     if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
       color = deleteColor;
     } else if (hover) {
@@ -225,14 +220,14 @@ export class FloorplannerView {
   }
 
   /** */
-  drawTarget(x, y, lastNode) {
+  private drawTarget(x: number, y: number, lastNode: Corner | null = null) {
     this.drawCircle(
       this.viewmodel.convertX(x),
       this.viewmodel.convertY(y),
       cornerRadiusHover,
       cornerColorHover
     );
-    if (this.viewmodel.lastNode) {
+    if (lastNode) {
       this.drawLine(
         this.viewmodel.convertX(lastNode.x),
         this.viewmodel.convertY(lastNode.y),
@@ -245,7 +240,14 @@ export class FloorplannerView {
   }
 
   /** */
-  drawLine(startX, startY, endX, endY, width, color) {
+  private drawLine(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    width: number,
+    color: string,
+  ) {
     // width is an integer
     // color is a hex string, i.e. #ff0000
     this.context.beginPath();
@@ -257,29 +259,37 @@ export class FloorplannerView {
   }
 
   /** */
-  drawPolygon(xArr, yArr, fill, fillColor, stroke, strokeColor, strokeWidth) {
+  private drawPolygon(
+    xArr: number[],
+    yArr: number[],
+    fill: boolean,
+    fillColor?: string,
+    stroke?: boolean,
+    strokeColor?: string,
+    strokeWidth?: number,
+  ) {
     // fillColor is a hex string, i.e. #ff0000
     fill = fill || false;
     stroke = stroke || false;
     this.context.beginPath();
     this.context.moveTo(xArr[0], yArr[0]);
-    for (var i = 1; i < xArr.length; i++) {
+    for (let i = 1; i < xArr.length; i++) {
       this.context.lineTo(xArr[i], yArr[i]);
     }
     this.context.closePath();
     if (fill) {
-      this.context.fillStyle = fillColor;
+      this.context.fillStyle = <string>fillColor;
       this.context.fill();
     }
     if (stroke) {
-      this.context.lineWidth = strokeWidth;
-      this.context.strokeStyle = strokeColor;
+      this.context.lineWidth = <number>strokeWidth;
+      this.context.strokeStyle = <string>strokeColor;
       this.context.stroke();
     }
   }
 
   /** */
-  drawCircle(centerX, centerY, radius, fillColor) {
+  private drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
     this.context.beginPath();
     this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
     this.context.fillStyle = fillColor;
@@ -287,7 +297,7 @@ export class FloorplannerView {
   }
 
   /** returns n where -gridSize/2 < n <= gridSize/2  */
-  calculateGridOffset(n) {
+  private calculateGridOffset(n: number) {
     if (n >= 0) {
       return (n + gridSpacing / 2.0) % gridSpacing - gridSpacing / 2.0;
     } else {
@@ -296,15 +306,15 @@ export class FloorplannerView {
   }
 
   /** */
-  drawGrid() {
-    var offsetX = this.calculateGridOffset(-this.viewmodel.originX);
-    var offsetY = this.calculateGridOffset(-this.viewmodel.originY);
-    var width = this.canvasElement.width;
-    var height = this.canvasElement.height;
-    for (var x = 0; x <= (width / gridSpacing); x++) {
+  private drawGrid() {
+    const offsetX = this.calculateGridOffset(-this.viewmodel.originX);
+    const offsetY = this.calculateGridOffset(-this.viewmodel.originY);
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+    for (let x = 0; x <= (width / gridSpacing); x++) {
       this.drawLine(gridSpacing * x + offsetX, 0, gridSpacing * x + offsetX, height, gridWidth, gridColor);
     }
-    for (var y = 0; y <= (height / gridSpacing); y++) {
+    for (let y = 0; y <= (height / gridSpacing); y++) {
       this.drawLine(0, gridSpacing * y + offsetY, width, gridSpacing * y + offsetY, gridWidth, gridColor);
     }
   }

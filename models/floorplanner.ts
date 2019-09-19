@@ -143,7 +143,10 @@ export class Floorplanner {
     this.mouseY = (event.clientY - this.canvasElement.getBoundingClientRect().top) * this.cmPerPixel + this.originY * this.cmPerPixel;
 
     // update target (snapped position of actual mouse)
-    if (this.mode == FloorplannerMode.DRAW || (this.mode == FloorplannerMode.MOVE && this.mouseDown)) {
+    if (
+      this.mode == FloorplannerMode.DRAW
+      || (this.mode == FloorplannerMode.MOVE && this.mouseDown)
+    ) {
       this.updateTarget();
     }
 
@@ -193,6 +196,7 @@ export class Floorplanner {
         this.lastX = this.rawMouseX;
         this.lastY = this.rawMouseY;
       }
+      this.checkWallDuplicates();
       this.view.draw();
     }
   }
@@ -210,6 +214,31 @@ export class Floorplanner {
         this.setMode(FloorplannerMode.MOVE);
       }
       this.lastNode = corner;
+      this.checkWallDuplicates();
+    }
+  }
+
+  private checkWallDuplicates() {
+    const duplicates: Wall[] = [];
+    const walls = this.floorplan.getWalls();
+    for (let i = 0; i < walls.length; i++) {
+      for (let k = i + 1; k < walls.length; k++) {
+        const wall = walls[i];
+        const wallCheck = walls[k];
+        if (
+          wall !== wallCheck &&
+          (
+            (wall.getEnd() === wallCheck.getEnd() && wall.getStart() === wallCheck.getStart())
+            ||
+            (wall.getEnd() === wallCheck.getStart() && wall.getStart() === wallCheck.getEnd())
+          )
+        ) {
+          duplicates.push(wallCheck);
+        }
+      }
+    }
+    for (const wall of duplicates) {
+      wall.remove();
     }
   }
 

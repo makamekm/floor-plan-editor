@@ -17,15 +17,6 @@ export class Corner {
   /** Array of end walls. */
   private wallEnds: Wall[] = [];
 
-  /** Callbacks to be fired on movement. */
-  private moved_callbacks = new Callback<Vector2>();
-
-  /** Callbacks to be fired on removal. */
-  private deleted_callbacks = new Callback<Corner>();
-
-  /** Callbacks to be fired in case of action. */
-  private action_callbacks = new Callback<() => void>();
-
   /** Constructs a corner. 
    * @param floorplan The associated floorplan.
    * @param x X coordinate.
@@ -36,46 +27,6 @@ export class Corner {
     this.id = id || Utils.guid();
   }
 
-  /** Add function to moved callbacks.
-   * @param func The function to be added.
-  */
-  public fireOnMove(func: () => void) {
-    this.moved_callbacks.add(func);
-  }
-
-  /** Add function to deleted callbacks.
-   * @param func The function to be added.
-   */
-  public fireOnDelete(func: () => void) {
-    this.deleted_callbacks.add(func);
-  }
-
-  /** Add function to action callbacks.
-   * @param func The function to be added.
-   */
-  public fireOnAction(func: () => void) {
-    this.action_callbacks.add(func);
-  }
-
-  /**
-   * @returns
-   * @deprecated
-   */
-  public getX(): number {
-    return this.x;
-  }
-
-  /**
-   * @returns
-   * @deprecated
-   */
-  public getY(): number {
-    return this.y;
-  }
-
-  /**
-   * 
-   */
   public snapToAxis(tolerance: number): { x: boolean, y: boolean } {
     // try to snap this corner to an axis
     const snapped = {
@@ -104,22 +55,16 @@ export class Corner {
     this.move(this.x + dx, this.y + dy);
   }
 
-  private fireAction(action: () => void) {
-    this.action_callbacks.fire(action);
-  }
-
   /** Remove callback. Fires the delete callbacks. */
   public remove() {
-    this.deleted_callbacks.fire(this);
+    this.floorplan.removeCorner(this);
   }
 
   /** Removes all walls. */
   public removeAll() {
-    for (let i = 0; i < this.wallStarts.length; i++) {
-      this.wallStarts[i].remove();
-    }
-    for (let i = 0; i < this.wallEnds.length; i++) {
-      this.wallEnds[i].remove();
+    let wall: Wall;
+    while (wall = this.wallStarts[0] || this.wallEnds[0]) {
+      wall.remove();
     }
     this.remove();
   }
@@ -132,15 +77,6 @@ export class Corner {
     this.x = newX;
     this.y = newY;
     this.mergeWithIntersected();
-    this.moved_callbacks.fire(new Vector2(this.x, this.y));
-
-    this.wallStarts.forEach((wall) => {
-      wall.fireMoved();
-    });
-
-    this.wallEnds.forEach((wall) => {
-      wall.fireMoved();
-    });
   }
 
   /** Gets the adjacent corners.
@@ -259,9 +195,6 @@ export class Corner {
     return this.wallTo(corner) || this.wallFrom(corner);
   }
 
-  /**
-   * 
-   */
   private combineWithCorner(corner: Corner) {
     // update position to other corner's
     this.x = corner.x;
@@ -280,7 +213,6 @@ export class Corner {
   }
 
   public mergeWithIntersected(): boolean {
-    //console.log('mergeWithIntersected for object: ' + this.type);
     // check corners
     for (let i = 0; i < this.floorplan.getCorners().length; i++) {
       const corner = this.floorplan.getCorners()[i];

@@ -46,7 +46,6 @@ export class FloorplannerView {
   /** The 2D context. */
   private context: CanvasRenderingContext2D;
 
-  /** */
   constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvasElement: HTMLCanvasElement) {
     this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
 
@@ -57,7 +56,6 @@ export class FloorplannerView {
     this.handleWindowResize();
   }
 
-  /** */
   public handleWindowResize() {
     const parent = <HTMLElement>this.canvasElement.parentElement;
     const dpr = Configuration.getNumericValue(configDpr);
@@ -69,7 +67,6 @@ export class FloorplannerView {
     this.draw();
   }
 
-  /** */
   public draw() {
     this.context.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
 
@@ -96,7 +93,6 @@ export class FloorplannerView {
     });
   }
 
-  /** */
   private drawWallLabels(wall: Wall) {
     // we'll just draw the shorter label... idk
     if (wall.backEdge && wall.frontEdge) {
@@ -112,7 +108,6 @@ export class FloorplannerView {
     }
   }
 
-  /** */
   private drawWall(wall: Wall) {
     const hover = (wall === this.viewmodel.activeWall);
     let color = wallColor;
@@ -137,7 +132,6 @@ export class FloorplannerView {
     }
   }
 
-  /** */
   private drawEdgeLabel(edge: HalfEdge) {
     const pos = edge.interiorCenter();
     const length = edge.interiorDistance();

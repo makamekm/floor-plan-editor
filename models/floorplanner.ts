@@ -12,21 +12,11 @@ const snapTolerance = 25;
  */
 export class Floorplanner {
 
-  /** */
   public mode = 0;
-
-  /** */
   public activeWall: Wall | null = null;
-
-  /** */
   public activeCorner: Corner | null = null;
-
   public onModeChange = new Callback<FloorplannerMode>();
-
-  /** */
   public originX = 0;
-
-  /** */
   public originY = 0;
 
   /** drawing state */
@@ -38,16 +28,8 @@ export class Floorplanner {
   /** drawing state */
   public lastNode: Corner | null = null;
 
-  /** */
-  private wallWidth: number;
-
-  /** */
   private view: FloorplannerView;
-
-  /** */
   private mouseDown = false;
-
-  /** */
   private mouseMoved = false;
 
   /** in ThreeJS coords */
@@ -68,13 +50,9 @@ export class Floorplanner {
   /** mouse position at last click */
   private lastY = 0;
 
-  /** */
   private cmPerPixel: number;
-
-  /** */
   private pixelsPerCm: number;
 
-  /** */
   constructor(private canvasElement: HTMLCanvasElement, private floorplan: Floorplan) {
 
     this.view = new FloorplannerView(this.floorplan, this, canvasElement);
@@ -83,8 +61,6 @@ export class Floorplanner {
     const pixelsPerFoot = 15.0;
     this.cmPerPixel = cmPerFoot * (1.0 / pixelsPerFoot);
     this.pixelsPerCm = 1.0 / this.cmPerPixel;
-
-    this.wallWidth = 10.0 * this.pixelsPerCm;
 
     // Initialization:
 
@@ -110,16 +86,14 @@ export class Floorplanner {
     });
 
     floorplan.roomLoadedCallbacks.add(() => {
-      this.reset()
+      this.reset();
     });
   }
 
-  /** */
   private escapeKey() {
     this.setMode(FloorplannerMode.MOVE);
   }
 
-  /** */
   private updateTarget() {
     if (this.mode == FloorplannerMode.DRAW && this.lastNode) {
       if (Math.abs(this.mouseX - this.lastNode.x) < snapTolerance) {
@@ -140,7 +114,6 @@ export class Floorplanner {
     this.view.draw();
   }
 
-  /** */
   private mousedown() {
     this.mouseDown = true;
     this.mouseMoved = false;
@@ -159,7 +132,6 @@ export class Floorplanner {
     }
   }
 
-  /** */
   private mousemove(event: MouseEvent) {
     this.mouseMoved = true;
 
@@ -225,7 +197,6 @@ export class Floorplanner {
     }
   }
 
-  /** */
   private mouseup() {
     this.mouseDown = false;
 
@@ -242,13 +213,11 @@ export class Floorplanner {
     }
   }
 
-  /** */
   private mouseleave() {
     this.mouseDown = false;
     //scope.setMode(scope.modes.MOVE);
   }
 
-  /** */
   private reset() {
     this.resizeView();
     this.setMode(FloorplannerMode.MOVE);
@@ -256,12 +225,10 @@ export class Floorplanner {
     this.view.draw();
   }
 
-  /** */
   private resizeView() {
     this.view.handleWindowResize();
   }
 
-  /** */
   public setMode(mode: FloorplannerMode) {
     this.lastNode = null;
     this.mode = mode;

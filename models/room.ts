@@ -8,16 +8,12 @@ import { Callback } from "../utils/callback";
  */
 export class Room {
 
-  /** */
   public interiorCorners: Vector2[] = [];
-
-  /** */
   private edgePointer: HalfEdge = null;
 
   /** floor plane for intersection testing */
   public floorPlane: Mesh = null;
 
-  /** */
   private floorChangeCallbacks = new Callback();
 
   /**

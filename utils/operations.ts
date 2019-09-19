@@ -209,7 +209,6 @@ export class Utils {
     return (tF - tB) * (tC - tA) > (tD - tB) * (tE - tA);
   }
 
-  /** */
   static lineLineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number): boolean {
     const tP1 = { x: x1, y: y1 };
     const tP2 = { x: x2, y: y2 };
@@ -220,7 +219,7 @@ export class Utils {
   }
 
   /**
-   @param corners Is an array of points with x,y attributes
+    @param corners Is an array of points with x,y attributes
     @param startX X start coord for raycast
     @param startY Y start coord for raycast
   */
@@ -322,7 +321,7 @@ export class Utils {
     return tReturn;
   }
 
-  /** Returns in the unique elemnts in arr */
+  /** Returns in the unique elements in arr */
   static unique<T extends string | number | symbol>(
     arr: T[],
     hashFunc: (key: T) => string | number,
@@ -340,10 +339,9 @@ export class Utils {
 
   /** Remove value from array, if it is present */
   static removeValue<T>(array: T[], value: T) {
-    for (let tI = array.length - 1; tI >= 0; tI--) {
-      if (array[tI] === value) {
-        array.splice(tI, 1);
-      }
+    const index = array.indexOf(value);
+    if (index >= 0) {
+      array.splice(index, 1);
     }
   }
 

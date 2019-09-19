@@ -18,10 +18,7 @@ export class HalfEdge {
   /** The predecessor edge in CCW ??? direction. */
   public prev: HalfEdge | null = null;
 
-  /** */
   public offset: number;
-
-  /** */
   public height: number;
 
   /** used for intersection testing... not convinced this belongs here */
@@ -39,7 +36,6 @@ export class HalfEdge {
   /** transform from world coords to wall planes (z=0) */
   private invExteriorTransform = new Matrix4();
 
-  /** */
   public redrawCallbacks = new Callback();
 
   /**

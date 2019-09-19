@@ -19,7 +19,6 @@ export interface FloorplanSerialized {
   }[],
 }
 
-/** */
 const defaultFloorPlanTolerance = 10.0;
 
 /** 
@@ -27,33 +26,14 @@ const defaultFloorPlanTolerance = 10.0;
  */
 export class Floorplan {
 
-  /** */
   private walls: Wall[] = [];
-
-  /** */
   private corners: Corner[] = [];
-
-  /** */
   private rooms: Room[] = [];
-
-  /** */
   private new_wall_callbacks = new Callback<Wall>();
-
-  /** */
   private new_corner_callbacks = new Callback<Corner>();
-
-  /** */
   private redraw_callbacks = new Callback();
-
-  /** */
   private updated_rooms = new Callback();
-
-  /** */
   public roomLoadedCallbacks = new Callback();
-
-  /** Constructs a floorplan. */
-  constructor() {
-  }
 
   // hack
   public wallEdges(): HalfEdge[] {
@@ -110,11 +90,8 @@ export class Floorplan {
    * @returns The new wall.
    */
   public newWall(start: Corner, end: Corner): Wall {
-    const wall = new Wall(start, end);
-    this.walls.push(wall)
-    wall.fireOnDelete(() => {
-      this.removeWall(wall);
-    });
+    const wall = new Wall(this, start, end);
+    this.walls.push(wall);
     this.new_wall_callbacks.fire(wall);
     this.update();
     return wall;
@@ -123,7 +100,7 @@ export class Floorplan {
   /** Removes a wall.
    * @param wall The wall to be removed.
    */
-  private removeWall(wall: Wall) {
+  public removeWall(wall: Wall) {
     Utils.removeValue(this.walls, wall);
     this.update();
   }
@@ -138,9 +115,6 @@ export class Floorplan {
   public newCorner(x: number, y: number, id?: string): Corner {
     const corner = new Corner(this, x, y, id);
     this.corners.push(corner);
-    corner.fireOnDelete(() => {
-      this.removeCorner(corner);
-    });
     this.new_corner_callbacks.fire(corner);
     return corner;
   }
@@ -148,7 +122,7 @@ export class Floorplan {
   /** Removes a corner.
    * @param corner The corner to be removed.
    */
-  private removeCorner(corner: Corner) {
+  public removeCorner(corner: Corner) {
     Utils.removeValue(this.corners, corner);
   }
 
@@ -187,8 +161,6 @@ export class Floorplan {
     return null;
   }
 
-  // import and export -- cleanup
-
   public exportFloorplan() {
     const floorplan: FloorplanSerialized = {
       corners: {},
@@ -197,8 +169,8 @@ export class Floorplan {
 
     this.corners.forEach((corner) => {
       floorplan.corners[corner.id] = {
-        'x': corner.x,
-        'y': corner.y
+        x: corner.x,
+        y: corner.y
       };
     });
 
@@ -218,10 +190,6 @@ export class Floorplan {
       [id: string]: Corner;
     } = {};
 
-    if (floorplan == null || !('corners' in floorplan) || !('walls' in floorplan)) {
-      return;
-    }
-
     for (const id in floorplan.corners) {
       const corner = floorplan.corners[id];
       corners[id] = this.newCorner(corner.x, corner.y, id);
@@ -237,7 +205,6 @@ export class Floorplan {
     this.roomLoadedCallbacks.fire();
   }
 
-  /** */
   private reset() {
     const tmpCorners = this.corners.slice(0);
     const tmpWalls = this.walls.slice(0);
@@ -315,7 +282,7 @@ export class Floorplan {
     // find orphaned wall segments (i.e. not part of rooms) and
     // give them edges
     const orphanWalls = []
-    this.walls.forEach((wall) => {
+    this.walls.forEach(wall => {
       if (!wall.backEdge && !wall.frontEdge) {
         wall.orphan = true;
         const back = new HalfEdge(wall, false);
@@ -325,7 +292,6 @@ export class Floorplan {
         orphanWalls.push(wall);
       }
     });
-
   }
 
   /*
@@ -335,129 +301,129 @@ export class Floorplan {
     * @returns The rooms, each room as an array of corners.
     */
   public findRooms(corners: Corner[]): Corner[][] {
-
-    function _calculateTheta(previousCorner: Corner, currentCorner: Corner, nextCorner: Corner) {
-      const theta = Utils.angle2pi(
-        previousCorner.x - currentCorner.x,
-        previousCorner.y - currentCorner.y,
-        nextCorner.x - currentCorner.x,
-        nextCorner.y - currentCorner.y);
-      return theta;
-    }
-
-    function _removeDuplicateRooms(roomArray: Corner[][]): Corner[][] {
-      const results: Corner[][] = [];
-      const lookup: {
-        [id: string]: boolean;
-      } = {};
-      const hashFunc = (corner: Corner) => {
-        return corner.id
-      };
-      const sep = '-';
-      for (let i = 0; i < roomArray.length; i++) {
-        // rooms are cycles, shift it around to check uniqueness
-        let add = true;
-        const room = roomArray[i];
-        let str: string;
-        for (let j = 0; j < room.length; j++) {
-          const roomShift = Utils.cycle(room, j);
-          str = roomShift.map(hashFunc).join(sep);
-          if (lookup.hasOwnProperty(str)) {
-            add = false;
-          }
-        }
-        if (add && str) {
-          results.push(roomArray[i]);
-          lookup[str] = true;
-        }
-      }
-      return results;
-    }
-
-    function _findTightestCycle(firstCorner: Corner, secondCorner: Corner): Corner[] {
-      const stack: {
-        corner: Corner,
-        previousCorners: Corner[]
-      }[] = [];
-
-      let next = {
-        corner: secondCorner,
-        previousCorners: [firstCorner]
-      };
-      const visited: {
-        [id: string]: boolean;
-      } = {};
-      visited[firstCorner.id] = true;
-
-      while (next) {
-        // update previous corners, current corner, and visited corners
-        const currentCorner = next.corner;
-        visited[currentCorner.id] = true;
-
-        // did we make it back to the startCorner?
-        if (next.corner === firstCorner && currentCorner !== secondCorner) {
-          return next.previousCorners;
-        }
-
-        const addToStack: Corner[] = [];
-        const adjacentCorners = next.corner.adjacentCorners();
-        for (let i = 0; i < adjacentCorners.length; i++) {
-          const nextCorner = adjacentCorners[i];
-
-          // is this where we came from?
-          // give an exception if its the first corner and we aren't at the second corner
-          if (nextCorner.id in visited &&
-            !(nextCorner === firstCorner && currentCorner !== secondCorner)) {
-            continue;
-          }
-
-          // nope, throw it on the queue  
-          addToStack.push(nextCorner);
-        }
-
-        const previousCorners = next.previousCorners.slice(0);
-        previousCorners.push(currentCorner);
-        if (addToStack.length > 1) {
-          // visit the ones with smallest theta first
-          const previousCorner = next.previousCorners[next.previousCorners.length - 1];
-          addToStack.sort(function (a, b) {
-            return (_calculateTheta(previousCorner, currentCorner, b) -
-              _calculateTheta(previousCorner, currentCorner, a));
-          });
-        }
-
-        if (addToStack.length > 0) {
-          // add to the stack
-          addToStack.forEach((corner) => {
-            stack.push({
-              corner: corner,
-              previousCorners: previousCorners
-            });
-          });
-        }
-
-        // pop off the next one
-        next = stack.pop();
-      }
-      return [];
-    }
-
     // find tightest loops, for each corner, for each adjacent
     // TODO: optimize this, only check corners with > 2 adjacents, or isolated cycles
     const loops: Corner[][] = [];
 
     corners.forEach((firstCorner) => {
       firstCorner.adjacentCorners().forEach((secondCorner) => {
-        loops.push(_findTightestCycle(firstCorner, secondCorner));
+        loops.push(this.findTightestCycle(firstCorner, secondCorner));
       });
     });
 
     // remove duplicates
-    const uniqueLoops = _removeDuplicateRooms(loops);
+    const uniqueLoops = this.removeDuplicateRooms(loops);
 
     //remove CW loops
     const uniqueCCWLoops = uniqueLoops.filter(i => !Utils.isClockwise(i));
 
     return uniqueCCWLoops;
+  }
+
+  calculateTheta(previousCorner: Corner, currentCorner: Corner, nextCorner: Corner) {
+    const theta = Utils.angle2pi(
+      previousCorner.x - currentCorner.x,
+      previousCorner.y - currentCorner.y,
+      nextCorner.x - currentCorner.x,
+      nextCorner.y - currentCorner.y
+    );
+    return theta;
+  }
+
+  removeDuplicateRooms(roomArray: Corner[][]): Corner[][] {
+    const results: Corner[][] = [];
+    const lookup: {
+      [id: string]: boolean;
+    } = {};
+    const hashFunc = (corner: Corner) => {
+      return corner.id
+    };
+    const sep = '-';
+    for (let i = 0; i < roomArray.length; i++) {
+      // rooms are cycles, shift it around to check uniqueness
+      let add = true;
+      const room = roomArray[i];
+      let str: string;
+      for (let j = 0; j < room.length; j++) {
+        const roomShift = Utils.cycle(room, j);
+        str = roomShift.map(hashFunc).join(sep);
+        if (lookup.hasOwnProperty(str)) {
+          add = false;
+        }
+      }
+      if (add && str) {
+        results.push(roomArray[i]);
+        lookup[str] = true;
+      }
+    }
+    return results;
+  }
+
+  findTightestCycle(firstCorner: Corner, secondCorner: Corner): Corner[] {
+    const stack: {
+      corner: Corner,
+      previousCorners: Corner[]
+    }[] = [];
+
+    let next = {
+      corner: secondCorner,
+      previousCorners: [firstCorner]
+    };
+    const visited: {
+      [id: string]: boolean;
+    } = {};
+    visited[firstCorner.id] = true;
+
+    while (next) {
+      // update previous corners, current corner, and visited corners
+      const currentCorner = next.corner;
+      visited[currentCorner.id] = true;
+
+      // did we make it back to the startCorner?
+      if (next.corner === firstCorner && currentCorner !== secondCorner) {
+        return next.previousCorners;
+      }
+
+      const addToStack: Corner[] = [];
+      const adjacentCorners = next.corner.adjacentCorners();
+      for (let i = 0; i < adjacentCorners.length; i++) {
+        const nextCorner = adjacentCorners[i];
+
+        // is this where we came from?
+        // give an exception if its the first corner and we aren't at the second corner
+        if (nextCorner.id in visited &&
+          !(nextCorner === firstCorner && currentCorner !== secondCorner)) {
+          continue;
+        }
+
+        // nope, throw it on the queue  
+        addToStack.push(nextCorner);
+      }
+
+      const previousCorners = next.previousCorners.slice(0);
+      previousCorners.push(currentCorner);
+      if (addToStack.length > 1) {
+        // visit the ones with smallest theta first
+        const previousCorner = next.previousCorners[next.previousCorners.length - 1];
+        addToStack.sort((a, b) => {
+          return (this.calculateTheta(previousCorner, currentCorner, b) -
+            this.calculateTheta(previousCorner, currentCorner, a));
+        });
+      }
+
+      if (addToStack.length > 0) {
+        // add to the stack
+        addToStack.forEach((corner) => {
+          stack.push({
+            corner: corner,
+            previousCorners: previousCorners
+          });
+        });
+      }
+
+      // pop off the next one
+      next = stack.pop();
+    }
+    return [];
   }
 }

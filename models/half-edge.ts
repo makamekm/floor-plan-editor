@@ -52,7 +52,6 @@ export class HalfEdge {
     this.front = front || false;
 
     this.offset = wall.thickness / 2.0;
-    this.height = wall.height;
 
     if (this.front) {
       this.wall.frontEdge = this;
@@ -73,9 +72,7 @@ export class HalfEdge {
     const v1 = this.transformCorner(this.interiorStart());
     const v2 = this.transformCorner(this.interiorEnd());
     const v3 = v2.clone();
-    v3.y = this.wall.height;
     const v4 = v1.clone();
-    v4.y = this.wall.height;
 
     const geometry = new Geometry();
     geometry.vertices = [v1, v2, v3, v4];
@@ -207,13 +204,13 @@ export class HalfEdge {
     if (this.prev != null) {
       const vec = this.halfAngleVector(this.prev, this);
       return new Vector2(
-        this.getEnd().x - vec.x,
-        this.getEnd().y - vec.y
+        this.getStart().x - vec.x,
+        this.getStart().y - vec.y
       );
     } else {
       return new Vector2(
-        this.getEnd().x,
-        this.getEnd().y
+        this.getStart().x,
+        this.getStart().y
       )
     }
   }

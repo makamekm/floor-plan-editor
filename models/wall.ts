@@ -1,5 +1,5 @@
-import { HalfEdge } from "./half_edge";
-import { Configuration, configWallThickness, configWallHeight } from "../utils/configuration";
+import { HalfEdge } from "./half-edge";
+import { Configuration, configWallThickness } from "../utils/configuration";
 import { Corner } from "./corner";
 import { Callback } from "../utils/callback";
 import { Utils } from "../utils/operations";
@@ -25,9 +25,6 @@ export class Wall {
 
   /** Wall thickness. */
   public thickness = Configuration.getNumericValue(configWallThickness);
-
-  /** Wall height. */
-  public height = Configuration.getNumericValue(configWallHeight);
 
   /** Actions to be applied after movement. */
   private moved_callbacks = new Callback();
@@ -149,8 +146,10 @@ export class Wall {
   }
 
   public distanceFrom(x: number, y: number): number {
-    return Utils.pointDistanceFromLine(x, y,
+    return Utils.pointDistanceFromLine(
+      x, y,
       this.getStartX(), this.getStartY(),
-      this.getEndX(), this.getEndY());
+      this.getEndX(), this.getEndY()
+    );
   }
 }

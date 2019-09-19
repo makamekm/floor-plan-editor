@@ -19,14 +19,12 @@ const itemTypeList = [
 
 class BlueprintView extends Component {
 
-  componentWillMount() {
-    this.setState({
-      activeState: 'move',
-    })
+  state = {
+    activeState: 'move',
   }
 
   componentDidMount() {
-    this.blueprint = new Blueprint("blueprint");
+    this.blueprint = new Blueprint(this.ref);
 
     this.blueprint.onModeChange.add(mode => {
       this.setState({

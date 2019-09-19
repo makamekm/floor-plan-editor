@@ -2,7 +2,7 @@ import { Wall } from "./wall";
 import { Corner } from "./corner";
 import { Room } from "./room";
 import { Callback } from "../utils/callback";
-import { HalfEdge } from "./half_edge";
+import { HalfEdge } from "./half-edge";
 import { Mesh, Vector3 } from "three";
 import { Utils } from "../utils/operations";
 
@@ -139,7 +139,7 @@ export class Floorplan {
     const corner = new Corner(this, x, y, id);
     this.corners.push(corner);
     corner.fireOnDelete(() => {
-      this.removeCorner;
+      this.removeCorner(corner);
     });
     this.new_corner_callbacks.fire(corner);
     return corner;

@@ -1,14 +1,14 @@
-import { dimInch } from "./dimensioning";
+import { dimMeter } from "./dimensioning";
 
 // GENERAL:
 
 /** The dimensioning unit for 2D floorplan measurements. */
 export const configDimUnit = "dimUnit";
 
-// WALL:
+/** The dpr unit to scale the application */
+export const configDpr = "dpr";
 
-/** The initial wall height in cm. */
-export const configWallHeight = "wallHeight";
+// WALL:
 
 /** The initial wall thickness in cm. */
 export const configWallThickness = "wallThickness";
@@ -17,10 +17,9 @@ export const configWallThickness = "wallThickness";
 export class Configuration {
   /** Configuration data loaded from/stored to extern. */
   private static data: {[key: string]: any} = {
-    dimUnit: dimInch,
-
-    wallHeight: 250,
-    wallThickness: 10
+    [configDimUnit]: dimMeter,
+    [configWallThickness]: 14,
+    [configDpr]: process.browser ? (window.devicePixelRatio || 1) : 1,
   };
 
   /** Set a configuration parameter. */
@@ -41,7 +40,7 @@ export class Configuration {
   /** Get a numeric configuration parameter. */
   public static getNumericValue(key: string): number {
     switch (key) {
-      case configWallHeight:
+      case configDpr:
       case configWallThickness:
         return <number>this.data[key];
       default:

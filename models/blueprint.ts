@@ -1,6 +1,6 @@
 import { Model } from "./model";
 import { Floorplanner } from "./floorplanner";
-import { floorplannerModes } from "./floorplanner-view";
+import { FloorplannerMode } from "./floorplanner-view";
 import { Callback } from "../utils/callback";
 
 /** Blueprint core application. */
@@ -13,19 +13,19 @@ export class Blueprint {
 
   /** Creates an instance.
    */
-  constructor(canvasId: string) {
+  constructor(canvas: HTMLCanvasElement) {
     this.model = new Model();
-    this.floorplanner = new Floorplanner(canvasId, this.model.getFloorplan());
+    this.floorplanner = new Floorplanner(canvas, this.model.getFloorplan());
 
     this.floorplanner.onModeChange.add(mode => {
       switch (mode) {
-        case floorplannerModes.MOVE:
+        case FloorplannerMode.MOVE:
           this.onModeChange.fire('move');
           break;
-        case floorplannerModes.DRAW:
+        case FloorplannerMode.DRAW:
           this.onModeChange.fire('draw');
           break;
-        case floorplannerModes.DELETE:
+        case FloorplannerMode.DELETE:
           this.onModeChange.fire('delete');
           break;
       }
@@ -43,13 +43,13 @@ export class Blueprint {
   public changeMode(mode: string) {
     switch (mode) {
       case 'move':
-        this.floorplanner.setMode(floorplannerModes.MOVE);
+        this.floorplanner.setMode(FloorplannerMode.MOVE);
         break;
       case 'draw':
-        this.floorplanner.setMode(floorplannerModes.DRAW);
+        this.floorplanner.setMode(FloorplannerMode.DRAW);
         break;
       case 'delete':
-        this.floorplanner.setMode(floorplannerModes.DELETE);
+        this.floorplanner.setMode(FloorplannerMode.DELETE);
         break;
     }
   }

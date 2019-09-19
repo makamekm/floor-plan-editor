@@ -121,7 +121,7 @@ export class Corner {
     for (let i = 0; i < this.wallEnds.length; i++) {
       this.wallEnds[i].remove();
     }
-    this.remove()
+    this.remove();
   }
 
   /** Moves corner to new position.

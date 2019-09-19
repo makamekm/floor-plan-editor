@@ -1,6 +1,6 @@
 import { Corner } from "./corner";
 import { Shape, Vector2, Mesh, ShapeGeometry, MeshBasicMaterial, DoubleSide } from "three";
-import { HalfEdge } from "./half_edge";
+import { HalfEdge } from "./half-edge";
 import { Callback } from "../utils/callback";
 
 /** 

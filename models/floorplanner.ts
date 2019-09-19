@@ -2,6 +2,7 @@ import { FloorplannerView, floorplannerModes } from "./floorplanner-view";
 import { Floorplan } from "./floorplan";
 import { Corner } from "./corner";
 import { Wall } from "./wall";
+import { Callback } from "../utils/callback";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
@@ -19,6 +20,8 @@ export class Floorplanner {
 
   /** */
   public activeCorner: Corner | null = null;
+
+  public onModeChange = new Callback<number>();
 
   /** */
   public originX = 0;
@@ -264,10 +267,11 @@ export class Floorplanner {
   }
 
   /** */
-  private setMode(mode: number) {
+  public setMode(mode: number) {
     this.lastNode = null;
     this.mode = mode;
     this.updateTarget();
+    this.onModeChange.fire(mode);
   }
 
   /** Sets the origin so that floorplan is centered */

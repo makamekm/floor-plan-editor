@@ -12,12 +12,17 @@ export default (Page) => {
 
       {React.createElement(Page)}
       
-      <style jsx global>{`
+      <style global jsx>{`
         body {
           margin: 0;
           font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
           background-color: #F3F7FA;
           color: #4A4A4A;
+          max-width: 100vw;
+          max-height: 100vh;
+          min-width: 100vw;
+          min-height: 100vh;
+          overflow: hidden;
         }
       `}</style>
     </>

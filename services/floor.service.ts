@@ -30,7 +30,6 @@ export class FloorService {
 
   constructor() {
     if (process.browser) {
-      this.floorListService.loadList();
       if (this.router.query.id != null) {
         this.loadFloor(Number.parseInt(<string>this.router.query.id, 10));
       }

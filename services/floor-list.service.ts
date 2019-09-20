@@ -6,6 +6,7 @@ import { FloorProvider } from "./floor.provider";
 
 export class FloorListService {
   @observable loading: boolean = true;
+  @observable opened: boolean = false;
   @observable list: IObservableArray<FloorplanListItemDto> = <any>[];
 
   private setLoading = debounce<(value: boolean) => void>(value => {

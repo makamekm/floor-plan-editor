@@ -9,8 +9,8 @@ import { FloorListService } from "../services/floor-list.service";
 const services = [
   FloorProvider,
   FloorService,
-  BlueprintService,
   FloorListService,
+  BlueprintService,
 ];
 
 export default (Page) => {

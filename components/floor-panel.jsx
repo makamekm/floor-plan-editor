@@ -1,9 +1,12 @@
 import React from 'react'
 import Panel from './panel';
 import ToggleButtonType from './toggle-type';
+import FloorList from './floor-list';
+import WindowPanel from './window-panel';
 import { useInstance } from 'react-ioc';
 import { FloorService } from '../services/floor.service';
 import { FloorListService } from '../services/floor-list.service';
+import { observer } from 'mobx-react';
 
 const FloorPanel = () => {
   const floorService = useInstance(FloorService);
@@ -27,19 +30,30 @@ const FloorPanel = () => {
           }]}
           onToggle={key => {
             if (key === 'menu') {
-              // floorService.
+              floorListService.opened = true;
             } else if (key === 'save') {
               floorService.createFloor();
             }
           }}
         />
+        <WindowPanel
+          active={floorListService.opened}
+          onClickOutside={() => {
+            floorListService.opened = false;
+          }}>
+          <div className="list">
+            <FloorList/>
+          </div>
+        </WindowPanel>
       </Panel>
   
       <style jsx>{`
-  
+        .list {
+          width: 400px;
+        }
       `}</style>
     </div>
   )
 }
 
-export default FloorPanel
+export default observer(FloorPanel);

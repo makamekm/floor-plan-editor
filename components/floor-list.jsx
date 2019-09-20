@@ -1,18 +1,23 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
+import { FloorListService } from '../services/floor-list.service'
 import { FloorService } from '../services/floor.service'
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
+  const floorListService = useInstance(FloorListService);
+
+  const currentId = floorService.floor.data && floorService.floor.data.id;
+
   return (
     <>
       <div className="list">
         {
-          floorService.list.map(({key, name}) => {
+          floorListService.list.map(({id, name}) => {
             return (
-              <div key={key} onClick={() => onToggle(key)}
-                className={"item clickable" + (activeState === key ? ' active' : '')}>
+              <div key={id} onClick={() => floorService.openFloor(id)}
+                className={"item clickable" + (id === currentId ? ' active' : '')}>
                 {name}
               </div>
             )

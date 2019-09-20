@@ -4,6 +4,7 @@ import { Corner } from "./corner";
 import { Wall } from "./wall";
 import { Callback } from "../utils/callback";
 import { FloorplannerMode } from "./floorplanner-mode.enum";
+import { Item } from "./item.model";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
@@ -16,6 +17,7 @@ export class Floorplanner {
   public mode = 0;
   public activeWall: Wall | null = null;
   public activeCorner: Corner | null = null;
+  public activeItem: Item | null = null;
   public onModeChange = new Callback<FloorplannerMode>();
   public originX = 0;
   public originY = 0;
@@ -127,6 +129,8 @@ export class Floorplanner {
         this.activeCorner.removeAll();
       } else if (this.activeWall) {
         this.activeWall.remove();
+      } else if (this.activeItem) {
+        this.activeItem.remove();
       } else {
         this.setMode(FloorplannerMode.MOVE);
       }
@@ -153,24 +157,32 @@ export class Floorplanner {
 
     // update object target
     if (this.mode != FloorplannerMode.DRAW && !this.mouseDown) {
-      const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
-      const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
-      let draw = false;
-      if (hoverCorner != this.activeCorner) {
-        this.activeCorner = hoverCorner;
-        draw = true;
-      }
-      // corner takes precendence
-      if (this.activeCorner == null) {
-        if (hoverWall != this.activeWall) {
-          this.activeWall = hoverWall;
+      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY);
+      if (hoverItem) {
+        this.activeItem = hoverItem;
+        this.activeCorner == null;
+        this.activeWall = null;
+      } else {
+        this.activeItem = null;
+        const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
+        const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
+        let draw = false;
+        if (hoverCorner != this.activeCorner) {
+          this.activeCorner = hoverCorner;
           draw = true;
         }
-      } else {
-        this.activeWall = null;
-      }
-      if (draw) {
-        this.view.draw();
+        // corner takes precendence
+        if (this.activeCorner == null) {
+          if (hoverWall != this.activeWall) {
+            this.activeWall = hoverWall;
+            draw = true;
+          }
+        } else {
+          this.activeWall = null;
+        }
+        if (draw) {
+          this.view.draw();
+        }
       }
     }
 
@@ -273,6 +285,16 @@ export class Floorplanner {
     const centerFloorplan = this.floorplan.getCenter();
     this.originX = centerFloorplan.x * this.pixelsPerCm - centerX;
     this.originY = centerFloorplan.z * this.pixelsPerCm - centerY;
+  }
+
+  /** Gets the center of the view */
+  public getCenter() {
+    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
+    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
+    return {
+      x: this.originX + centerX,
+      y: this.originY + centerY,
+    };
   }
 
   /** Convert from THREEjs coords to canvas coords. */

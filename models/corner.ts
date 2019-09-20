@@ -1,8 +1,6 @@
 import { Wall } from "./wall";
-import { Callback } from "../utils/callback";
 import { Floorplan } from "./floorplan";
 import { Utils } from "../utils/operations";
-import { Vector2 } from "three";
 
 const cornerTolerance: number = 20;
 

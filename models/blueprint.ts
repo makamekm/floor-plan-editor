@@ -3,6 +3,7 @@ import { Floorplanner } from "./floorplanner";
 import { Callback } from "../utils/callback";
 import { FloorplanDto } from "./floor.dto";
 import { FloorplannerMode } from "./floorplanner-mode.enum";
+import { ItemEnum } from "./item.enum";
 
 /** Blueprint core application. */
 export class Blueprint {
@@ -11,6 +12,11 @@ export class Blueprint {
   private floorplanner: Floorplanner;
 
   public onModeChange = new Callback<string>();
+  public onModelChange = new Callback<{
+    floorplane: FloorplanDto;
+    x: number;
+    y: number;
+  }>();
 
   /** Creates an instance.
    */
@@ -58,5 +64,18 @@ export class Blueprint {
         this.floorplanner.setMode(FloorplannerMode.DELETE);
         break;
     }
+  }
+
+  public addItem(type: ItemEnum) {
+    const { x, y } = this.floorplanner.getCenter();
+    this.model.getFloorplan().newItem(
+      x,
+      y,
+      {
+        description: '',
+        name: '',
+        type,
+      }
+    );
   }
 }

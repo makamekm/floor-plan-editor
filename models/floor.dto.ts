@@ -10,17 +10,19 @@ export interface FloorplanDto {
     corner1: string;
     corner2: string;
   }[];
+  items: FloorplanItemDto[];
+}
+
+export interface FloorplanItemDto {
+  id?: number;
+  name: string;
+  description: string;
+  type: number;
+  x: number;
+  y: number;
 }
 
 export interface FloorplanDataDto {
   id: number;
   name: string;
-  items: {
-    id: number;
-    name: string;
-    description: string;
-    type: number;
-    x: number;
-    y: number;
-  }[];
 }

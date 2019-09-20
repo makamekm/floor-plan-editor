@@ -38,12 +38,20 @@ export const demoPlan: FloorplanDto = {
       corner2: "71d4f128-ae80-3d58-9bd2-711c6ce6cdf2"
     }
   ],
+  items: [
+    {
+      name: 'test',
+      description: 'sdfsdfsd',
+      type: 0,
+      x: 400,
+      y: 400,
+    }
+  ],
 };
 
 export const demoFloorData: FloorplanDataDto = {
   id: 1,
   name: "Floor 2 (Kitchen)",
-  items: [],
 };
 
 export const demoFloorList: FloorplanListDto = [

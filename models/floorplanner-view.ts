@@ -7,6 +7,8 @@ import { Room } from "./room";
 import { Corner } from "./corner";
 import { Configuration, configDpr } from "../utils/configuration";
 import { FloorplannerMode } from "./floorplanner-mode.enum";
+import { Item } from "./item.model";
+import { ItemDict } from "./item.dict";
 
 // grid parameters
 const gridSpacing = 20; // pixels
@@ -40,6 +42,11 @@ export class FloorplannerView {
 
   /** The 2D context. */
   private context: CanvasRenderingContext2D;
+
+  /** The 2D context. */
+  public getContext() {
+    return this.context;
+  };
 
   constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvasElement: HTMLCanvasElement) {
     this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
@@ -86,6 +93,22 @@ export class FloorplannerView {
     this.floorplan.getWalls().forEach((wall) => {
       this.drawWallLabels(wall);
     });
+
+    this.floorplan.getItems().forEach((item) => {
+      this.drawItem(item);
+    });
+  }
+
+  private drawItem(item: Item) {
+    const hover = item === this.viewmodel.activeItem;
+    ItemDict[item.metadata.type].render(
+      this.viewmodel.convertX(item.x),
+      this.viewmodel.convertY(item.y),
+      hover,
+      this,
+      item,
+      this.floorplan,
+    );
   }
 
   private drawWallLabels(wall: Wall) {
@@ -104,7 +127,7 @@ export class FloorplannerView {
   }
 
   private drawWall(wall: Wall) {
-    const hover = (wall === this.viewmodel.activeWall);
+    const hover = wall === this.viewmodel.activeWall;
     let color = wallColor;
     if (hover && this.viewmodel.mode == FloorplannerMode.DELETE) {
       color = deleteColor;
@@ -222,7 +245,29 @@ export class FloorplannerView {
     }
   }
 
-  private drawLine(
+  /** returns n where -gridSize/2 < n <= gridSize/2  */
+  private calculateGridOffset(n: number) {
+    if (n >= 0) {
+      return (n + gridSpacing / 2.0) % gridSpacing - gridSpacing / 2.0;
+    } else {
+      return (n - gridSpacing / 2.0) % gridSpacing + gridSpacing / 2.0;
+    }
+  }
+
+  private drawGrid() {
+    const offsetX = this.calculateGridOffset(-this.viewmodel.originX);
+    const offsetY = this.calculateGridOffset(-this.viewmodel.originY);
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+    for (let x = 0; x <= (width / gridSpacing); x++) {
+      this.drawLine(gridSpacing * x + offsetX, 0, gridSpacing * x + offsetX, height, gridWidth, gridColor);
+    }
+    for (let y = 0; y <= (height / gridSpacing); y++) {
+      this.drawLine(0, gridSpacing * y + offsetY, width, gridSpacing * y + offsetY, gridWidth, gridColor);
+    }
+  }
+
+  public drawLine(
     startX: number,
     startY: number,
     endX: number,
@@ -240,7 +285,7 @@ export class FloorplannerView {
     this.context.stroke();
   }
 
-  private drawPolygon(
+  public drawPolygon(
     xArr: number[],
     yArr: number[],
     fill: boolean,
@@ -269,32 +314,10 @@ export class FloorplannerView {
     }
   }
 
-  private drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
+  public drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
     this.context.beginPath();
     this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
     this.context.fillStyle = fillColor;
     this.context.fill();
-  }
-
-  /** returns n where -gridSize/2 < n <= gridSize/2  */
-  private calculateGridOffset(n: number) {
-    if (n >= 0) {
-      return (n + gridSpacing / 2.0) % gridSpacing - gridSpacing / 2.0;
-    } else {
-      return (n - gridSpacing / 2.0) % gridSpacing + gridSpacing / 2.0;
-    }
-  }
-
-  private drawGrid() {
-    const offsetX = this.calculateGridOffset(-this.viewmodel.originX);
-    const offsetY = this.calculateGridOffset(-this.viewmodel.originY);
-    const width = this.canvasElement.width;
-    const height = this.canvasElement.height;
-    for (let x = 0; x <= (width / gridSpacing); x++) {
-      this.drawLine(gridSpacing * x + offsetX, 0, gridSpacing * x + offsetX, height, gridWidth, gridColor);
-    }
-    for (let y = 0; y <= (height / gridSpacing); y++) {
-      this.drawLine(0, gridSpacing * y + offsetY, width, gridSpacing * y + offsetY, gridWidth, gridColor);
-    }
   }
 }

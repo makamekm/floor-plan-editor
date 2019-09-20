@@ -6,6 +6,8 @@ import { HalfEdge } from "./half-edge";
 import { Mesh, Vector3 } from "three";
 import { Utils } from "../utils/operations";
 import { FloorplanDto } from "./floor.dto";
+import { Item, ItemMetadata } from "./item.model";
+import { ItemDict } from "./item.dict";
 
 const defaultFloorPlanTolerance = 10.0;
 
@@ -17,10 +19,9 @@ export class Floorplan {
   private walls: Wall[] = [];
   private corners: Corner[] = [];
   private rooms: Room[] = [];
-  private new_wall_callbacks = new Callback<Wall>();
-  private new_corner_callbacks = new Callback<Corner>();
-  private redraw_callbacks = new Callback();
-  private updated_rooms = new Callback();
+  private items: Item[] = [];
+  private selectedItem: Item = null;
+
   public roomLoadedCallbacks = new Callback();
 
   // hack
@@ -55,22 +56,6 @@ export class Floorplan {
     return planes;
   }
 
-  public fireOnNewWall(callback: () => void) {
-    this.new_wall_callbacks.add(callback);
-  }
-
-  public fireOnNewCorner(callback: () => void) {
-    this.new_corner_callbacks.add(callback);
-  }
-
-  public fireOnRedraw(callback: () => void) {
-    this.redraw_callbacks.add(callback);
-  }
-
-  public fireOnUpdatedRooms(callback: () => void) {
-    this.updated_rooms.add(callback);
-  }
-
   /**
    * Creates a new wall.
    * @param start The start corner.
@@ -80,7 +65,6 @@ export class Floorplan {
   public newWall(start: Corner, end: Corner): Wall {
     const wall = new Wall(this, start, end);
     this.walls.push(wall);
-    this.new_wall_callbacks.fire(wall);
     this.update();
     return wall;
   }
@@ -103,7 +87,6 @@ export class Floorplan {
   public newCorner(x: number, y: number, id?: string): Corner {
     const corner = new Corner(this, x, y, id);
     this.corners.push(corner);
-    this.new_corner_callbacks.fire(corner);
     return corner;
   }
 
@@ -112,6 +95,29 @@ export class Floorplan {
    */
   public removeCorner(corner: Corner) {
     Utils.removeValue(this.corners, corner);
+  }
+
+  /**
+   * Creates a new item.
+   * @param x The x coordinate.
+   * @param y The y coordinate.
+   * @returns The new item.
+   */
+  public newItem(x: number, y: number, metadata: ItemMetadata): Item {
+    const item = new Item(this, x, y, metadata);
+    this.items.push(item);
+    return item;
+  }
+
+  /** Removes a item.
+   * @param item The item to be removed.
+   */
+  public removeItem(item: Item) {
+    if (this.selectedItem === item) {
+      this.selectedItem = null;
+    }
+
+    Utils.removeValue(this.items, item);
   }
 
   /** Gets the walls. */
@@ -127,6 +133,35 @@ export class Floorplan {
   /** Gets the rooms. */
   public getRooms(): Room[] {
     return this.rooms;
+  }
+
+  /** Gets the items. */
+  public getItems(): Item[] {
+    return this.items;
+  }
+
+  /** Gets the selected item. */
+  public getSelectedItem(): Item {
+    return this.selectedItem;
+  }
+
+  /** Gets the selected item. */
+  public setSelectedItem(item: Item) {
+    this.selectedItem = item;
+  }
+
+  public overlappedItem(x: number, y: number): Item {
+    for (let i = 0; i < this.items.length; i++) {
+      if (ItemDict[this.items[i].metadata.type].overlapped(
+        x,
+        y,
+        this.items[i],
+        this,
+      )) {
+        return this.items[i];
+      }
+    }
+    return null;
   }
 
   public overlappedCorner(x: number, y: number, tolerance?: number): Corner {
@@ -153,6 +188,7 @@ export class Floorplan {
     const floorplan: FloorplanDto = {
       corners: {},
       walls: [],
+      items: [],
     }
 
     this.corners.forEach((corner) => {
@@ -168,6 +204,18 @@ export class Floorplan {
         corner2: wall.getEnd().id,
       });
     });
+
+    this.items.forEach((item) => {
+      floorplan.items.push({
+        x: item.x,
+        y: item.y,
+        id: item.metadata.id,
+        description: item.metadata.description,
+        name: item.metadata.name,
+        type: item.metadata.type,
+      });
+    });
+
     return floorplan;
   }
 
@@ -189,6 +237,19 @@ export class Floorplan {
       );
     });
 
+    floorplan.items.forEach((item) => {
+      this.newItem(
+        item.x,
+        item.y,
+        {
+          id: item.id,
+          description: item.description,
+          name: item.name,
+          type: item.type,
+        },
+      );
+    });
+
     this.update();
     this.roomLoadedCallbacks.fire();
   }
@@ -196,14 +257,19 @@ export class Floorplan {
   public reset() {
     const tmpCorners = this.corners.slice(0);
     const tmpWalls = this.walls.slice(0);
+    const tmpItems = this.items.slice(0);
     tmpCorners.forEach((corner) => {
       corner.remove();
     })
     tmpWalls.forEach((wall) => {
       wall.remove();
     })
+    tmpItems.forEach((item) => {
+      item.remove();
+    })
     this.corners = [];
     this.walls = [];
+    this.items = [];
   }
 
   /** 
@@ -221,8 +287,6 @@ export class Floorplan {
       scope.rooms.push(new Room(corners));
     });
     this.assignOrphanEdges();
-
-    this.updated_rooms.fire();
   }
 
   /** 

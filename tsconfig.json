@@ -23,7 +23,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noImplicitAny": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "checkJs": true
   },
   "exclude": [
     "node_modules"

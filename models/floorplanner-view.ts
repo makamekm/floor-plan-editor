@@ -6,12 +6,7 @@ import { HalfEdge } from "./half-edge";
 import { Room } from "./room";
 import { Corner } from "./corner";
 import { Configuration, configDpr } from "../utils/configuration";
-
-export enum FloorplannerMode {
-  MOVE = 0,
-  DRAW = 1,
-  DELETE = 2,
-};
+import { FloorplannerMode } from "./floorplanner-mode.enum";
 
 // grid parameters
 const gridSpacing = 20; // pixels

@@ -5,19 +5,7 @@ import { Callback } from "../utils/callback";
 import { HalfEdge } from "./half-edge";
 import { Mesh, Vector3 } from "three";
 import { Utils } from "../utils/operations";
-
-export interface FloorplanSerialized {
-  corners: {
-    [id: string]: {
-      x: number;
-      y: number;
-    }
-  },
-  walls: {
-    corner1: string,
-    corner2: string,
-  }[],
-}
+import { FloorplanDto } from "./floor.dto";
 
 const defaultFloorPlanTolerance = 10.0;
 
@@ -162,7 +150,7 @@ export class Floorplan {
   }
 
   public exportFloorplan() {
-    const floorplan: FloorplanSerialized = {
+    const floorplan: FloorplanDto = {
       corners: {},
       walls: [],
     }
@@ -183,7 +171,7 @@ export class Floorplan {
     return floorplan;
   }
 
-  public loadFloorplan(floorplan: FloorplanSerialized) {
+  public loadFloorplan(floorplan: FloorplanDto) {
     this.reset();
 
     const corners: {
@@ -205,7 +193,7 @@ export class Floorplan {
     this.roomLoadedCallbacks.fire();
   }
 
-  private reset() {
+  public reset() {
     const tmpCorners = this.corners.slice(0);
     const tmpWalls = this.walls.slice(0);
     tmpCorners.forEach((corner) => {

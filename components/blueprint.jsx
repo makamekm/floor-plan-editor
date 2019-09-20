@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Blueprint } from '../models/blueprint';
 import ToggleButtonType from './toggle-type';
 import Panel from './panel';
+import { inject } from 'react-ioc';
+import { BlueprintService } from '../services/blueprint.service';
+import { observer } from 'mobx-react';
 
 const itemTypeList = [
   {
@@ -18,27 +21,18 @@ const itemTypeList = [
   },
 ]
 
+@observer
 class BlueprintView extends Component {
 
-  state = {
-    activeState: 'move',
-  }
+  @inject(BlueprintService) blueprintService;
 
   componentDidMount() {
     this.blueprint = new Blueprint(this.ref);
-
-    this.blueprint.onModeChange.add(mode => {
-      this.setState({
-        activeState: mode,
-      });
-    });
+    this.blueprintService.setBlueprint(this.blueprint);
   }
 
   componentWillUnmount() {
-  }
-
-  changeMode(mode) {
-    this.blueprint.changeMode(mode);
+    this.blueprintService.unsetBlueprint(this.blueprint);
   }
 
   render() {
@@ -53,9 +47,9 @@ class BlueprintView extends Component {
 
         <div className="mode-panel">
           <ToggleButtonType
-            activeState={this.state.activeState}
+            activeState={this.blueprintService.mode}
             items={itemTypeList}
-            onToggle={key => this.changeMode(key)}
+            onToggle={mode => this.blueprintService.changeMode(mode)}
           />
         </div>
 

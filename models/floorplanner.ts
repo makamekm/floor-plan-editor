@@ -1,8 +1,9 @@
-import { FloorplannerView, FloorplannerMode } from "./floorplanner-view";
+import { FloorplannerView } from "./floorplanner-view";
 import { Floorplan } from "./floorplan";
 import { Corner } from "./corner";
 import { Wall } from "./wall";
 import { Callback } from "../utils/callback";
+import { FloorplannerMode } from "./floorplanner-mode.enum";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
@@ -247,7 +248,7 @@ export class Floorplanner {
     //scope.setMode(scope.modes.MOVE);
   }
 
-  private reset() {
+  public reset() {
     this.resizeView();
     this.setMode(FloorplannerMode.MOVE);
     this.resetOrigin();

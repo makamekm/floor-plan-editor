@@ -1,4 +1,5 @@
 import { Floorplan } from "./floorplan";
+import { FloorplanDto } from "./floor.dto";
 
 export interface IItemExport {
   item_name: string;
@@ -32,12 +33,15 @@ export class Model {
     this.floorplan = new Floorplan();
   }
 
-  public exportSerialized(): string {
-    const floorplan = this.floorplan.exportFloorplan();
-    return JSON.stringify(floorplan);
+  public export() {
+    return this.floorplan.exportFloorplan();
   }
 
-  public loadSerialized(floorplan: string) {
-    this.floorplan.loadFloorplan(JSON.parse(floorplan));
+  public load(floorplan: FloorplanDto) {
+    this.floorplan.loadFloorplan(floorplan);
+  }
+
+  public reset() {
+    this.floorplan.reset();
   }
 }

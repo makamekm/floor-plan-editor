@@ -1,6 +1,9 @@
 import React from 'react'
 import Head from 'next/head'
 import { provider } from 'react-ioc'
+import { FloorProvider } from "../services/floor.provider";
+import { FloorService } from "../services/floor.service";
+import { BlueprintService } from "../services/blueprint.service";
 
 export default (Page) => {
   const Root = () => (
@@ -35,5 +38,8 @@ export default (Page) => {
   }
 
   return provider(
+    FloorProvider,
+    FloorService,
+    BlueprintService,
   )(Root);
 }

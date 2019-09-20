@@ -6,6 +6,7 @@ export interface IItemDict {
   render: (
     x: number,
     y: number,
+    r: number,
     hover: boolean,
     ctx: FloorplannerView,
     item: Item,

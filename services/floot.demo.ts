@@ -45,6 +45,7 @@ export const demoPlan: FloorplanDto = {
       type: 0,
       x: 400,
       y: 400,
+      r: 0,
     }
   ],
 };

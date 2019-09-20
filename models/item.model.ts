@@ -18,6 +18,7 @@ export class Item {
     private floorplan: Floorplan,
     public x: number,
     public y: number,
+    public r: number,
     public metadata: ItemMetadata,
   ) {
     

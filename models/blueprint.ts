@@ -71,6 +71,7 @@ export class Blueprint {
     this.model.getFloorplan().newItem(
       x,
       y,
+      0,
       {
         description: '',
         name: '',

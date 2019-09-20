@@ -20,6 +20,7 @@ export interface FloorplanItemDto {
   type: number;
   x: number;
   y: number;
+  r: number;
 }
 
 export interface FloorplanDataDto {

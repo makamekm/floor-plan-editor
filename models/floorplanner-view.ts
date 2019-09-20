@@ -104,6 +104,7 @@ export class FloorplannerView {
     ItemDict[item.metadata.type].render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
+      item.r,
       hover,
       this,
       item,

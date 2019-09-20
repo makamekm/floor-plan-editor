@@ -32,4 +32,8 @@ export class FloorProvider {
     await new Promise(r => setTimeout(r, 1000));
     return true;
   }
+  public async createFloorplan(data: FloorplanDataDto, floorplan: FloorplanDto): Promise<FloorplanDataDto>{
+    await new Promise(r => setTimeout(r, 1000));
+    return JSON.parse(JSON.stringify({...data, id: 1}));
+  }
 }

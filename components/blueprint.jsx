@@ -2,9 +2,13 @@ import React, { Component } from 'react';
 import { Blueprint } from '../models/blueprint';
 import ToggleButtonType from './toggle-type';
 import Panel from './panel';
+import Loading from './loading';
+import FloorPanel from './floor-panel';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
+import { FloorService } from '../services/floor.service';
+import { FloorListService } from '../services/floor-list.service';
 
 const itemTypeList = [
   {
@@ -24,6 +28,8 @@ const itemTypeList = [
 @observer
 class BlueprintView extends Component {
 
+  @inject(FloorService) floorService;
+  @inject(FloorListService) floorListService;
   @inject(BlueprintService) blueprintService;
 
   componentDidMount() {
@@ -39,7 +45,6 @@ class BlueprintView extends Component {
     return (
       <div className="view">
         <canvas
-          id="blueprint"
           ref={(ref) => {
             this.ref = ref;
           }}
@@ -57,13 +62,13 @@ class BlueprintView extends Component {
           <Panel>
             <div className="list">
               <div className="item clickable">
-                Add Table
+                + &nbsp;Table
               </div>
               <div className="item clickable">
-                Add Computer
+                + &nbsp;Computer
               </div>
               <div className="item clickable">
-                Add Warning
+                + &nbsp;Warning
               </div>
             </div>
           </Panel>
@@ -92,26 +97,19 @@ class BlueprintView extends Component {
         </div>
 
         <div className="floor-panel">
-          <Panel>
-            <ToggleButtonType
-              activeState={'2 floor'}
-              items={[{
-                key: '2 floor',
-                name: '2 floor',
-              }, {
-                key: 'menu',
-                name: '=',
-              }]}
-              onToggle={key => {}}
-            />
-          </Panel>
+          <FloorPanel/>
         </div>
+
+        <Loading active={
+          this.floorService.loading
+          || this.floorListService.loading
+        }></Loading>
   
         <style jsx>{`
           .view {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
           }
 
           .mode-panel {

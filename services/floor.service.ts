@@ -1,18 +1,20 @@
 import { FloorplanListItemDto } from "../models/floor-list.dto";
 import { useRouter } from "next/router";
 import { observable, IObservableArray, computed } from "mobx";
+import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
 import { FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
+import { BlueprintService } from "./blueprint.service";
+import { FloorListService } from "./floor-list.service";
 
 export class FloorService {
-  @observable loadingList: boolean = true;
-  @observable loadingFloor: boolean = false;
-  @computed loading() {
-    return this.loadingFloor && this.loadingList;
-  };
+  @observable loading: boolean = false;
 
-  @observable list: IObservableArray<FloorplanListItemDto> = <any>[];
+  private setLoading = debounce<(value: boolean) => void>(value => {
+    this.loading = value;
+  }, 50);
+
   @observable floor: {
     data: FloorplanDataDto;
     plan: FloorplanDto;
@@ -22,12 +24,13 @@ export class FloorService {
   };
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
+  @inject(FloorListService) private floorListService: FloorListService;
+  @inject(BlueprintService) private blueprintService: BlueprintService;
   private router = useRouter();
 
   constructor() {
     if (process.browser) {
-      this.loadList();
-
+      this.floorListService.loadList();
       if (this.router.query.id != null) {
         this.loadFloor(Number.parseInt(<string>this.router.query.id, 10));
       }
@@ -35,7 +38,7 @@ export class FloorService {
   }
 
   public async loadFloor(id: number) {
-    this.loadingFloor = true;
+    this.setLoading(true);
     try {
       const [plan, data]: [
         FloorplanDto,
@@ -46,11 +49,11 @@ export class FloorService {
       ]);
       this.floor.plan = plan;
       this.floor.data = data;
-      console.log(this.floor.plan, this.floor.data);
+      this.blueprintService.setFloorplan(plan);
     } catch (error) {
       console.error(error);
     } finally {
-      this.loadingFloor = false;
+      this.setLoading(false);
     }
   }
 
@@ -59,21 +62,8 @@ export class FloorService {
     this.loadFloor(id);
   }
 
-  public async loadList() {
-    this.loadingList = true;
-    try {
-      const list = await this.floorProvider.getFloorList();
-      this.list.replace(list);
-      console.log(this.list);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.loadingList = false;
-    }
-  }
-
   public async saveFloor() {
-    this.loadingFloor = true;
+    this.setLoading(true);
     try {
       const [plan, data]: [
         FloorplanDto,
@@ -84,21 +74,32 @@ export class FloorService {
       ]);
       this.floor.plan = plan;
       this.floor.data = data;
-      await this.loadList();
-      console.log(this.floor.plan, this.floor.data);
+      await this.floorListService.loadList();
     } catch (error) {
       console.error(error);
     } finally {
-      this.loadingFloor = false;
+      this.setLoading(false);
+    }
+  }
+
+  public async createFloor() {
+    this.setLoading(true);
+    try {
+      const data = await this.floorProvider.createFloorplan(this.floor.data, this.floor.plan);
+      this.router.push('/' + String(data.id));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.setLoading(false);
     }
   }
 
   public async deleteFloor(id: number) {
-    this.loadingFloor = true;
+    this.setLoading(true);
     try {
       const result = await this.floorProvider.deleteFloorPlan(id);
       if (result) {
-        await this.loadList();
+        await this.floorListService.loadList();
         if (this.floor.data.id === id) {
           this.router.push('/');
           this.floor.plan = null;
@@ -108,7 +109,7 @@ export class FloorService {
     } catch (error) {
       console.error(error);
     } finally {
-      this.loadingFloor = false;
+      this.setLoading(false);
     }
   }
 }

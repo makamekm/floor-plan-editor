@@ -28,6 +28,7 @@
   "devDependencies": {
     "@types/node": "12.7.5",
     "@types/react": "16.9.2",
+    "@types/debounce": "1.2.0",
     "babel-eslint": "10.0.3",
     "eslint": "6.4.0",
     "eslint-plugin-react": "7.14.3",

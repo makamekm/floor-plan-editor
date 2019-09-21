@@ -5,15 +5,20 @@ export const ItemDict: {
   [key: number]: IItemDict;
 } = {
   [ItemEnum.Table]: {
-    render(x, y, hover, ctx, item) {
+    render(x, y, r, hover, ctx, item, floorplan) {
       // ctx.drawImage();
+      console.log(hover);
+      const active = floorplan.getSelectedItem() === item;
+      ctx.drawCircle(x, y, 30, active ? "#0000ff" : (hover ? "#00ff00" : "#ff0000"));
     },
     overlapped(x, y, item) {
-      return false;
+      const sens = 50;
+      return x < (item.x + sens) && x > (item.x - sens)
+        && y < (item.y + sens) && y > (item.y - sens);
     },
   },
   [ItemEnum.Sign]: {
-    render(x, y, hover, ctx, item) {
+    render(x, y, r, hover, ctx, item) {
       // ctx.drawImage();
     },
     overlapped(x, y, item) {
@@ -21,7 +26,7 @@ export const ItemDict: {
     },
   },
   [ItemEnum.Computer]: {
-    render(x, y, hover, ctx, item) {
+    render(x, y, r, hover, ctx, item) {
       // ctx.drawImage();
     },
     overlapped(x, y, item) {

@@ -157,7 +157,11 @@ export class Floorplanner {
 
     // update object target
     if (this.mode != FloorplannerMode.DRAW && !this.mouseDown) {
+      let draw = false;
       const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY);
+      if (hoverItem !== this.activeItem) {
+        draw = true;
+      }
       if (hoverItem) {
         this.activeItem = hoverItem;
         this.activeCorner == null;
@@ -166,7 +170,6 @@ export class Floorplanner {
         this.activeItem = null;
         const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
         const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
-        let draw = false;
         if (hoverCorner != this.activeCorner) {
           this.activeCorner = hoverCorner;
           draw = true;
@@ -180,9 +183,9 @@ export class Floorplanner {
         } else {
           this.activeWall = null;
         }
-        if (draw) {
-          this.view.draw();
-        }
+      }
+      if (draw) {
+        this.view.draw();
       }
     }
 
@@ -218,7 +221,7 @@ export class Floorplanner {
     this.mouseDown = false;
 
     // drawing
-    if (this.mode == FloorplannerMode.DRAW && !this.mouseMoved) {
+    if (this.mode === FloorplannerMode.DRAW && !this.mouseMoved) {
       const corner = this.floorplan.newCorner(this.targetX, this.targetY);
       if (this.lastNode != null) {
         this.floorplan.newWall(this.lastNode, corner);
@@ -228,6 +231,14 @@ export class Floorplanner {
       }
       this.lastNode = corner;
       this.checkWallDuplicates();
+    } else if (!this.mouseMoved && this.mode === FloorplannerMode.MOVE) {
+      if (this.activeItem) {
+        this.floorplan.setSelectedItem(this.activeItem);
+        this.view.draw();
+      } else {
+        this.floorplan.setSelectedItem(null);
+        this.view.draw();
+      }
     }
   }
 

@@ -1,18 +1,18 @@
-import { FloorplannerView } from "./floorplanner-view";
-import { Floorplan } from "./floorplan";
-import { Corner } from "./corner";
-import { Wall } from "./wall";
+import { FloorplanView } from "./floorplan-view";
+import { FloorplanModel } from "./floorplan-model";
+import { Corner } from "./floorplan-entities/corner.model";
+import { Wall } from "./floorplan-entities/wall.model";
 import { Callback } from "../utils/callback";
-import { FloorplannerMode } from "./floorplanner-mode.enum";
-import { Item } from "./item.model";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { Item } from "./floorplan-entities/item.model";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
 
 /** 
- * The Floorplanner implements an interactive tool for creation of floorplans.
+ * The FloorplanController implements an interactive tool for creation of floorplans.
  */
-export class Floorplanner {
+export class FloorplanController {
 
   public mode = 0;
   public activeWall: Wall | null = null;
@@ -34,7 +34,7 @@ export class Floorplanner {
     return this._activeItem;
   };
 
-  public onModeChange = new Callback<FloorplannerMode>();
+  public onModeChange = new Callback<FloorplanMode>();
 
   public originX = 0;
   public originY = 0;
@@ -48,7 +48,7 @@ export class Floorplanner {
   /** drawing state */
   public lastNode: Corner | null = null;
 
-  private view: FloorplannerView;
+  private view: FloorplanView;
   private mouseDown = false;
   private mouseMoved = false;
 
@@ -67,9 +67,9 @@ export class Floorplanner {
   private cmPerPixel: number;
   private pixelsPerCm: number;
 
-  constructor(private canvasElement: HTMLCanvasElement, private floorplan: Floorplan) {
+  constructor(private canvasElement: HTMLCanvasElement, private floorplan: FloorplanModel) {
 
-    this.view = new FloorplannerView(this.floorplan, this, canvasElement);
+    this.view = new FloorplanView(this.floorplan, this, canvasElement);
 
     const cmPerFoot = 30.48;
     const pixelsPerFoot = 15.0;
@@ -78,7 +78,7 @@ export class Floorplanner {
 
     // Initialization:
 
-    this.setMode(FloorplannerMode.MOVE);
+    this.setMode(FloorplanMode.MOVE);
 
     this.canvasElement.addEventListener("mousedown", () => {
       this.mousedown();
@@ -105,11 +105,11 @@ export class Floorplanner {
   }
 
   private escapeKey() {
-    this.setMode(FloorplannerMode.MOVE);
+    this.setMode(FloorplanMode.MOVE);
   }
 
   private updateTarget() {
-    if (this.mode == FloorplannerMode.DRAW && this.lastNode) {
+    if (this.mode == FloorplanMode.DRAW && this.lastNode) {
       if (Math.abs(this.mouseX - this.lastNode.x) < snapTolerance) {
         this.targetX = this.lastNode.x;
       } else {
@@ -137,7 +137,7 @@ export class Floorplanner {
     const selectedItem = this.floorplan.getSelectedItem();
 
     // delete
-    if (this.mode == FloorplannerMode.DELETE) {
+    if (this.mode == FloorplanMode.DELETE) {
       if (this.activeCorner) {
         this.activeCorner.removeAll();
       } else if (this.activeWall) {
@@ -145,7 +145,7 @@ export class Floorplanner {
       } else if (this.activeItem) {
         this.activeItem.remove();
       } else {
-        this.setMode(FloorplannerMode.MOVE);
+        this.setMode(FloorplanMode.MOVE);
       }
     } else {
       if (selectedItem) {
@@ -168,14 +168,14 @@ export class Floorplanner {
 
     // update target (snapped position of actual mouse)
     if (
-      this.mode == FloorplannerMode.DRAW
-      || (this.mode == FloorplannerMode.MOVE && this.mouseDown)
+      this.mode == FloorplanMode.DRAW
+      || (this.mode == FloorplanMode.MOVE && this.mouseDown)
     ) {
       this.updateTarget();
     }
 
     // update object target
-    if (this.mode != FloorplannerMode.DRAW && !this.mouseDown) {
+    if (this.mode != FloorplanMode.DRAW && !this.mouseDown) {
       let draw = false;
       const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY);
       if (hoverItem !== this.activeItem) {
@@ -218,7 +218,7 @@ export class Floorplanner {
     }
 
     // dragging
-    if (this.mode == FloorplannerMode.MOVE && this.mouseDown) {
+    if (this.mode == FloorplanMode.MOVE && this.mouseDown) {
       if (
         selectedItem
         && selectedItem === this.activeItem
@@ -230,6 +230,11 @@ export class Floorplanner {
         )
       ) {
         // Do nothing
+      } else if (this.activeItem) {
+        this.activeItem.relativeMove(
+          this.mouseX - this.lastX,
+          this.mouseY - this.lastY
+        );
       } else if (this.activeCorner) {
         this.activeCorner.move(this.mouseX, this.mouseY);
         this.activeCorner.snapToAxis(snapTolerance);
@@ -239,11 +244,6 @@ export class Floorplanner {
           this.mouseY - this.lastY
         );
         this.activeWall.snapToAxis(snapTolerance);
-      } else if (this.activeItem) {
-        this.activeItem.relativeMove(
-          this.mouseX - this.lastX,
-          this.mouseY - this.lastY
-        );
       }
       this.checkWallDuplicates();
       this.lastX = this.mouseX;
@@ -262,17 +262,17 @@ export class Floorplanner {
     }
 
     // drawing
-    if (this.mode === FloorplannerMode.DRAW && !this.mouseMoved) {
+    if (this.mode === FloorplanMode.DRAW && !this.mouseMoved) {
       const corner = this.floorplan.newCorner(this.targetX, this.targetY);
       if (this.lastNode != null) {
         this.floorplan.newWall(this.lastNode, corner);
       }
       if (corner.mergeWithIntersected() && this.lastNode != null) {
-        this.setMode(FloorplannerMode.MOVE);
+        this.setMode(FloorplanMode.MOVE);
       }
       this.lastNode = corner;
       this.checkWallDuplicates();
-    } else if (!this.mouseMoved && this.mode === FloorplannerMode.MOVE) {
+    } else if (!this.mouseMoved && this.mode === FloorplanMode.MOVE) {
       if (this.activeItem) {
         this.floorplan.setSelectedItem(this.activeItem);
       } else {
@@ -317,7 +317,7 @@ export class Floorplanner {
 
   public reset() {
     this.resizeView();
-    this.setMode(FloorplannerMode.MOVE);
+    this.setMode(FloorplanMode.MOVE);
     this.resetOrigin();
     this.view.draw();
   }
@@ -326,7 +326,7 @@ export class Floorplanner {
     this.view.handleWindowResize();
   }
 
-  public setMode(mode: FloorplannerMode) {
+  public setMode(mode: FloorplanMode) {
     this.activeWall = null;
     this.activeCorner = null;
     this.activeItem = null;

@@ -1,4 +1,4 @@
-import { dimMeter } from "./dimensioning";
+import { dimMeter, dimInch, dimMilliMeter, dimCentiMeter } from "./dimensioning";
 
 // GENERAL:
 
@@ -45,6 +45,27 @@ export class Configuration {
         return <number>this.data[key];
       default:
         throw new Error("Invalid numeric configuration parameter: " + key);
+    }
+  }
+
+  /** Converts cm to dimensioning string.
+   * @param cm Centi meter value to be converted.
+   * @returns String representation.
+   */
+  public static cmToMeasure(cm: number): string {
+    switch (Configuration.getStringValue(configDimUnit)) {
+      case dimInch:
+        const realFeet = ((cm * 0.393700) / 12);
+        const feet = Math.floor(realFeet);
+        const inches = Math.round((realFeet - feet) * 12);
+        return feet + "'" + inches + '"';
+      case dimMilliMeter:
+        return "" + Math.round(10 * cm) + " mm";
+      case dimCentiMeter:
+        return "" + Math.round(10 * cm) / 10 + " cm";
+      case dimMeter:
+      default:
+        return "" + Math.round(10 * cm) / 1000 + " m";
     }
   }
 }

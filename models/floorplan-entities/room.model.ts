@@ -1,7 +1,7 @@
-import { Corner } from "./corner";
+import { Corner } from "./corner.model";
 import { Shape, Vector2, Mesh, ShapeGeometry, MeshBasicMaterial, DoubleSide } from "three";
-import { HalfEdge } from "./half-edge";
-import { Callback } from "../utils/callback";
+import { HalfEdge } from "./half-edge.model";
+import { Callback } from "../../utils/callback";
 
 /** 
  * A Room is the combination of a Floorplan with a floor plane. 

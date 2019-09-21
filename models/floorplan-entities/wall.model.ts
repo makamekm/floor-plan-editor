@@ -1,9 +1,9 @@
-import { HalfEdge } from "./half-edge";
-import { Configuration, configWallThickness } from "../utils/configuration";
-import { Corner } from "./corner";
-import { Callback } from "../utils/callback";
-import { Utils } from "../utils/operations";
-import { Floorplan } from "./floorplan";
+import { HalfEdge } from "./half-edge.model";
+import { Configuration, configWallThickness } from "../../utils/configuration";
+import { Corner } from "./corner.model";
+import { Callback } from "../../utils/callback";
+import { Utils } from "../../utils/operations";
+import { FloorplanModel } from "../floorplan-model";
 
 /** 
  * A Wall is the basic element to create Rooms.
@@ -31,7 +31,7 @@ export class Wall {
    * @param start Start corner.
    * @param end End corner.
    */
-  constructor(private floorplan: Floorplan, private start: Corner, private end: Corner) {
+  constructor(private floorplan: FloorplanModel, private start: Corner, private end: Corner) {
     this.id = this.getUuid();
 
     this.start.attachStart(this)

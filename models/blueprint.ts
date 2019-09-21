@@ -1,15 +1,15 @@
-import { Model } from "./model";
-import { Floorplanner } from "./floorplanner";
+import { FloorplanController } from "./floorplan-controller";
 import { Callback } from "../utils/callback";
 import { FloorplanDto } from "./floor.dto";
-import { FloorplannerMode } from "./floorplanner-mode.enum";
-import { ItemEnum } from "./item.enum";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { ItemEnum } from "./floorplan-entities/item.enum";
+import { FloorplanModel } from "./floorplan-model";
 
 /** Blueprint core application. */
 export class Blueprint {
-  
-  private model: Model;
-  private floorplanner: Floorplanner;
+
+  private floorplanner: FloorplanController;
+  private floorplan: FloorplanModel;
 
   public onModeChange = new Callback<string>();
   public onModelChange = new Callback<{
@@ -21,18 +21,18 @@ export class Blueprint {
   /** Creates an instance.
    */
   constructor(canvas: HTMLCanvasElement) {
-    this.model = new Model();
-    this.floorplanner = new Floorplanner(canvas, this.model.getFloorplan());
+    this.floorplan = new FloorplanModel();
+    this.floorplanner = new FloorplanController(canvas, this.floorplan);
 
     this.floorplanner.onModeChange.add(mode => {
       switch (mode) {
-        case FloorplannerMode.MOVE:
+        case FloorplanMode.MOVE:
           this.onModeChange.fire('move');
           break;
-        case FloorplannerMode.DRAW:
+        case FloorplanMode.DRAW:
           this.onModeChange.fire('draw');
           break;
-        case FloorplannerMode.DELETE:
+        case FloorplanMode.DELETE:
           this.onModeChange.fire('delete');
           break;
       }
@@ -40,35 +40,35 @@ export class Blueprint {
   }
 
   public load(floorplan: FloorplanDto) {
-    this.model.load(floorplan);
+    this.floorplan.loadFloorplan(floorplan);
   }
 
   public export(): FloorplanDto {
-    return this.model.export();
+    return this.floorplan.exportFloorplan();
   }
 
   public reset() {
-    this.model.reset();
+    this.floorplan.reset();
     this.floorplanner.reset();
   }
 
   public changeMode(mode: string) {
     switch (mode) {
       case 'move':
-        this.floorplanner.setMode(FloorplannerMode.MOVE);
+        this.floorplanner.setMode(FloorplanMode.MOVE);
         break;
       case 'draw':
-        this.floorplanner.setMode(FloorplannerMode.DRAW);
+        this.floorplanner.setMode(FloorplanMode.DRAW);
         break;
       case 'delete':
-        this.floorplanner.setMode(FloorplannerMode.DELETE);
+        this.floorplanner.setMode(FloorplanMode.DELETE);
         break;
     }
   }
 
   public addItem(type: ItemEnum) {
     const { x, y } = this.floorplanner.getCenter();
-    this.model.getFloorplan().newItem(
+    this.floorplan.newItem(
       x,
       y,
       0,

@@ -1,5 +1,5 @@
-import { Floorplan } from "./floorplan";
-import { FloorplannerView } from "./floorplanner-view";
+import { FloorplanModel } from "../floorplan-model";
+import { FloorplanView } from "../floorplan-view";
 
 export interface ItemMetadata {
   id?: number;
@@ -16,7 +16,7 @@ export abstract class Item {
    * @param y Y coordinate.
    */
   constructor(
-    private floorplan: Floorplan,
+    private floorplan: FloorplanModel,
     public x: number,
     public y: number,
     public r: number,
@@ -48,7 +48,7 @@ export abstract class Item {
     y: number,
     hover: boolean,
     selected: boolean,
-    view: FloorplannerView,
+    view: FloorplanView,
   ): void;
 
   public abstract overlapped(

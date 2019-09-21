@@ -1,6 +1,6 @@
-import { Wall } from "./wall";
-import { Floorplan } from "./floorplan";
-import { Utils } from "../utils/operations";
+import { Wall } from "./wall.model";
+import { FloorplanModel } from "../floorplan-model";
+import { Utils } from "../../utils/operations";
 
 const cornerTolerance: number = 20;
 
@@ -21,7 +21,7 @@ export class Corner {
    * @param y Y coordinate.
    * @param id An optional unique id. If not set, created internally.
    */
-  constructor(private floorplan: Floorplan, public x: number, public y: number, public id: string = '') {
+  constructor(private floorplan: FloorplanModel, public x: number, public y: number, public id: string = '') {
     this.id = id || Utils.guid();
   }
 

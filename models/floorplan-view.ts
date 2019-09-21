@@ -1,14 +1,12 @@
-import { Floorplanner } from "./floorplanner";
-import { Floorplan } from "./floorplan";
-import { Wall } from "./wall";
-import { Dimensioning } from "../utils/dimensioning";
-import { HalfEdge } from "./half-edge";
-import { Room } from "./room";
-import { Corner } from "./corner";
+import { FloorplanController } from "./floorplan-controller";
+import { FloorplanModel } from "./floorplan-model";
+import { Wall } from "./floorplan-entities/wall.model";
+import { HalfEdge } from "./floorplan-entities/half-edge.model";
+import { Room } from "./floorplan-entities/room.model";
+import { Corner } from "./floorplan-entities/corner.model";
 import { Configuration, configDpr } from "../utils/configuration";
-import { FloorplannerMode } from "./floorplanner-mode.enum";
-import { Item } from "./item.model";
-import { ItemDict } from "./item.dict";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { Item } from "./floorplan-entities/item.model";
 
 // grid parameters
 const gridSpacing = 20; // pixels
@@ -38,12 +36,12 @@ const cornerColorHover = "#2196F3"
 /**
  * The View to be used by a Floorplanner to render in/interact with.
  */
-export class FloorplannerView {
+export class FloorplanView {
 
   /** The 2D context. */
   private context: CanvasRenderingContext2D;
 
-  constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvasElement: HTMLCanvasElement) {
+  constructor(private floorplan: FloorplanModel, private viewmodel: FloorplanController, private canvasElement: HTMLCanvasElement) {
     this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
 
     window.addEventListener('resize', () => {
@@ -81,7 +79,7 @@ export class FloorplannerView {
       this.drawCorner(corner);
     });
 
-    if (this.viewmodel.mode == FloorplannerMode.DRAW) {
+    if (this.viewmodel.mode == FloorplanMode.DRAW) {
       this.drawTarget(this.viewmodel.targetX, this.viewmodel.targetY, this.viewmodel.lastNode);
     }
 
@@ -141,7 +139,7 @@ export class FloorplannerView {
   private drawWall(wall: Wall) {
     const hover = wall === this.viewmodel.activeWall;
     let color = wallColor;
-    if (hover && this.viewmodel.mode == FloorplannerMode.DELETE) {
+    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = wallColorHover;
@@ -176,18 +174,18 @@ export class FloorplannerView {
     this.context.strokeStyle = "#ffffff";
     this.context.lineWidth = 4;
 
-    this.context.strokeText(Dimensioning.cmToMeasure(length),
+    this.context.strokeText(Configuration.cmToMeasure(length),
       this.viewmodel.convertX(pos.x),
       this.viewmodel.convertY(pos.y));
 
-    this.context.fillText(Dimensioning.cmToMeasure(length),
+    this.context.fillText(Configuration.cmToMeasure(length),
       this.viewmodel.convertX(pos.x),
       this.viewmodel.convertY(pos.y));
   }
 
   private drawEdge(edge: HalfEdge, hover: boolean) {
     let color = edgeColor;
-    if (hover && this.viewmodel.mode == FloorplannerMode.DELETE) {
+    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = edgeColorHover;
@@ -225,7 +223,7 @@ export class FloorplannerView {
   private drawCorner(corner: Corner) {
     const hover = (corner === this.viewmodel.activeCorner);
     let color = cornerColor;
-    if (hover && this.viewmodel.mode == FloorplannerMode.DELETE) {
+    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = cornerColorHover;
@@ -341,7 +339,7 @@ export class FloorplannerView {
     this.context.stroke();
   }
 
-  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: Floorplanner, floorplan: Floorplan) => void) {
+  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: FloorplanController, floorplan: FloorplanModel) => void) {
     this.context.save();
     render(this.context, this.viewmodel, this.floorplan);
     this.context.restore();

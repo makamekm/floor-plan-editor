@@ -1,7 +1,7 @@
 import { Matrix4, Mesh, Vector3, Face3, Geometry, MeshBasicMaterial, Vector2 } from "three";
-import { Callback } from "../utils/callback";
-import { Wall } from "./wall";
-import { Utils } from "../utils/operations";
+import { Callback } from "../../utils/callback";
+import { Wall } from "./wall.model";
+import { Utils } from "../../utils/operations";
 
 /**
  * Half Edges are created by Room.

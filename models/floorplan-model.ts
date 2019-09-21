@@ -1,20 +1,20 @@
-import { Wall } from "./wall";
-import { Corner } from "./corner";
-import { Room } from "./room";
+import { Wall } from "./floorplan-entities/wall.model";
+import { Corner } from "./floorplan-entities/corner.model";
+import { Room } from "./floorplan-entities/room.model";
 import { Callback } from "../utils/callback";
-import { HalfEdge } from "./half-edge";
+import { HalfEdge } from "./floorplan-entities/half-edge.model";
 import { Mesh, Vector3 } from "three";
 import { Utils } from "../utils/operations";
 import { FloorplanDto } from "./floor.dto";
-import { Item, ItemMetadata } from "./item.model";
-import { ItemDict } from "./item.dict";
+import { Item, ItemMetadata } from "./floorplan-entities/item.model";
+import { ItemDict } from "./floorplan-entities/item.dict";
 
 const defaultFloorPlanTolerance = 10.0;
 
 /** 
  * A Floorplan represents a number of Walls, Corners and Rooms.
  */
-export class Floorplan {
+export class FloorplanModel {
 
   private walls: Wall[] = [];
   private corners: Corner[] = [];

@@ -1,7 +1,7 @@
 import { Item } from "./item.model";
-import { Utils } from "../utils/operations";
-import { Floorplan } from "./floorplan";
-import { FloorplannerView } from "./floorplanner-view";
+import { Utils } from "../../utils/operations";
+import { FloorplanModel } from "../floorplan-model";
+import { FloorplanView } from "../floorplan-view";
 
 const rotateRadius = 100;
 const rotateLineWidth = 8;
@@ -64,7 +64,7 @@ export class TableItem extends Item {
     y: number,
     hover: boolean,
     selected: boolean,
-    view: FloorplannerView,
+    view: FloorplanView,
   ): void {
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);

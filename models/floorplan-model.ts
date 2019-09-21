@@ -103,8 +103,8 @@ export class FloorplanModel {
    * @param y The y coordinate.
    * @returns The new item.
    */
-  public newItem(x: number, y: number, r: number, metadata: ItemMetadata): Item {
-    const item = new (<any>ItemDict[metadata.type])(this, x, y, r, metadata);
+  public newItem(x: number, y: number, metadata: ItemMetadata): Item {
+    const item = new (<any>ItemDict[metadata.type])(this, x, y, metadata);
     this.items.push(item);
     return item;
   }
@@ -208,7 +208,7 @@ export class FloorplanModel {
       floorplan.items.push({
         x: item.x,
         y: item.y,
-        r: item.r,
+        r: item.metadata.r,
         id: item.metadata.id,
         description: item.metadata.description,
         name: item.metadata.name,
@@ -241,12 +241,12 @@ export class FloorplanModel {
       this.newItem(
         item.x,
         item.y,
-        item.r,
         {
           id: item.id,
           description: item.description,
           name: item.name,
           type: item.type,
+          r: item.r,
         },
       );
     });

@@ -1,13 +1,20 @@
 import { Item } from "./item.model";
 import { Utils } from "../../utils/operations";
-import { FloorplanModel } from "../floorplan-model";
 import { FloorplanView } from "../floorplan-view";
 
+const tableHeight = 100;
+const tableWidth = 50;
+const tableColor = "#dddddd";
+const tableColorHover = "#008cba";
+const tableEdgeColor = "#888888";
+const tableEdgeColorHover = "#008cba";
+const tableEdgeWidth = 1;
+
 const rotateRadius = 100;
-const rotateLineWidth = 8;
+const rotateLineWidth = 10;
 const rotateColor = "#888888";
-const rotateHoverColor = "#008cba";
-const rotateActiveColor = "#ff0000";
+const rotateHoverColor = "#2196F3";
+const rotateActiveColor = "#2196F3";
 
 export class TableItem extends Item {
 
@@ -28,7 +35,7 @@ export class TableItem extends Item {
   }
 
   startActive(): void {
-
+    // Skip
   };
 
   endActive(): void {
@@ -37,8 +44,10 @@ export class TableItem extends Item {
   };
 
   mouseup(x: number, y: number) {
-    this.isRotating = false;
-    this.isRotatingHover = false;
+    if (this.isRotating) {
+      this.isRotating = false;
+      this.roundAngle();
+    }
   }
 
   mousemove(
@@ -59,6 +68,23 @@ export class TableItem extends Item {
     }
   }
 
+  private findClosestAngle(angles: number[], sens: number) {
+    const a = Math.round(this.metadata.r);
+    for (const roundingAngle of angles) {
+      const r = Math.floor(
+        (a % 360 + roundingAngle / 2) / roundingAngle
+      ) * roundingAngle;
+      if (Math.abs(r - a % 360) <= sens) {
+        return r;
+      }
+    }
+    return a;
+  }
+
+  private roundAngle(sens = 5) {
+    this.metadata.r = this.findClosestAngle([30, 45], sens);
+  }
+
   render(
     x: number,
     y: number,
@@ -68,18 +94,19 @@ export class TableItem extends Item {
   ): void {
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);
-      ctx.rotate(this.r * Math.PI / 180);
-      view.drawLine(-20, -20, 20, 20, 10, hover ? "#0000ff" : (selected ? "#00ff00" : "#ff0000"));
+      ctx.rotate(this.metadata.r * Math.PI / 180);
+      view.drawLine(0, -20, 0, 20, 10, hover ? "#0000ff" : (selected ? "#00ff00" : "#ff0000"));
     });
     if (selected) {
       view.drawTransaction((ctx) => {
+        ctx.globalAlpha = this.isRotating ? 1 : (this.isRotatingHover ? 0.8 : 0.3);
         ctx.translate(x, y);
           view.drawCircleStroke(
             0,
             0,
             rotateRadius,
             this.isRotating ? rotateActiveColor : (this.isRotatingHover ? rotateHoverColor : rotateColor),
-            rotateLineWidth,
+            rotateLineWidth / 2,
           );
       });
     }

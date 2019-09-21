@@ -5,6 +5,7 @@ export interface ItemMetadata {
   id?: number;
   name: string;
   description: string;
+  r: number;
   type: number;
 }
 
@@ -19,7 +20,6 @@ export abstract class Item {
     private floorplan: FloorplanModel,
     public x: number,
     public y: number,
-    public r: number,
     public metadata: ItemMetadata,
   ) {
     
@@ -75,7 +75,7 @@ export abstract class Item {
    * @param r The new r angle.
    */
   public rotate(r: number) {
-    this.r = r;
+    this.metadata.r = r;
   }
 
   /** Moves item relatively to new position.
@@ -90,6 +90,6 @@ export abstract class Item {
    * @param dr The delta r.
    */
   public relativeRotate(dr: number) {
-    this.rotate(this.r + dr * 180 / Math.PI);
+    this.rotate(this.metadata.r + dr * 180 / Math.PI);
   }
 }

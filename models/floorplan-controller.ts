@@ -64,6 +64,12 @@ export class FloorplanController {
   /** mouse position at last click */
   private lastY = 0;
 
+  /** mouse position at last click */
+  private lastRawX = 0;
+
+  /** mouse position at last click */
+  private lastRawY = 0;
+
   private cmPerPixel: number;
   private pixelsPerCm: number;
 
@@ -80,8 +86,8 @@ export class FloorplanController {
 
     this.setMode(FloorplanMode.MOVE);
 
-    this.canvasElement.addEventListener("mousedown", () => {
-      this.mousedown();
+    this.canvasElement.addEventListener("mousedown", (event) => {
+      this.mousedown(event);
     });
     this.canvasElement.addEventListener("mousemove", (event) => {
       this.mousemove(event);
@@ -128,11 +134,13 @@ export class FloorplanController {
     this.view.draw();
   }
 
-  private mousedown() {
+  private mousedown(event: MouseEvent) {
     this.mouseDown = true;
     this.mouseMoved = false;
     this.lastX = this.mouseX;
     this.lastY = this.mouseY;
+    this.lastRawX = event.clientX;
+    this.lastRawY = event.clientY;
 
     const selectedItem = this.floorplan.getSelectedItem();
 
@@ -210,10 +218,10 @@ export class FloorplanController {
 
     // panning
     if (this.mouseDown && !this.activeCorner && !this.activeWall && !this.activeItem) {
-      this.originX += (this.lastX - this.mouseX);
-      this.originY += (this.lastY - this.mouseY);
-      this.lastX = this.mouseX;
-      this.lastY = this.mouseY;
+      this.originX -= event.clientX - this.lastRawX;
+      this.originY -= event.clientY - this.lastRawY;
+      this.lastRawX = event.clientX;
+      this.lastRawY = event.clientY;
       this.view.draw();
     }
 
@@ -331,6 +339,7 @@ export class FloorplanController {
     this.activeCorner = null;
     this.activeItem = null;
     this.lastNode = null;
+    this.floorplan.setSelectedItem(null);
     this.mode = mode;
     this.updateTarget();
     this.onModeChange.fire(mode);

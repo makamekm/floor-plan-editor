@@ -71,11 +71,11 @@ export class Blueprint {
     this.floorplan.newItem(
       x,
       y,
-      0,
       {
         description: '',
         name: '',
         type,
+        r: 0,
       }
     );
   }

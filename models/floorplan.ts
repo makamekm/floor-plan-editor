@@ -104,7 +104,7 @@ export class Floorplan {
    * @returns The new item.
    */
   public newItem(x: number, y: number, r: number, metadata: ItemMetadata): Item {
-    const item = new Item(this, x, y, r, metadata);
+    const item = new (<any>ItemDict[metadata.type])(this, x, y, r, metadata);
     this.items.push(item);
     return item;
   }
@@ -152,11 +152,10 @@ export class Floorplan {
 
   public overlappedItem(x: number, y: number): Item {
     for (let i = 0; i < this.items.length; i++) {
-      if (ItemDict[this.items[i].metadata.type].overlapped(
+      if (this.items[i].overlapped(
         x,
         y,
-        this.items[i],
-        this,
+        this.selectedItem === this.items[i],
       )) {
         return this.items[i];
       }

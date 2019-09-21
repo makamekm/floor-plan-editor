@@ -1,5 +1,16 @@
 export class Utils {
 
+  /** Determines the distance between points.
+   * @param x1 Point 1's x coordinate.
+   * @param y1 Point 1's y coordinate.
+   * @param x2 Point 2's x coordinate.
+   * @param y2 Point 2's y coordinate.
+   * @returns The distance.
+   */
+  public static pointDistance(x1: number, y1: number, x2: number, y2: number): number {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+  }
+
   /** Determines the distance of a point from a line.
    * @param x Point's x coordinate.
    * @param y Point's y coordinate.

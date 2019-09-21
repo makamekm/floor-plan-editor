@@ -43,11 +43,6 @@ export class FloorplannerView {
   /** The 2D context. */
   private context: CanvasRenderingContext2D;
 
-  /** The 2D context. */
-  public getContext() {
-    return this.context;
-  };
-
   constructor(private floorplan: Floorplan, private viewmodel: Floorplanner, private canvasElement: HTMLCanvasElement) {
     this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
 
@@ -95,20 +90,36 @@ export class FloorplannerView {
     });
 
     this.floorplan.getItems().forEach((item) => {
-      this.drawItem(item);
+      if (this.floorplan.getSelectedItem() !== item) {
+        this.drawItem(item);
+      }
     });
+
+    if (this.floorplan.getSelectedItem()) {
+      this.drawSelectedItem();
+    }
+  }
+
+  private drawSelectedItem() {
+    const item = this.floorplan.getSelectedItem();
+    const hover = item === this.viewmodel.activeItem;
+    item.render(
+      this.viewmodel.convertX(item.x),
+      this.viewmodel.convertY(item.y),
+      hover,
+      true,
+      this,
+    );
   }
 
   private drawItem(item: Item) {
     const hover = item === this.viewmodel.activeItem;
-    ItemDict[item.metadata.type].render(
+    item.render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
-      item.r,
       hover,
+      false,
       this,
-      item,
-      this.floorplan,
     );
   }
 
@@ -320,5 +331,19 @@ export class FloorplannerView {
     this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
     this.context.fillStyle = fillColor;
     this.context.fill();
+  }
+
+  public drawCircleStroke(centerX: number, centerY: number, radius: number, fillColor: string, lineWidth: number) {
+    this.context.beginPath();
+    this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    this.context.strokeStyle = fillColor;
+    this.context.lineWidth = lineWidth;
+    this.context.stroke();
+  }
+
+  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: Floorplanner, floorplan: Floorplan) => void) {
+    this.context.save();
+    render(this.context, this.viewmodel, this.floorplan);
+    this.context.restore();
   }
 }

@@ -344,4 +344,23 @@ export class FloorplanView {
     render(this.context, this.viewmodel, this.floorplan);
     this.context.restore();
   }
+
+  public drawLabel(x: number, y: number, text: string) {
+    this.context.font = "normal 12px Arial";
+    this.context.fillStyle = "#000000";
+    this.context.textBaseline = "middle";
+    this.context.textAlign = "center";
+    this.context.strokeStyle = "#ffffff";
+    this.context.lineWidth = 4;
+
+    this.context.strokeText(text,
+      this.viewmodel.convertX(x),
+      this.viewmodel.convertY(y),
+    );
+
+    this.context.fillText(text,
+      this.viewmodel.convertX(x),
+      this.viewmodel.convertY(y),
+    );
+  }
 }

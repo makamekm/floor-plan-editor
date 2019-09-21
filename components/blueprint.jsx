@@ -9,6 +9,7 @@ import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
 import { FloorService } from '../services/floor.service';
 import { FloorListService } from '../services/floor-list.service';
+import { ItemEnum } from '../models/floorplan-entities/item.enum';
 
 const itemTypeList = [
   {
@@ -61,14 +62,10 @@ class BlueprintView extends Component {
         <div className="items-panel">
           <Panel>
             <div className="list">
-              <div className="item clickable">
+              <div className="item clickable" onClick={() => {
+                this.blueprint.addItem(ItemEnum.Table);
+              }}>
                 + &nbsp;Table
-              </div>
-              <div className="item clickable">
-                + &nbsp;Computer
-              </div>
-              <div className="item clickable">
-                + &nbsp;Warning
               </div>
             </div>
           </Panel>

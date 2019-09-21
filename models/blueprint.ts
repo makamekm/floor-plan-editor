@@ -78,5 +78,6 @@ export class Blueprint {
         r: 0,
       }
     );
+    this.floorplanner.draw();
   }
 }

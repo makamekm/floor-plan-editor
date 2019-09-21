@@ -323,6 +323,10 @@ export class FloorplanController {
     //scope.setMode(scope.modes.MOVE);
   }
 
+  public draw() {
+    this.view.draw();
+  }
+
   public reset() {
     this.resizeView();
     this.setMode(FloorplanMode.MOVE);
@@ -359,8 +363,8 @@ export class FloorplanController {
     const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
     const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
     return {
-      x: this.originX + centerX,
-      y: this.originY + centerY,
+      x: (this.originX + centerX) * this.cmPerPixel,
+      y: (this.originY + centerY) * this.cmPerPixel,
     };
   }
 

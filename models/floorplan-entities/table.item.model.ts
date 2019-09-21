@@ -2,12 +2,14 @@ import { Item } from "./item.model";
 import { Utils } from "../../utils/operations";
 import { FloorplanView } from "../floorplan-view";
 
-const tableHeight = 100;
-const tableWidth = 50;
-const tableColor = "#dddddd";
-const tableColorHover = "#008cba";
+const tableHeight = 60;
+const tableWidth = 30;
+const tableColor = "#ffffff";
+const tableColorHover = "#F1FCFF";
+const tableColorActive = "#F1FCFF";
 const tableEdgeColor = "#888888";
-const tableEdgeColorHover = "#008cba";
+const tableEdgeColorHover = "#888888";
+const tableEdgeColorActive = "#888888";
 const tableEdgeWidth = 1;
 
 const rotateRadius = 100;
@@ -15,6 +17,8 @@ const rotateLineWidth = 10;
 const rotateColor = "#888888";
 const rotateHoverColor = "#2196F3";
 const rotateActiveColor = "#2196F3";
+
+const tableTextLimit = 14;
 
 export class TableItem extends Item {
 
@@ -68,21 +72,12 @@ export class TableItem extends Item {
     }
   }
 
-  private findClosestAngle(angles: number[], sens: number) {
-    const a = Math.round(this.metadata.r);
-    for (const roundingAngle of angles) {
-      const r = Math.floor(
-        (a % 360 + roundingAngle / 2) / roundingAngle
-      ) * roundingAngle;
-      if (Math.abs(r - a % 360) <= sens) {
-        return r;
-      }
-    }
-    return a;
+  private getClosestAngle(sens = 5) {
+    return Utils.findClosestAngle(this.metadata.r, [15, 45], sens);
   }
 
-  private roundAngle(sens = 5) {
-    this.metadata.r = this.findClosestAngle([30, 45], sens);
+  private roundAngle() {
+    this.metadata.r = this.getClosestAngle();
   }
 
   render(
@@ -92,36 +87,86 @@ export class TableItem extends Item {
     selected: boolean,
     view: FloorplanView,
   ): void {
+    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : tableColor);
+    const edgeColor = hover ? tableEdgeColorHover : (selected ? tableEdgeColorActive : tableEdgeColor);
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);
-      ctx.rotate(this.metadata.r * Math.PI / 180);
-      view.drawLine(0, -20, 0, 20, 10, hover ? "#0000ff" : (selected ? "#00ff00" : "#ff0000"));
+      ctx.rotate(this.getClosestAngle() * Math.PI / 180);
+      view.drawPolygon([
+        -tableWidth / 2,
+        tableWidth / 2,
+        tableWidth / 2,
+        -tableWidth / 2,
+      ], [
+        -tableHeight / 2,
+        -tableHeight / 2,
+        tableHeight / 2,
+        tableHeight / 2,
+      ], true, fillColor, true, edgeColor, tableEdgeWidth);
+      view.drawLine(
+        -tableWidth / 2,
+        -tableHeight / 2,
+        tableWidth / 2,
+        tableHeight / 2,
+        tableEdgeWidth,
+        edgeColor,
+      );
+      view.drawLine(
+        tableWidth / 2,
+        -tableHeight / 2,
+        -tableWidth / 2,
+        tableHeight / 2,
+        tableEdgeWidth,
+        edgeColor,
+      );
     });
     if (selected) {
       view.drawTransaction((ctx) => {
         ctx.globalAlpha = this.isRotating ? 1 : (this.isRotatingHover ? 0.8 : 0.3);
         ctx.translate(x, y);
-          view.drawCircleStroke(
-            0,
-            0,
-            rotateRadius,
-            this.isRotating ? rotateActiveColor : (this.isRotatingHover ? rotateHoverColor : rotateColor),
-            rotateLineWidth / 2,
-          );
+        view.drawCircleStroke(
+          0,
+          0,
+          rotateRadius,
+          this.isRotating ? rotateActiveColor : (this.isRotatingHover ? rotateHoverColor : rotateColor),
+          rotateLineWidth / 2,
+        );
       });
+    }
+    if (this.metadata.name) {
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
+    }
+  }
+
+  limitText(text: string) {
+    if (text.length > tableTextLimit) {
+      return text.substr(0, tableTextLimit) + '...';
+    } else {
+      return text;
+    }
+  }
+
+  rotateVector(x: number, y: number, ang: number) {
+    ang = -ang * (Math.PI/180);
+    const cos = Math.cos(ang);
+    const sin = Math.sin(ang);
+    return {
+      x: (x * cos - y * sin),
+      y: (x * sin + y * cos),
     }
   }
 
   overlapped(
-    x: number,
-    y: number,
+    rawX: number,
+    rawY: number,
     selected: boolean,
   ) {
-    const sens = 50;
-    const isMainHover = x < (this.x + sens) && x > (this.x - sens)
-      && y < (this.y + sens) && y > (this.y - sens);
+    let { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
+    const sens = 5;
+    const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
+      && y <= (tableHeight + sens) && y >= (-tableHeight - sens);
     if (selected) {
-      this.isRotatingHover = this.overlappedRotate(x, y);
+      this.isRotatingHover = this.overlappedRotate(rawX, rawY);
       return isMainHover || this.isRotatingHover;
     } else {
       return isMainHover;

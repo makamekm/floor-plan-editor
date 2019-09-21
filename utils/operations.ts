@@ -1,5 +1,18 @@
 export class Utils {
 
+  public static findClosestAngle(angle: number, angles: number[], sens: number) {
+    const a = Math.round(angle);
+    for (const roundingAngle of angles) {
+      const r = Math.floor(
+        (a % 360 + roundingAngle / 2) / roundingAngle
+      ) * roundingAngle;
+      if (Math.abs(r - a % 360) <= sens) {
+        return r;
+      }
+    }
+    return a;
+  }
+
   /** Determines the distance between points.
    * @param x1 Point 1's x coordinate.
    * @param y1 Point 1's y coordinate.

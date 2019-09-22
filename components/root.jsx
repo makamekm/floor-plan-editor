@@ -22,6 +22,12 @@ export default (Page) => {
       <>
         <Head>
           <title>Floor Plan Editor</title>
+          <link rel="manifest" href="/static/manifest.json" />
+          <meta name="theme-color" content="#F3F7FA" />
+          <meta
+            name="description"
+            content="Floor Plan Editor will help you to plan your apartments"
+          />
           <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet"></link>
         </Head>
   

@@ -1,0 +1,21 @@
+{
+  "name": "Floor Plan Editor",
+  "short_name": "Floor Plan Editor",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "background_color": "#FFFFFF",
+  "description": "Floor Plan Editor will help you to plan your apartments",
+  "display": "fullscreen",
+  "start_url": "/",
+  "theme_color": "#F3F7FA"
+}

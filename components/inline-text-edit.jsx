@@ -64,7 +64,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) =
           {value || placeholder}
         </div>
         <div className="value-edit">
-          <img src={EditIcon} onClick={() => onStartEdit()}/>
+          <img src={EditIcon} onClick={() => onStartEdit()} alt=""/>
         </div>
       </div>
       <div className="input">

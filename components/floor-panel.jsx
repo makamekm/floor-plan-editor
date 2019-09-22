@@ -34,10 +34,10 @@ const FloorPanel = () => {
                 name: isCreate ? 'Save Plan' : name,
               }, floorListService.list.length > 0 && {
                 key: 'menu',
-                name: <img src={ListIcon}/>,
+                name: <img src={ListIcon} alt=""/>,
               }, !isCreate && {
                 key: 'edit',
-                name: <img src={EditIcon}/>,
+                name: <img src={EditIcon} alt=""/>,
               }].filter(s => !!s)}
               onToggle={key => {
                 if (key === 'menu') {

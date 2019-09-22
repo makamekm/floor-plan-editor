@@ -139,11 +139,13 @@ export class BlueprintService {
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.ctrlKey && event.key === 'z') {
-      this.undo();
-    }
-    if (event.ctrlKey && event.key === 'y') {
-      this.redo();
+    if (event.currentTarget === document) {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+        this.undo();
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key === 'y') {
+        this.redo();
+      }
     }
   }
 }

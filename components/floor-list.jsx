@@ -3,15 +3,21 @@ import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
 import { FloorListService } from '../services/floor-list.service'
 import { FloorService } from '../services/floor.service'
+import { useRouter } from 'next/router'
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
   const floorListService = useInstance(FloorListService);
+  const router = useRouter();
 
   const currentId = floorService.floor.data && floorService.floor.data.id;
 
   return (
     <>
+      <div onClick={() => router.push('/')}
+        className={"item clickable" + (currentId === null ? ' active' : '')}>
+        + Create Plan
+      </div>
       {
         floorListService.list.map(({id, name}) => {
           return (

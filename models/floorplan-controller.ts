@@ -194,8 +194,6 @@ export class FloorplanController {
       } else if (this.activeItem) {
         this.activeItem.remove();
         this.emitChanges();
-      } else {
-        this.setMode(FloorplanMode.MOVE);
       }
     } else {
       if (selectedItem) {

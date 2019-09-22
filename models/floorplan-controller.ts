@@ -111,20 +111,24 @@ export class FloorplanController {
       this.mousedown(event.clientX, event.clientY);
     });
     this.canvasElement.addEventListener("touchstart", (event) => {
-      this.mousedown(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      event.preventDefault();
+      this.mousemove(event.touches[0].clientX, event.touches[0].clientY);
+      this.mousedown(event.touches[0].clientX, event.touches[0].clientY);
     });
 
     this.canvasElement.addEventListener("mousemove", (event) => {
       this.mousemove(event.clientX, event.clientY);
     });
     this.canvasElement.addEventListener("touchmove", (event) => {
-      this.mousemove(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      this.mousemove(event.touches[0].clientX, event.touches[0].clientY);
     });
 
     this.canvasElement.addEventListener("mouseup", (event) => {
       this.mouseup(event.clientX, event.clientY);
     });
+
     this.canvasElement.addEventListener("touchend", (event) => {
+      event.preventDefault();
       this.mouseup(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
     });
 
@@ -132,6 +136,7 @@ export class FloorplanController {
       this.mouseleave();
     });
     this.canvasElement.addEventListener("touchleave", () => {
+      event.preventDefault();
       this.mouseleave();
     });
 
@@ -389,7 +394,7 @@ export class FloorplanController {
     this.activeCorner = null;
     this.activeItem = null;
     this.lastNode = null;
-    this.floorplan.setSelectedItem(null);
+    this.floorplan.setSelectedItem(null, true);
     this.mode = mode;
     this.updateTarget();
     this.onModeChange.fire(mode);

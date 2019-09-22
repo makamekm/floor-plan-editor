@@ -122,7 +122,7 @@ class BlueprintView extends Component {
           .view {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
           }
 
           .mode-panel {
@@ -159,7 +159,7 @@ class BlueprintView extends Component {
 
           .list.is-overflow {
             overflow: auto;
-            max-height: calc(100vh - 20px);
+            max-height: calc(var(--vh, 1vh) * 100 - 20px);
           }
 
           .item {

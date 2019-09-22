@@ -398,6 +398,7 @@ export class FloorplanController {
     this.mode = mode;
     this.updateTarget();
     this.onModeChange.fire(mode);
+    this.view.draw();
   }
 
   /** Sets the origin so that floorplan is centered */

@@ -42,7 +42,7 @@ const FloorDeleteDialog = ({children}) => {
           width: calc(100vw - 20px);
           max-width: 400px;
           overflow: auto;
-          max-height: calc(100vh - 20px);
+          max-height: calc(var(--vh, 1vh) * 100 - 20px);
         }
 
         .item {

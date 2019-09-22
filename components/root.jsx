@@ -18,6 +18,16 @@ const services = [
 export default (Page) => {
   const Root = () => {
     useInstances(...services);
+    React.useEffect(() => {
+      if (process.browser) {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        window.addEventListener('resize', () => {
+          const vh = window.innerHeight * 0.01;
+          document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+      }
+    });
     return (
       <>
         <Head>
@@ -42,9 +52,9 @@ export default (Page) => {
             background-color: #F3F7FA;
             color: #4A4A4A;
             max-width: 100vw;
-            max-height: 100vh;
+            max-height: calc(var(--vh, 1vh) * 100);
             min-width: 100vw;
-            min-height: 100vh;
+            min-height: calc(var(--vh, 1vh) * 100);
             overflow: hidden;
           }
         `}</style>

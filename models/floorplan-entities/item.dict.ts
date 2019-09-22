@@ -7,3 +7,11 @@ export const ItemDict: {
 } = {
   [ItemEnum.Table]: TableItem,
 };
+
+export const ItemNameDict = {
+  [ItemEnum.Table]: "Table",
+};
+
+export const ItemArray = [
+  ItemEnum.Table,
+]

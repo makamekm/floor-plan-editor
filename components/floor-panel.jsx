@@ -24,10 +24,13 @@ const FloorPanel = () => {
           items={[{
             key: 'save',
             name: isCreate ? 'Save Plan' : name,
-          }, {
+          }, floorListService.list.length > 0 && {
             key: 'menu',
             name: '=',
-          }]}
+          }, !isCreate && {
+            key: 'edit',
+            name: 'Edit',
+          }].filter(s => !!s)}
           onToggle={key => {
             if (key === 'menu') {
               floorListService.opened = true;
@@ -49,7 +52,8 @@ const FloorPanel = () => {
   
       <style jsx>{`
         .list {
-          width: 400px;
+          width: 100%;
+          max-width: 400px;
         }
       `}</style>
     </div>

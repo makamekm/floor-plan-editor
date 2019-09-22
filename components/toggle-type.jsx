@@ -1,15 +1,15 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 
-const ToggleButtonType = ({onToggle, activeState, items}) => {
+const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
   return (
     <>
-      <div className="filter-type">
+      <div className="toggle-type">
         {
           items.map(({key, name}) => {
             return (
               <div key={key} onClick={() => onToggle(key)}
-                className={"filter-type-button" + (activeState === key ? ' active' : '')}>
+                className={"toggle-type-button" + (activeState === key ? ' active' : '')}>
                 {name}
               </div>
             )
@@ -19,13 +19,14 @@ const ToggleButtonType = ({onToggle, activeState, items}) => {
       
       <style jsx>{`
 
-        .filter-type {
+        .toggle-type {
           display: flex;
           flex-direction: row;
           box-sizing: border-box;
         }
   
-        .filter-type-button {
+        .toggle-type-button {
+          white-space: nowrap;
           font-family: Open Sans;
           font-style: normal;
           font-weight: 600;
@@ -47,50 +48,52 @@ const ToggleButtonType = ({onToggle, activeState, items}) => {
           border-right-width: 1px;
         }
 
-        .filter-type-button:hover {
+        .toggle-type-button:hover {
           background-color: #F1FCFF;
         }
 
-        .filter-type-button:first-child {
+        .toggle-type-button:first-child {
           border-top-left-radius: 5px;
           border-bottom-left-radius: 5px;
           border-left-width: 1px;
         }
 
-        .filter-type-button:last-child {
+        .toggle-type-button:last-child {
           border-top-right-radius: 5px;
           border-bottom-right-radius: 5px;
           border-right-width: 1px;
         }
 
-        .filter-type-button:active, .filter-type-button.active {
+        .toggle-type-button:active, .toggle-type-button.active {
           background-color: #2196F3;
           border-color: #2196F3;
           color: #FFFFFF;
         }
 
-        .filter-type-button.active {
+        .toggle-type-button.active {
           cursor: default;
           pointer-events: none;
         }
 
-        @media (max-width: 766px) {
-          .filter-type {
-            flex-direction: column;
-          }
+        ${responsive ? `
+          @media (max-width: 766px) {
+            .toggle-type {
+              flex-direction: column;
+            }
 
-          .filter-type-button:first-child {
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            border-bottom-left-radius: 0;
+            .toggle-type-button:first-child {
+              border-top-left-radius: 5px;
+              border-top-right-radius: 5px;
+              border-bottom-left-radius: 0;
+            }
+    
+            .toggle-type-button:last-child {
+              border-top-right-radius: 0;
+              border-bottom-right-radius: 5px;
+              border-bottom-left-radius: 5px;
+            }
           }
-  
-          .filter-type-button:last-child {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 5px;
-            border-bottom-left-radius: 5px;
-          }
-        }
+        ` : ``}
       `}</style>
     </>
   )

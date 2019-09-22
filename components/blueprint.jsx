@@ -4,12 +4,15 @@ import ToggleButtonType from './toggle-type';
 import Panel from './panel';
 import Loading from './loading';
 import FloorPanel from './floor-panel';
+import InlineTextEdit from './inline-text-edit';
+import InlineTextareaEdit from './inline-textarea-edit';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
 import { FloorService } from '../services/floor.service';
 import { FloorListService } from '../services/floor-list.service';
 import { ItemEnum } from '../models/floorplan-entities/item.enum';
+import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
 
 const itemTypeList = [
   {
@@ -61,12 +64,14 @@ class BlueprintView extends Component {
 
         <div className="items-panel">
           <Panel>
-            <div className="list">
-              <div className="item clickable" onClick={() => {
-                this.blueprintService.addItem(ItemEnum.Table);
-              }}>
-                + &nbsp;Table
-              </div>
+            <div className="list is-overflow">
+              {ItemArray.map(item => (
+                <div key={item} className="item clickable" onClick={() => {
+                  this.blueprintService.addItem(item);
+                }}>
+                  + &nbsp;{ItemNameDict[item]}
+                </div>
+              ))}
             </div>
           </Panel>
         </div>
@@ -75,19 +80,31 @@ class BlueprintView extends Component {
           {this.blueprintService.selected ? <Panel>
             <div className="list">
               <div className="item header">
-                Table
+                {ItemNameDict[this.blueprintService.selected.type]}
               </div>
-              <div className="item">
-                {this.blueprintService.selected.name}
-              </div>
-              <div className="item">
-                Date added: 11/12/2019
+              <div className="item is-field">
+                <InlineTextEdit
+                  placeholder="Write Name..."
+                  value={this.blueprintService.selected.name}
+                  onChange={value => {
+                    this.blueprintService.selected.name = value;
+                    this.blueprintService.applyChanges();
+                  }}
+                />
               </div>
               <div className="item header">
                 Description
               </div>
-              <div className="item">
-                The best table has ever made
+              <div className="item is-field">
+                <InlineTextareaEdit
+                  borderRadius="0 0 5px 5px"
+                  placeholder="Write Description..."
+                  value={this.blueprintService.selected.description}
+                  onChange={value => {
+                    this.blueprintService.selected.description = value;
+                    this.blueprintService.applyChanges();
+                  }}
+                />
               </div>
             </div>
           </Panel> : null}
@@ -139,24 +156,25 @@ class BlueprintView extends Component {
             transform: translateX(-50%);
           }
 
-          .list {
+          .list.is-overflow {
             overflow: auto;
             max-height: calc(100vh - 20px);
           }
 
           .item {
-            padding-left: 20px;
-            padding-right: 20px;
+            padding: 10px 15px;
             transition: background-color 0.1s;
             will-change: background-color;
             user-select: none;
-            padding-top: 10px;
-            padding-bottom: 10px;
             font-family: Open Sans;
             font-style: normal;
             font-size: 12px;
             line-height: 12px;
             border-bottom: 1px solid #f1f1f1;
+          }
+
+          .item.is-field {
+            padding: 0;
           }
 
           .item:last-child {
@@ -191,6 +209,22 @@ class BlueprintView extends Component {
     
           .item.clickable:active {
             background-color: #e0f6ff;
+          }
+
+          @media (max-width: 850px) {
+            .mode-panel {
+              display: none;
+            }
+            
+            .items-panel {
+              display: none;
+            }
+
+            .property-panel {
+              top: 80px;
+              right: 20px;
+              width: unset;
+            }
           }
         `}</style>
       </div>

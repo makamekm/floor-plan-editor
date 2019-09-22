@@ -36,6 +36,7 @@ export default (Page) => {
         
         <style global jsx>{`
           body {
+            position: fixed;
             margin: 0;
             font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, Helvetica, sans-serif;
             background-color: #F3F7FA;

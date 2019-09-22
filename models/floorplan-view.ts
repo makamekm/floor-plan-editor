@@ -45,7 +45,7 @@ export class FloorplanView {
     this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
 
     window.addEventListener('resize', () => {
-      this.handleWindowResize();
+      setTimeout(() => this.handleWindowResize(), 0);
     });
 
     this.handleWindowResize();

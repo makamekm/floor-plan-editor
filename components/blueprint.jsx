@@ -213,10 +213,6 @@ class BlueprintView extends Component {
           }
 
           @media (max-width: 900px) {
-            .mode-panel {
-              display: none;
-            }
-            
             .items-panel {
               display: none;
             }

@@ -22,6 +22,7 @@ export default (Page) => {
       <>
         <Head>
           <title>Floor Plan Editor</title>
+          <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico' />
           <link rel="manifest" href="/static/manifest.json" />
           <meta name="theme-color" content="#F3F7FA" />
           <meta

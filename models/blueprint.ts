@@ -12,6 +12,7 @@ export class Blueprint {
   private floorplan: FloorplanModel;
 
   public onModeChange = new Callback<string>();
+  public onSelectedItemChange = new Callback<number>();
   public onModelChange = new Callback<{
     floorplane: FloorplanDto;
     x: number;
@@ -37,10 +38,28 @@ export class Blueprint {
           break;
       }
     });
+
+    this.floorplanner.onModelChange.add(model => {
+      this.onModelChange.fire(model);
+    });
+
+    this.floorplan.onSelectedItemChange.add(index => {
+      this.onSelectedItemChange.fire(index);
+    });
+  }
+
+  public setState(floorplan: FloorplanDto, x: number, y: number, selectedItem: number | null) {
+    this.floorplan.reset();
+    this.floorplanner.originX = x;
+    this.floorplanner.originY = y;
+    this.floorplan.loadFloorplan(floorplan, false);
+    this.floorplan.setSelectedItem(selectedItem != null ? this.floorplan.getItems()[selectedItem] : null);
+    this.floorplanner.draw();
   }
 
   public load(floorplan: FloorplanDto) {
     this.floorplan.loadFloorplan(floorplan);
+    this.floorplanner.fireChanges();
   }
 
   public export(): FloorplanDto {

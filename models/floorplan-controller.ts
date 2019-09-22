@@ -5,9 +5,16 @@ import { Wall } from "./floorplan-entities/wall.model";
 import { Callback } from "../utils/callback";
 import { FloorplanMode } from "./floorplan-mode.enum";
 import { Item } from "./floorplan-entities/item.model";
+import { FloorplanDto } from "./floor.dto";
+import debounce from "debounce";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
+
+const cmPerFoot = 30.48;
+const pixelsPerFoot = 15.0;
+const cmPerPixel = cmPerFoot * (1.0 / pixelsPerFoot);
+const pixelsPerCm = 1.0 / cmPerPixel;
 
 /** 
  * The FloorplanController implements an interactive tool for creation of floorplans.
@@ -18,23 +25,45 @@ export class FloorplanController {
   public activeWall: Wall | null = null;
   public activeCorner: Corner | null = null;
 
-  private _activeItem: Item | null = null;
+  private _activeItemIndex: number | null = null;
   public set activeItem(item: Item) {
-    if (item !== this._activeItem) {
-      if (!!this._activeItem) {
-        this._activeItem.endActive();
+    const activeItem = this.activeItem;
+    if (item !== activeItem) {
+      if (!!activeItem) {
+        activeItem.endActive();
       }
       if (!!item) {
         item.startActive();
       }
     }
-    this._activeItem = item;
+    const index = this.floorplan.getItems().indexOf(item);
+    this._activeItemIndex = index >= 0 ? index : null;
   };
+
   public get activeItem() {
-    return this._activeItem;
+    return this._activeItemIndex != null
+    ? this.floorplan.getItems()[this._activeItemIndex]
+    : null;
   };
 
   public onModeChange = new Callback<FloorplanMode>();
+  public onModelChange = new Callback<{
+    floorplane: FloorplanDto;
+    x: number;
+    y: number;
+  }>();
+
+  public fireChanges() {
+    this.onModelChange.fire({
+      x: this.originX,
+      y: this.originY,
+      floorplane: this.floorplan.exportFloorplan(),
+    });
+  }
+
+  private emitChanges = debounce(() => {
+    this.fireChanges();
+  });
 
   public originX = 0;
   public originY = 0;
@@ -70,17 +99,9 @@ export class FloorplanController {
   /** mouse position at last click */
   private lastRawY = 0;
 
-  private cmPerPixel: number;
-  private pixelsPerCm: number;
-
   constructor(private canvasElement: HTMLCanvasElement, private floorplan: FloorplanModel) {
 
     this.view = new FloorplanView(this.floorplan, this, canvasElement);
-
-    const cmPerFoot = 30.48;
-    const pixelsPerFoot = 15.0;
-    this.cmPerPixel = cmPerFoot * (1.0 / pixelsPerFoot);
-    this.pixelsPerCm = 1.0 / this.cmPerPixel;
 
     // Initialization:
 
@@ -130,8 +151,6 @@ export class FloorplanController {
       this.targetX = this.mouseX;
       this.targetY = this.mouseY;
     }
-
-    this.view.draw();
   }
 
   private mousedown(event: MouseEvent) {
@@ -148,10 +167,13 @@ export class FloorplanController {
     if (this.mode == FloorplanMode.DELETE) {
       if (this.activeCorner) {
         this.activeCorner.removeAll();
+        this.emitChanges();
       } else if (this.activeWall) {
         this.activeWall.remove();
+        this.emitChanges();
       } else if (this.activeItem) {
         this.activeItem.remove();
+        this.emitChanges();
       } else {
         this.setMode(FloorplanMode.MOVE);
       }
@@ -169,8 +191,8 @@ export class FloorplanController {
 
     // update mouse
 
-    this.mouseX = (event.clientX - this.canvasElement.getBoundingClientRect().left) * this.cmPerPixel + this.originX * this.cmPerPixel;
-    this.mouseY = (event.clientY - this.canvasElement.getBoundingClientRect().top) * this.cmPerPixel + this.originY * this.cmPerPixel;
+    this.mouseX = (event.clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel;
+    this.mouseY = (event.clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel;
 
     const selectedItem = this.floorplan.getSelectedItem();
 
@@ -180,6 +202,7 @@ export class FloorplanController {
       || (this.mode == FloorplanMode.MOVE && this.mouseDown)
     ) {
       this.updateTarget();
+      this.view.draw();
     }
 
     // update object target
@@ -237,23 +260,27 @@ export class FloorplanController {
           this.lastY,
         )
       ) {
-        // Do nothing
+        this.emitChanges();
       } else if (this.activeItem) {
         this.activeItem.relativeMove(
           this.mouseX - this.lastX,
           this.mouseY - this.lastY
         );
+        this.emitChanges();
       } else if (this.activeCorner) {
         this.activeCorner.move(this.mouseX, this.mouseY);
         this.activeCorner.snapToAxis(snapTolerance);
+        this.checkWallDuplicates();
+        this.emitChanges();
       } else if (this.activeWall) {
         this.activeWall.relativeMove(
           this.mouseX - this.lastX,
           this.mouseY - this.lastY
         );
         this.activeWall.snapToAxis(snapTolerance);
+        this.checkWallDuplicates();
+        this.emitChanges();
       }
-      this.checkWallDuplicates();
       this.lastX = this.mouseX;
       this.lastY = this.mouseY;
       this.view.draw();
@@ -265,8 +292,10 @@ export class FloorplanController {
     const selectedItem = this.floorplan.getSelectedItem();
 
     if (selectedItem) {
-      selectedItem.mouseup(this.mouseX, this.mouseY);
-      this.view.draw();
+      if (selectedItem.mouseup(this.mouseX, this.mouseY)) {
+        this.view.draw();
+        this.emitChanges();
+      };
     }
 
     // drawing
@@ -280,11 +309,13 @@ export class FloorplanController {
       }
       this.lastNode = corner;
       this.checkWallDuplicates();
+      this.view.draw();
+      this.emitChanges();
     } else if (!this.mouseMoved && this.mode === FloorplanMode.MOVE) {
       if (this.activeItem) {
-        this.floorplan.setSelectedItem(this.activeItem);
+        this.floorplan.setSelectedItem(this.activeItem, true);
       } else {
-        this.floorplan.setSelectedItem(null);
+        this.floorplan.setSelectedItem(null, true);
       }
       this.view.draw();
     }
@@ -354,8 +385,8 @@ export class FloorplanController {
     const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
     const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
     const centerFloorplan = this.floorplan.getCenter();
-    this.originX = centerFloorplan.x * this.pixelsPerCm - centerX;
-    this.originY = centerFloorplan.z * this.pixelsPerCm - centerY;
+    this.originX = centerFloorplan.x * pixelsPerCm - centerX;
+    this.originY = centerFloorplan.z * pixelsPerCm - centerY;
   }
 
   /** Gets the center of the view */
@@ -363,18 +394,18 @@ export class FloorplanController {
     const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
     const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
     return {
-      x: (this.originX + centerX) * this.cmPerPixel,
-      y: (this.originY + centerY) * this.cmPerPixel,
+      x: (this.originX + centerX) * cmPerPixel,
+      y: (this.originY + centerY) * cmPerPixel,
     };
   }
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertX(x: number): number {
-    return (x - this.originX * this.cmPerPixel) * this.pixelsPerCm;
+    return (x - this.originX * cmPerPixel) * pixelsPerCm;
   }
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertY(y: number): number {
-    return (y - this.originY * this.cmPerPixel) * this.pixelsPerCm;
+    return (y - this.originY * cmPerPixel) * pixelsPerCm;
   }
 }

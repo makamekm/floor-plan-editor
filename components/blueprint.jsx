@@ -39,7 +39,7 @@ class BlueprintView extends Component {
   }
 
   componentWillUnmount() {
-    this.blueprintService.unsetBlueprint(this.blueprint);
+    this.blueprintService.destructor();
   }
 
   render() {

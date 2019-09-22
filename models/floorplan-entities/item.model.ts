@@ -35,7 +35,7 @@ export abstract class Item {
   public abstract mousedown(x: number, y: number): void;
 
   /** Reset the state */
-  public abstract mouseup(x: number, y: number): void;
+  public abstract mouseup(x: number, y: number): boolean | void;
 
   /** Reset the state */
   public abstract mousemove(

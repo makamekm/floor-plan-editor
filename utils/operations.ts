@@ -369,6 +369,13 @@ export class Utils {
     }
   }
 
+  static limitArray<T>(array: T[], limit: number) {
+    const removeElements = array.length - limit;
+    if (removeElements > 0) {
+      array.splice(0, removeElements);
+    }
+  }
+
   /** Checks if value is in array */
   static hasValue = <T>(array: T[], value: T): boolean => {
     return array.indexOf(value) >= 0;

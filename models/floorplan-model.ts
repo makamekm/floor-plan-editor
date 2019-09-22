@@ -20,8 +20,24 @@ export class FloorplanModel {
   private corners: Corner[] = [];
   private rooms: Room[] = [];
   private items: Item[] = [];
-  private selectedItem: Item = null;
+  private selectedItemIndex: number | null = null;
 
+  public setSelectedItem(value: Item | null, fire = false) {
+    let index = this.items.indexOf(value);
+    index = index >= 0 ? index : null;
+    if (index !== this.selectedItemIndex && fire) {
+      this.onSelectedItemChange.fire(index);
+    }
+    this.selectedItemIndex = index;
+  }
+
+  public getSelectedItem() {
+    return this.selectedItemIndex != null
+      ? this.items[this.selectedItemIndex]
+      : null;
+  }
+
+  public onSelectedItemChange = new Callback<number>();
   public roomLoadedCallbacks = new Callback();
 
   // hack
@@ -113,8 +129,8 @@ export class FloorplanModel {
    * @param item The item to be removed.
    */
   public removeItem(item: Item) {
-    if (this.selectedItem === item) {
-      this.selectedItem = null;
+    if (this.getSelectedItem() === item) {
+      this.setSelectedItem(null);
     }
 
     Utils.removeValue(this.items, item);
@@ -140,22 +156,12 @@ export class FloorplanModel {
     return this.items;
   }
 
-  /** Gets the selected item. */
-  public getSelectedItem(): Item {
-    return this.selectedItem;
-  }
-
-  /** Gets the selected item. */
-  public setSelectedItem(item: Item) {
-    this.selectedItem = item;
-  }
-
   public overlappedItem(x: number, y: number): Item {
     for (let i = 0; i < this.items.length; i++) {
       if (this.items[i].overlapped(
         x,
         y,
-        this.selectedItem === this.items[i],
+        this.getSelectedItem() === this.items[i],
       )) {
         return this.items[i];
       }
@@ -219,8 +225,10 @@ export class FloorplanModel {
     return floorplan;
   }
 
-  public loadFloorplan(floorplan: FloorplanDto) {
-    this.reset();
+  public loadFloorplan(floorplan: FloorplanDto, reset = true) {
+    if (reset) {
+      this.reset();
+    }
 
     const corners: {
       [id: string]: Corner;
@@ -252,10 +260,14 @@ export class FloorplanModel {
     });
 
     this.update();
-    this.roomLoadedCallbacks.fire();
+
+    if (reset) {
+      this.roomLoadedCallbacks.fire();
+    }
   }
 
   public reset() {
+    this.setSelectedItem(null);
     const tmpCorners = this.corners.slice(0);
     const tmpWalls = this.walls.slice(0);
     const tmpItems = this.items.slice(0);

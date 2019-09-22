@@ -51,6 +51,7 @@ export class TableItem extends Item {
     if (this.isRotating) {
       this.isRotating = false;
       this.roundAngle();
+      return true;
     }
   }
 

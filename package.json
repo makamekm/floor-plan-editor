@@ -24,7 +24,8 @@
     "debounce": "1.2.0",
     "rxjs": "6.5.3",
     "three": "0.108.0",
-    "next-offline": "4.0.5"
+    "next-offline": "4.0.5",
+    "react-sidebar": "3.0.2"
   },
   "devDependencies": {
     "@types/node": "12.7.5",

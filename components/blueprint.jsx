@@ -63,7 +63,7 @@ class BlueprintView extends Component {
           <Panel>
             <div className="list">
               <div className="item clickable" onClick={() => {
-                this.blueprint.addItem(ItemEnum.Table);
+                this.blueprintService.addItem(ItemEnum.Table);
               }}>
                 + &nbsp;Table
               </div>
@@ -72,13 +72,13 @@ class BlueprintView extends Component {
         </div>
 
         <div className="property-panel">
-          <Panel>
+          {this.blueprintService.selected ? <Panel>
             <div className="list">
               <div className="item header">
                 Table
               </div>
               <div className="item">
-                Owner: Karpov Maxim
+                {this.blueprintService.selected.name}
               </div>
               <div className="item">
                 Date added: 11/12/2019
@@ -90,7 +90,7 @@ class BlueprintView extends Component {
                 The best table has ever made
               </div>
             </div>
-          </Panel>
+          </Panel> : null}
         </div>
 
         <div className="floor-panel">

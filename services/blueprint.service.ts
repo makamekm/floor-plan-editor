@@ -1,8 +1,10 @@
 import { Router } from "next/router";
 import { Blueprint } from "../models/blueprint";
-import { observable, toJS } from "mobx";
+import { observable, observe, toJS, computed } from "mobx";
+import debounce from "debounce";
 import { FloorplanDto } from "../models/floor.dto";
 import { Utils } from "../utils/operations";
+import { ItemEnum } from "../models/floorplan-entities/item.enum";
 
 export interface IModel {
   x: number;
@@ -15,15 +17,28 @@ const historyLimit = 50;
 
 export class BlueprintService {
   @observable public mode: string = 'move';
-  @observable public model: {
+  @observable private model: {
     history: IModel[];
     revert: IModel[];
+    changeState: IModel;
     state: IModel;
   } = {
     history: [],
     revert: [],
+    changeState: null,
     state: null,
   };
+  @computed public get state() {
+    return this.model.changeState;
+  }
+  @computed public get selected() {
+    return this.model.changeState
+      && this.model.changeState.selectedItem != null
+      && this.model.changeState.floorplane.items[this.model.changeState.selectedItem];
+  }
+  private changes = observe(this.model, "state", ({ newValue }) => {
+    this.model.changeState = toJS(newValue);
+  });
   private blueprint: Blueprint;
 
   public setBlueprint(blueprint: Blueprint) {
@@ -44,6 +59,24 @@ export class BlueprintService {
     }
     this.blueprint = null;
   }
+
+  public addItem(type: ItemEnum) {
+    this.blueprint.addItem(type);
+  }
+
+  public applyChanges = debounce(() => {
+    this.pushHistory();
+    this.model.state = {
+      ...this.model.state,
+      ...toJS(this.model.changeState),
+    };
+    this.blueprint.setState(
+      this.model.state.floorplane,
+      this.model.state.x,
+      this.model.state.y,
+      this.model.state.selectedItem,
+    );
+  }, 100);
 
   public redo() {
     const state = this.model.revert.pop();
@@ -128,6 +161,7 @@ export class BlueprintService {
   destructor() {
     this.unsetBlueprint();
     this.unsetUndoListener();
+    // this.reaction.dispose();
   }
   
   private setUndoListener() {

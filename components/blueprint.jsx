@@ -11,7 +11,6 @@ import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
 import { FloorService } from '../services/floor.service';
 import { FloorListService } from '../services/floor-list.service';
-import { ItemEnum } from '../models/floorplan-entities/item.enum';
 import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
 
 const itemTypeList = [
@@ -154,6 +153,8 @@ class BlueprintView extends Component {
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
+            max-width: calc(100vw - 40px);
+            width: 230px;
           }
 
           .list.is-overflow {
@@ -211,7 +212,7 @@ class BlueprintView extends Component {
             background-color: #e0f6ff;
           }
 
-          @media (max-width: 850px) {
+          @media (max-width: 900px) {
             .mode-panel {
               display: none;
             }

@@ -172,6 +172,11 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
           max-width: 100%;
           box-sizing: border-box;
         }
+
+        .input-control::selection {
+          background-color: #000;
+          color: #ffffff;
+        }
     
         .input-control::placeholder {
           opacity: 0.67;

@@ -36,7 +36,6 @@ const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
           padding: 20px 20px 10px 20px;
           user-select: none;
           white-space: nowrap;
-          flex: 1 0 0;
           transition: background-color 0.1s, border 0.1s, color 0.1s;
           will-change: background-color, border, color;
           cursor: pointer;
@@ -46,6 +45,12 @@ const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
           border: 1px solid #DFE5EC;
           border-left-width: 0px;
           border-right-width: 1px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        
+        .toggle-type-button:first-child {
+          flex: 1;
         }
 
         .toggle-type-button:hover {

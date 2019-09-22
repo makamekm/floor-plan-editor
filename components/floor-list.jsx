@@ -12,30 +12,23 @@ const FloorList = () => {
 
   return (
     <>
-      <div className="list">
-        {
-          floorListService.list.map(({id, name}) => {
-            return (
-              <div key={id} onClick={() => floorService.openFloor(id)}
-                className={"item clickable" + (id === currentId ? ' active' : '')}>
-                {name}
-              </div>
-            )
-          })
-        }
-      </div>
+      {
+        floorListService.list.map(({id, name}) => {
+          return (
+            <div key={id} onClick={() => floorService.openFloor(id)}
+              className={"item clickable" + (id === currentId ? ' active' : '')}>
+              {name}
+            </div>
+          )
+        })
+      }
       
       <style jsx>{`
-        .list {
-          overflow: auto;
-          max-height: calc(100vh - 20px);
-        }
-
         .item {
           padding-left: 20px;
           padding-right: 20px;
-          transition: background-color 0.1s;
-          will-change: background-color;
+          transition: background-color 0.1s, border-color 0.1s;
+          will-change: background-color, border-color;
           user-select: none;
           padding-top: 10px;
           padding-bottom: 10px;
@@ -76,11 +69,7 @@ const FloorList = () => {
           background-color: #F1FCFF;
         }
 
-        .item.clickable:active {
-          background-color: #e0f6ff;
-        }
-
-        .item:active, .item.active {
+        .item.clickable:active, .item.clickable.active {
           background-color: #2196F3;
           border-color: #2196F3;
           color: #FFFFFF;

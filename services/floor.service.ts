@@ -1,6 +1,5 @@
-import { FloorplanListItemDto } from "../models/floor-list.dto";
 import { useRouter } from "next/router";
-import { observable, IObservableArray, computed } from "mobx";
+import { observable } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
@@ -81,10 +80,10 @@ export class FloorService {
     }
   }
 
-  public async createFloor() {
+  public async createFloor(name: string) {
     this.setLoading(true);
     try {
-      const data = await this.floorProvider.createFloorplan(this.floor.data, this.floor.plan);
+      const data = await this.floorProvider.createFloorplan(name, this.floor.plan);
       this.router.push('/' + String(data.id));
     } catch (error) {
       console.error(error);

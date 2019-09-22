@@ -52,7 +52,14 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) =
   }
 
   return useObserver(() => <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
-      <div className="value" onDoubleClick={() => onStartEdit()} onTouchEnd={() => onStartEdit()}>
+      <div className="value"
+        onClick={() => {
+          if (!value) {
+            onStartEdit();
+          }
+        }}
+        onDoubleClick={() => onStartEdit()}
+        onTouchEnd={() => onStartEdit()}>
         <div className="value-body">
           {value || placeholder}
         </div>
@@ -170,6 +177,11 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) =
           width: 100%;
           max-width: 100%;
           box-sizing: border-box;
+        }
+
+        .input-control::selection {
+          background-color: #000;
+          color: #ffffff;
         }
     
         .input-control::placeholder {

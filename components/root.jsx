@@ -5,12 +5,14 @@ import { FloorProvider } from "../services/floor.provider";
 import { FloorService } from "../services/floor.service";
 import { BlueprintService } from "../services/blueprint.service";
 import { FloorListService } from "../services/floor-list.service";
+import { FloorEditService } from '../services/floor-edit.service';
 
 const services = [
   FloorProvider,
   FloorService,
   FloorListService,
   BlueprintService,
+  FloorEditService,
 ];
 
 export default (Page) => {

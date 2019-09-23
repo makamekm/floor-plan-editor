@@ -56,9 +56,14 @@ export class FloorService {
     }
   }
 
-  public async openFloor(id: number, projectId: number = this.projectService.project.id) {
-    this.router.push('/' + String(projectId) + '/' + String(id));
+  public async openPublicFloor(id: number, projectId: number = this.projectService.project.id) {
     await this.loadFloor(id);
+    this.router.push('/' + String(projectId) + '/view/' + String(id));
+  }
+
+  public async openFloor(id: number, projectId: number = this.projectService.project.id) {
+    await this.loadFloor(id);
+    this.router.push('/' + String(projectId) + '/' + String(id));
   }
 
   public async saveFloor() {

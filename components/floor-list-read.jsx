@@ -28,13 +28,13 @@ const FloorListRead = () => {
     }}
       className={"item clickable"}>
       <WithIcon icon={CopyIcon}>
-        Copy Public Link
+        Copy Link
       </WithIcon>
     </div>
     {
       floorListService.list.map(({id, name}) => {
         return (
-          <div key={id} onClick={() => floorService.openFloor(id)}
+          <div key={id} onClick={() => floorService.openPublicFloor(id)}
             className={"item clickable" + (id === currentId ? ' active' : '')}>
             {name}
           </div>

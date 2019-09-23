@@ -1,5 +1,6 @@
 import { FloorplanDto, FloorplanDataDto } from "../models/floor.dto";
 import { FloorplanListDto } from "../models/floor-list.dto";
+import { ProjectListDto, ProjectListItemDto } from "../models/project-list.dto";
 
 export const demoPlan: FloorplanDto = {
   corners: {
@@ -69,3 +70,27 @@ export const demoFloorList: FloorplanListDto = [
     name: "Floor 3 (Server)"
   },
 ];
+
+export const demoProjectList: ProjectListDto = [
+  {
+    id: 0,
+    name: "Main Project"
+  },
+  {
+    id: 1,
+    name: "Alternative"
+  },
+  {
+    id: 2,
+    name: "Draft"
+  },
+  {
+    id: 3,
+    name: "Copied"
+  },
+];
+
+export const demoProject: ProjectListItemDto = {
+  id: 0,
+  name: "Main Project"
+};

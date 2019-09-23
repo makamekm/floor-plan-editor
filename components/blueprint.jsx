@@ -3,7 +3,6 @@ import Sidebar from 'react-sidebar';
 import { Blueprint } from '../models/blueprint';
 import ToggleButtonType from './toggle-type';
 import Panel from './panel';
-import Loading from './loading';
 import FloorPanel from './floor-panel';
 import InlineTextEdit from './inline-text-edit';
 import InlineTextareaEdit from './inline-textarea-edit';
@@ -11,8 +10,6 @@ import List from './list';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
-import { FloorService } from '../services/floor.service';
-import { FloorListService } from '../services/floor-list.service';
 import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
 
 const itemTypeList = [
@@ -37,8 +34,6 @@ class BlueprintView extends Component {
     isToolbarOpen: false,
   }
 
-  @inject(FloorService) floorService;
-  @inject(FloorListService) floorListService;
   @inject(BlueprintService) blueprintService;
 
   componentDidMount() {
@@ -152,11 +147,6 @@ class BlueprintView extends Component {
           <div className="floor-panel">
             <FloorPanel/>
           </div>
-
-          <Loading active={
-            this.floorService.loading
-            || this.floorListService.loading
-          }></Loading>
 
           <style jsx>{`
             .view {

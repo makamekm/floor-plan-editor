@@ -5,7 +5,7 @@ import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
 import { FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
 import { BlueprintService } from "./blueprint.service";
-import { FloorListService } from "./floor-list.service";
+import { ProjectService } from "./project.service";
 
 export class FloorService {
   @observable loading: boolean = false;
@@ -23,7 +23,7 @@ export class FloorService {
   };
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
-  @inject(FloorListService) private floorListService: FloorListService;
+  @inject(ProjectService) private projectService: ProjectService;
   @inject(BlueprintService) private blueprintService: BlueprintService;
   private router = useRouter();
 
@@ -37,13 +37,14 @@ export class FloorService {
 
   public async loadFloor(id: number) {
     this.setLoading(true);
+    await this.projectService.loadProject(this.projectService.project.id);
     try {
       const [plan, data]: [
         FloorplanDto,
         FloorplanDataDto,
       ] = await Promise.all([
-        this.floorProvider.getFloorplan(id),
-        this.floorProvider.getFloorplanData(id),
+        this.floorProvider.getFloorplan(this.projectService.project.id, id),
+        this.floorProvider.getFloorplanData(this.projectService.project.id, id),
       ]);
       this.floor.plan = plan;
       this.floor.data = data;
@@ -55,9 +56,9 @@ export class FloorService {
     }
   }
 
-  public openFloor(id: number) {
-    this.router.push('/' + String(id));
-    this.loadFloor(id);
+  public async openFloor(id: number, projectId: number = this.projectService.project.id) {
+    this.router.push('/' + String(projectId) + '/' + String(id));
+    await this.loadFloor(id);
   }
 
   public async saveFloor() {
@@ -67,12 +68,20 @@ export class FloorService {
         FloorplanDto,
         FloorplanDataDto,
       ] = await Promise.all([
-        this.floorProvider.saveFloorPlan(this.floor.data.id, this.floor.plan),
-        this.floorProvider.saveFloorplanData(this.floor.data.id, this.floor.data),
+        this.floorProvider.saveFloorPlan(
+          this.projectService.project.id,
+          this.floor.data.id,
+          this.floor.plan,
+        ),
+        this.floorProvider.saveFloorplanData(
+          this.projectService.project.id,
+          this.floor.data.id,
+          this.floor.data,
+        ),
       ]);
       this.floor.plan = plan;
       this.floor.data = data;
-      await this.floorListService.loadList();
+      await this.projectService.loadProject(this.projectService.project.id);
     } catch (error) {
       console.error(error);
     } finally {
@@ -83,8 +92,12 @@ export class FloorService {
   public async createFloor(name: string) {
     this.setLoading(true);
     try {
-      const data = await this.floorProvider.createFloorplan(name, this.floor.plan);
-      this.router.push('/' + String(data.id));
+      const data = await this.floorProvider.createFloorplan(
+        this.projectService.project.id,
+        name,
+        this.floor.plan,
+      );
+      this.openFloor(data.id);
     } catch (error) {
       console.error(error);
     } finally {
@@ -92,14 +105,19 @@ export class FloorService {
     }
   }
 
-  public async deleteFloor(id: number) {
+  public async deleteFloor(id: number = this.floor.data.id) {
     this.setLoading(true);
     try {
-      const result = await this.floorProvider.deleteFloorPlan(id);
+      const result = await this.floorProvider.deleteFloorPlan(
+        this.projectService.project.id,
+        id,
+      );
       if (result) {
-        await this.floorListService.loadList();
+        await this.projectService.loadProject(this.projectService.project.id);
         if (this.floor.data.id === id) {
-          this.router.push('/');
+          this.projectService.openProject(
+            this.projectService.project.id,
+          );
           this.floor.plan = null;
           this.floor.data = null;
         }

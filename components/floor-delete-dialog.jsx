@@ -36,7 +36,7 @@ const FloorDeleteDialog = ({children}) => {
                 key: 'action',
                 body: "Yes, Remove",
                 onClick: async () => {
-                  await floorService.deleteFloor(floorService.floor.data.id);
+                  await floorService.deleteFloor();
                   data.isOpen = false;
                 },
                 isClickable: true,

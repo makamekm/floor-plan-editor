@@ -23,10 +23,12 @@ const FloorEdit = () => {
               key: 'name',
               body: (
                 <InlineTextEdit
-                  placeholder="Write Name..."
+                  placeholder="Write name..."
                   value={floorEditService.data.name}
                   onChange={value => {
-                    floorEditService.data.name = value;
+                    if (value.length > 0) {
+                      floorEditService.data.name = value;
+                    }
                   }}
                 />
               ),

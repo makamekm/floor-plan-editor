@@ -1,16 +1,20 @@
 import React from 'react'
 import Head from 'next/head'
 import { provider, useInstances } from 'react-ioc'
-import { FloorProvider } from "../services/floor.provider";
+import { FloorProvider } from '../services/floor.provider';
+import { ProjectListService } from "../services/project-list.service";
+import { ProjectService } from '../services/project.service';
+import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
 import { BlueprintService } from "../services/blueprint.service";
-import { FloorListService } from "../services/floor-list.service";
 import { FloorEditService } from '../services/floor-edit.service';
 
 const services = [
   FloorProvider,
-  FloorService,
   FloorListService,
+  ProjectListService,
+  ProjectService,
+  FloorService,
   BlueprintService,
   FloorEditService,
 ];

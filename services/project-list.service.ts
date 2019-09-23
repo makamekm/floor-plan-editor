@@ -1,13 +1,13 @@
-import { FloorplanListItemDto } from "../models/floor-list.dto";
 import { observable, IObservableArray } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
+import { ProjectListItemDto } from "../models/project-list.dto";
 
-export class FloorListService {
+export class ProjectListService {
   @observable loading: boolean = true;
   @observable opened: boolean = false;
-  @observable list: IObservableArray<FloorplanListItemDto> = <any>[];
+  @observable list: IObservableArray<ProjectListItemDto> = <any>[];
 
   private setLoading = debounce<(value: boolean) => void>(value => {
     this.loading = value;
@@ -15,10 +15,16 @@ export class FloorListService {
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
 
-  public async loadList(projectId: number) {
+  constructor() {
+    if (process.browser) {
+      this.loadList();
+    }
+  }
+
+  public async loadList() {
     this.setLoading(true);
     try {
-      const list = await this.floorProvider.getFloorList(projectId);
+      const list = await this.floorProvider.getProjectList();
       this.list.replace(list);
     } catch (error) {
       console.error(error);

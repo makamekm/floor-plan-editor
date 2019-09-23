@@ -1,3 +1,4 @@
+import { ProjectListItemDto } from "./project-list.dto";
 
 export interface FloorplanDto {
   corners: {

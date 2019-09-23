@@ -8,6 +8,12 @@ export const configDimUnit = "dimUnit";
 /** The dpr unit to scale the application */
 export const configDpr = "dpr";
 
+/** Firebase */
+export const configApiKey = "apiKey";
+
+/** Firebase */
+export const configAuthDomain = "authDomain";
+
 // WALL:
 
 /** The initial wall thickness in cm. */
@@ -17,6 +23,8 @@ export const configWallThickness = "wallThickness";
 export class Configuration {
   /** Configuration data loaded from/stored to extern. */
   private static data: {[key: string]: any} = {
+    [configApiKey]: 'AIzaSyASRwAqeD-9Fdo6m0VsDaN4GznhZ4ygfRU',
+    [configAuthDomain]: 'localhost',
     [configDimUnit]: dimMeter,
     [configWallThickness]: 14,
     [configDpr]: process.browser ? (window.devicePixelRatio || 1) : 1,
@@ -30,6 +38,8 @@ export class Configuration {
   /** Get a string configuration parameter. */
   public static getStringValue(key: string): string {
     switch (key) {
+      case configApiKey:
+      case configAuthDomain:
       case configDimUnit:
         return <string>this.data[key];
       default:

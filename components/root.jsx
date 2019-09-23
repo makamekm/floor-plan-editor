@@ -8,6 +8,34 @@ import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
 import { BlueprintService } from "../services/blueprint.service";
 import { FloorEditService } from '../services/floor-edit.service';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import firebase from 'firebase';
+import { Configuration, configAuthDomain, configApiKey } from '../utils/configuration';
+
+const config = {
+  apiKey: Configuration.getStringValue(configApiKey),
+  authDomain: Configuration.getStringValue(configAuthDomain),
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
+
+const uiConfig = {
+  // Popup signin flow rather than redirect flow.
+  signInFlow: 'popup',
+  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
+  // signInSuccessUrl: '/',
+  // We will display Google and Facebook as auth providers.
+  signInOptions: [
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+  ],
+  callbacks: {
+    // Avoid redirects after sign-in.
+    signInSuccessWithAuthResult: () => false
+  },
+};
 
 const services = [
   FloorProvider,
@@ -21,6 +49,7 @@ const services = [
 
 export default (Page) => {
   const Root = () => {
+    let unregisterAuthObserver;
     useInstances(...services);
     React.useEffect(() => {
       if (process.browser) {
@@ -30,6 +59,14 @@ export default (Page) => {
           const vh = window.innerHeight * 0.01;
           document.documentElement.style.setProperty('--vh', `${vh}px`);
         });
+        unregisterAuthObserver = firebase.auth().onAuthStateChanged(
+          (user) => {
+            console.log(user);
+          }
+        );
+      }
+      return () => {
+        unregisterAuthObserver();
       }
     });
     return (
@@ -45,6 +82,7 @@ export default (Page) => {
           />
           <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet"></link>
         </Head>
+        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
   
         {React.createElement(Page)}
         

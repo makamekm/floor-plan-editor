@@ -1,5 +1,6 @@
 import { FloorplanModel } from "../floorplan-model";
 import { FloorplanView } from "../floorplan-view";
+import { FloorplanMode } from "../floorplan-mode.enum";
 
 export interface ItemMetadata {
   id?: number;
@@ -32,15 +33,16 @@ export abstract class Item {
   public abstract endActive(): void;
 
   /** Reset the state */
-  public abstract mousedown(x: number, y: number): void;
+  public abstract mousedown(x: number, y: number, mode: FloorplanMode): void;
 
   /** Reset the state */
-  public abstract mouseup(x: number, y: number): boolean | void;
+  public abstract mouseup(x: number, y: number, mode: FloorplanMode): boolean | void;
 
   /** Reset the state */
   public abstract mousemove(
     mouseX: number, mouseY: number,
     lastMouseX: number, lastMouseY: number,
+    mode: FloorplanMode,
   ): boolean | void;
 
   public abstract render(
@@ -48,6 +50,7 @@ export abstract class Item {
     y: number,
     hover: boolean,
     selected: boolean,
+    mode: FloorplanMode,
     view: FloorplanView,
   ): void;
 
@@ -55,6 +58,7 @@ export abstract class Item {
     x: number,
     y: number,
     selected: boolean,
+    mode: FloorplanMode,
   ): boolean;
 
   /** Remove callback. Fires the delete callbacks. */

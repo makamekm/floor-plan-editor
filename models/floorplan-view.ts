@@ -106,6 +106,7 @@ export class FloorplanView {
       this.viewmodel.convertY(item.y),
       hover,
       true,
+      this.viewmodel.mode,
       this,
     );
   }
@@ -117,6 +118,7 @@ export class FloorplanView {
       this.viewmodel.convertY(item.y),
       hover,
       false,
+      this.viewmodel.mode,
       this,
     );
   }
@@ -137,7 +139,7 @@ export class FloorplanView {
   }
 
   private drawWall(wall: Wall) {
-    const hover = wall === this.viewmodel.activeWall;
+    const hover = wall === this.viewmodel.activeWall && this.viewmodel.mode != null;
     let color = wallColor;
     if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
       color = deleteColor;
@@ -187,7 +189,7 @@ export class FloorplanView {
     let color = edgeColor;
     if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
       color = deleteColor;
-    } else if (hover) {
+    } else if (hover && this.viewmodel.mode != null) {
       color = edgeColorHover;
     }
     const corners = edge.corners();
@@ -221,19 +223,21 @@ export class FloorplanView {
   }
 
   private drawCorner(corner: Corner) {
-    const hover = (corner === this.viewmodel.activeCorner);
-    let color = cornerColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
-      color = deleteColor;
-    } else if (hover) {
-      color = cornerColorHover;
+    if (this.viewmodel.mode != null) {
+      const hover = (corner === this.viewmodel.activeCorner);
+      let color = cornerColor;
+      if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+        color = deleteColor;
+      } else if (hover) {
+        color = cornerColorHover;
+      }
+      this.drawCircle(
+        this.viewmodel.convertX(corner.x),
+        this.viewmodel.convertY(corner.y),
+        hover ? cornerRadiusHover : cornerRadius,
+        color
+      );
     }
-    this.drawCircle(
-      this.viewmodel.convertX(corner.x),
-      this.viewmodel.convertY(corner.y),
-      hover ? cornerRadiusHover : cornerRadius,
-      color
-    );
   }
 
   private drawTarget(x: number, y: number, lastNode: Corner | null = null) {

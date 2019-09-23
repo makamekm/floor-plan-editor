@@ -73,6 +73,9 @@ export class Blueprint {
 
   public changeMode(mode: string) {
     switch (mode) {
+      case 'read':
+        this.floorplanner.setMode(null);
+        break;
       case 'move':
         this.floorplanner.setMode(FloorplanMode.MOVE);
         break;

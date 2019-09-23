@@ -47,6 +47,8 @@ const WindowPanel = ({children, active, onClickOutside}) => <Portal>
       .overflow {
         overflow: auto;
         max-height: calc(var(--vh, 1vh) * 100 - 40px);
+        width: calc(100vw - 20px);
+        max-width: 400px;
       }
     `}</style>
   </div>

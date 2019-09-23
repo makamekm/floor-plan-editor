@@ -13,7 +13,7 @@ const List = ({children, onClick, borderRadius}) => {
             + (item.isHeader ? " is-header" : "")
             + (item.isField ? " is-field" : "")
           }
-          onClick={item.isClickable ? () => onClick(item) : undefined}>
+          onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
           {item.body}
         </div>
       ))}

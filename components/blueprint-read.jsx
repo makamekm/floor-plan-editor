@@ -1,31 +1,12 @@
 import React, { Component } from 'react';
-import Sidebar from 'react-sidebar';
 import { Blueprint } from '../models/blueprint';
-import ToggleButtonType from './toggle-type';
 import Panel from './panel';
-import FloorPanel from './floor-panel';
-import InlineTextEdit from './inline-text-edit';
-import InlineTextareaEdit from './inline-textarea-edit';
+import FloorPanelRead from './floor-panel-read';
 import List from './list';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
-import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
-
-const itemTypeList = [
-  {
-    key: 'move',
-    name: 'Move',
-  },
-  {
-    key: 'draw',
-    name: 'Draw',
-  },
-  {
-    key: 'delete',
-    name: 'Delete',
-  },
-]
+import { ItemNameDict } from '../models/floorplan-entities/item.dict';
 
 @observer
 class BlueprintView extends Component {
@@ -83,7 +64,7 @@ class BlueprintView extends Component {
         </div>
 
         <div className="floor-panel">
-          <FloorPanel/>
+          <FloorPanelRead/>
         </div>
 
         <style jsx>{`

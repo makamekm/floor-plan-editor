@@ -7,8 +7,10 @@ import { ProjectService } from '../services/project.service'
 import EditIcon from "../icons/edit.svg"
 import BackIcon from "../icons/back.svg"
 import AddIcon from "../icons/add.svg"
+import CopyIcon from "../icons/copy.svg"
 import WithIcon from './with-icon'
 import ProjectEditDialog from './project-edit-dialog'
+import { copyTextToClipboard } from '../utils/clipboard'
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
@@ -29,13 +31,27 @@ const FloorList = () => {
         <div onClick={() => projectService.openProjectList()}
           className={"item clickable"}>
           <WithIcon icon={BackIcon}>
-            Open Projects
+            Open My Projects
           </WithIcon>
         </div>
         <div onClick={() => projectService.openProjectCreatePlan()}
           className={"item clickable" + (currentId === null ? ' active' : '')}>
           <WithIcon icon={AddIcon}>
             Create Plan
+          </WithIcon>
+        </div>
+        <div onClick={() => {
+          copyTextToClipboard(
+            window.location.origin
+            + '/'
+            + projectService.project.id
+            + '/view/'
+            + floorService.floor.data.id,
+          );
+        }}
+          className={"item clickable"}>
+          <WithIcon icon={CopyIcon}>
+            Copy Public Link
           </WithIcon>
         </div>
         {

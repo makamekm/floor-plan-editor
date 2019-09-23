@@ -49,7 +49,17 @@ class BlueprintView extends Component {
     return (
       <Sidebar
         pullRight
-        styles={{ sidebar: { background: "white" } }}
+        styles={{
+          sidebar: {
+            background: "white",
+            overflowY: "auto",
+            maxHeight: "calc(var(--vh, 1vh) * 100)",
+          },
+          content: {
+            overflowY: "hidden",
+            maxHeight: "calc(var(--vh, 1vh) * 100)",
+          },
+        }}
         open={this.state.isToolbarOpen}
         onSetOpen={open => this.setState({ isToolbarOpen: open })}
         sidebar={

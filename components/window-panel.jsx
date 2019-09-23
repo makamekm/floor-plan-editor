@@ -16,6 +16,7 @@ const WindowPanel = ({children, active, onClickOutside}) => <Portal>
 
     <style jsx>{`
       .window {
+        display: none;
         position: fixed;
         left: 0px;
         top: 0px;
@@ -27,8 +28,7 @@ const WindowPanel = ({children, active, onClickOutside}) => <Portal>
         pointer-events: none;
         z-index: 100;
         opacity: 0;
-        transition: opacity 0.2s:
-        display: none;
+        transition: opacity 0.2s;
       }
 
       .window.is-open {

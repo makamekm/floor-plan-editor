@@ -2,6 +2,7 @@ import React from 'react'
 
 const WithIcon = ({children, icon, padding}) => {
   padding = padding || '3px';
+
   return (
     <div className="row">
       <div>

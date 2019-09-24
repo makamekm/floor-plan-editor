@@ -2,6 +2,7 @@ import React from 'react'
 
 const List = ({children, onClick, borderRadius}) => {
   borderRadius = borderRadius || '0px';
+
   return (
     <div className={"list"}>
   

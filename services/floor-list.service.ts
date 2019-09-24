@@ -15,7 +15,7 @@ export class FloorListService {
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
 
-  public async loadList(projectId: number) {
+  public async loadList(projectId: number | string) {
     this.setLoading(true);
     try {
       const list = await this.floorProvider.getFloorList(projectId);

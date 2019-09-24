@@ -15,45 +15,43 @@ const FloorPanelRead = () => {
 
   const name = floorService.floor.data && floorService.floor.data.name;
 
-  return (
-    <>
-      <Panel>
-        <ToggleButtonType
-          activeState={'name'}
-          items={[{
-            key: 'name',
-            name: name,
-          }, {
-            key: 'menu',
-            name: <div style={{lineHeight: 0}}><img src={ListIcon} alt=""/></div>,
-          }]}
-          onToggle={key => {
-            if (key === 'menu') {
-              floorListService.opened = true;
-            }
-          }}
-        />
-        <WindowPanel
-          active={floorListService.opened}
-          onClickOutside={() => {
-            floorListService.opened = false;
-          }}>
-          <div className="list">
-            <FloorListRead/>
-          </div>
-        </WindowPanel>
-      </Panel>
-  
-      <style jsx>{`
-        .list {
-          width: calc(100vw - 20px);
-          max-width: 400px;
-          overflow: auto;
-          max-height: calc(var(--vh, 1vh) * 100 - 20px);
-        }
-      `}</style>
-    </>
-  )
+  return <>
+    <Panel>
+      <ToggleButtonType
+        activeState={'name'}
+        items={[{
+          key: 'name',
+          name: name,
+        }, {
+          key: 'menu',
+          name: <div style={{lineHeight: 0}}><img src={ListIcon} alt=""/></div>,
+        }]}
+        onToggle={key => {
+          if (key === 'menu') {
+            floorListService.opened = true;
+          }
+        }}
+      />
+      <WindowPanel
+        active={floorListService.opened}
+        onClickOutside={() => {
+          floorListService.opened = false;
+        }}>
+        <div className="list">
+          <FloorListRead/>
+        </div>
+      </WindowPanel>
+    </Panel>
+
+    <style jsx>{`
+      .list {
+        width: calc(100vw - 20px);
+        max-width: 400px;
+        overflow: auto;
+        max-height: calc(var(--vh, 1vh) * 100 - 20px);
+      }
+    `}</style>
+  </>
 }
 
 export default observer(FloorPanelRead);

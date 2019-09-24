@@ -1,10 +1,10 @@
 export interface ProjectDto {
-  id: number;
+  id: number | string;
   name: string;
 }
 
 export interface ProjectListItemDto {
-  id: number;
+  id: number | string;
   name: string;
 }
 

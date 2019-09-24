@@ -28,18 +28,21 @@ const FloorList = () => {
             Edit Project
           </WithIcon>
         </div>
+
         <div onClick={() => projectService.openProjectList()}
           className={"item clickable"}>
           <WithIcon icon={BackIcon}>
             Open My Projects
           </WithIcon>
         </div>
+
         <div onClick={() => projectService.openProjectCreatePlan()}
           className={"item clickable" + (currentId === null ? ' active' : '')}>
           <WithIcon icon={AddIcon}>
             Create Plan
           </WithIcon>
         </div>
+
         <div onClick={() => {
           copyTextToClipboard(
             window.location.origin
@@ -54,6 +57,7 @@ const FloorList = () => {
             Copy Public Link
           </WithIcon>
         </div>
+
         {
           floorListService.list.map(({id, name}) => {
             return (
@@ -64,7 +68,7 @@ const FloorList = () => {
             )
           })
         }
-        
+
         <style jsx>{`
           .item {
             padding-left: 20px;

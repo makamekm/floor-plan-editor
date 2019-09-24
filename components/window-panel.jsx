@@ -6,6 +6,7 @@ const WindowPanel = ({children, active, onClickOutside}) => <Portal>
   <div
     className={"window" + (active ? " is-open" : "")}
     onClick={(e) => onClickOutside && onClickOutside(e)}>
+
     <div className="content" onClick={e => e.stopPropagation()}>
       <Panel>
         <div className="overflow">

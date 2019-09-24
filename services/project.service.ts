@@ -6,6 +6,7 @@ import { FloorProvider } from "./floor.provider";
 import { ProjectDto } from "../models/project-list.dto";
 import { ProjectListService } from "./project-list.service";
 import { FloorListService } from "./floor-list.service";
+import { useEffect } from "react";
 
 export class ProjectService {
   @observable loading: boolean = false;
@@ -30,14 +31,14 @@ export class ProjectService {
   private router = useRouter();
 
   constructor() {
-    if (process.browser) {
+    useEffect(() => {
       if (this.router.query.project_id != null) {
-        this.loadProject(Number.parseInt(<string>this.router.query.project_id, 10));
+        this.loadProject(<string>this.router.query.project_id);
       }
-    }
+    }, []);
   }
 
-  public async loadProject(id: number = this.project.id) {
+  public async loadProject(id: number | string = this.project.id) {
     this.data.project = {
       id,
       name: '',
@@ -56,32 +57,26 @@ export class ProjectService {
     return this.project;
   }
 
-  public async openProject(id: number) {
-    this.data.project = {
-      id,
-      name: '',
-    };
-    await this.loadProject(id);
+  public async openProject(id: number | string) {
+    this.setLoading(true);
+    await this.floorListService.loadList(id);
+    this.setLoading(false);
+
     const firstPlan = this.floorListService.list[0];
+
     if (firstPlan) {
       this.router.push('/' + String(id) + '/' + String(firstPlan.id));
     } else {
-      this.router.push('/' + String(id));
+      this.router.push('/[project_id]', '/' + String(id));
     }
   }
 
-  public async openProjectCreatePlan(id: number = this.data.project.id) {
-    this.data.project = {
-      id,
-      name: '',
-    };
-    await this.loadProject(id);
-    this.router.push('/' + String(id));
+  public async openProjectCreatePlan(id: number | string = this.data.project.id) {
+    this.router.push('/[project_id]', '/' + String(id));
   }
 
   public async openProjectList() {
-    this.router.push('/');
-    await this.projectListService.loadList();
+    this.router.push('/', '/');
   }
 
   public async saveProject() {
@@ -110,7 +105,7 @@ export class ProjectService {
     }
   }
 
-  public async deleteProject(id: number = this.data.project.id) {
+  public async deleteProject(id: number | string = this.data.project.id) {
     this.setLoading(true);
     try {
       const result = await this.floorProvider.deleteProject(id);

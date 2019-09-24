@@ -4,42 +4,42 @@ import { demoFloorData, demoPlan, demoFloorList, demoProjectList, demoProject } 
 import { ProjectListDto, ProjectListItemDto, ProjectDto } from "../models/project-list.dto";
 
 export class FloorProvider {
-  public async getFloorplanData(projectId: number, id: number): Promise<FloorplanDataDto>{
+  public async getFloorplanData(projectId: number | string, id: number | string): Promise<FloorplanDataDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(demoFloorData));
   }
 
-  public async getFloorplan(projectId: number, id: number): Promise<FloorplanDto>{
+  public async getFloorplan(projectId: number | string, id: number | string): Promise<FloorplanDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(demoPlan));
   }
 
-  public async saveFloorplanData(projectId: number, id: number, data: FloorplanDataDto): Promise<FloorplanDataDto>{
+  public async saveFloorplanData(projectId: number | string, id: number | string, data: FloorplanDataDto): Promise<FloorplanDataDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(data));
   }
 
-  public async saveFloorPlan(projectId: number, id: number, floorplan: FloorplanDto): Promise<FloorplanDto>{
+  public async saveFloorPlan(projectId: number | string, id: number | string, floorplan: FloorplanDto): Promise<FloorplanDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(floorplan));
   }
 
-  public async getFloorList(projectId: number): Promise<FloorplanListDto>{
+  public async getFloorList(projectId: number | string): Promise<FloorplanListDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(demoFloorList));
   }
 
-  public async deleteFloorPlan(projectId: number, id: number): Promise<boolean>{
+  public async deleteFloorPlan(projectId: number | string, id: number | string): Promise<boolean>{
     await new Promise(r => setTimeout(r, 1000));
     return true;
   }
 
-  public async createFloorplan(projectId: number, name: string, floorplan: FloorplanDto): Promise<FloorplanDataDto>{
+  public async createFloorplan(projectId: number | string, name: string, floorplan: FloorplanDto): Promise<FloorplanDataDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify({ name, id: 1 }));
   }
 
-  public async getProject(projectId: number): Promise<ProjectDto>{
+  public async getProject(projectId: number | string): Promise<ProjectDto>{
     await new Promise(r => setTimeout(r, 1000));
     return JSON.parse(JSON.stringify(demoProject));
   }
@@ -49,7 +49,7 @@ export class FloorProvider {
     return JSON.parse(JSON.stringify(demoProjectList));
   }
 
-  public async deleteProject(projectId: number): Promise<boolean>{
+  public async deleteProject(projectId: number | string): Promise<boolean>{
     await new Promise(r => setTimeout(r, 1000));
     return true;
   }

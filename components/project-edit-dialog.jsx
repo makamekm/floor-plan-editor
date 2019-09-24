@@ -12,7 +12,7 @@ const ProjectEditDialog = ({children}) => {
   const data = useObservable({isOpen: false});
   const projectService = useInstance(ProjectService);
 
-  return useObserver(() => <>
+  return <>
     {children(() => {
       data.isOpen = true;
       data.name = "";
@@ -62,7 +62,7 @@ const ProjectEditDialog = ({children}) => {
         </List>}
       </ProjectDeleteDialog>
     </WindowPanel>
-  </>)
+  </>
 }
 
 export default observer(ProjectEditDialog)

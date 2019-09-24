@@ -1,17 +1,18 @@
 import { observable, computed } from "mobx";
 import debounce from "debounce";
 import { useEffect } from "react";
-// import firebase from 'firebase';
-// import { Configuration, configAuthDomain, configApiKey } from '../utils/configuration';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import { Configuration, configAuthDomain, configApiKey } from '../utils/configuration';
 
-// const config = {
-//   apiKey: Configuration.getStringValue(configApiKey),
-//   authDomain: Configuration.getStringValue(configAuthDomain),
-// };
+const config = {
+  apiKey: Configuration.getStringValue(configApiKey),
+  authDomain: Configuration.getStringValue(configAuthDomain),
+};
 
-// if (!firebase.apps.length) {
-//   firebase.initializeApp(config);
-// }
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
 
 export class UserService {
   @observable loading: boolean = true;
@@ -35,25 +36,24 @@ export class UserService {
 
   constructor() {
     useEffect(() => {
-      this.data.user = {};
-      this.setLoading(false);
-      // const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
-      //   (user) => {
-      //     console.log(user);
-      //     this.data.user = user;
-      //     this.setLoading(false);
-      //   }
-      // );
-      // return () => {
-      //   unregisterAuthObserver();
-      // }
+      this.setLoading(true);
+      const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
+        (user) => {
+          console.log(user);
+          this.data.user = user;
+          this.setLoading(false);
+        }
+      );
+      return () => {
+        unregisterAuthObserver();
+      }
     }, []);
   }
 
   public async logout() {
     this.setLoading(true);
     try {
-      // await this.auth.signOut();
+      await this.auth.signOut();
       window.location.reload(false); // monkey fix
     } catch (e) {
       console.error(e);
@@ -62,20 +62,20 @@ export class UserService {
     }
   }
 
-  // public get auth() {
-  //   return firebase.auth();
-  // }
+  public get auth() {
+    return firebase.auth();
+  }
 
-  // public get uiConfig() {
-  //   return {
-  //     signInFlow: 'popup',
-  //     signInOptions: [
-  //       firebase.auth.EmailAuthProvider.PROVIDER_ID,
-  //       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-  //     ],
-  //     callbacks: {
-  //       signInSuccessWithAuthResult: () => false,
-  //     },
-  //   };
-  // }
+  public get uiConfig() {
+    return {
+      signInFlow: 'popup',
+      signInOptions: [
+        firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      ],
+      callbacks: {
+        signInSuccessWithAuthResult: () => false,
+      },
+    };
+  }
 }

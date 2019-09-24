@@ -1,6 +1,7 @@
 import React from 'react'
-import { useObserver, useObservable } from 'mobx-react-lite'
+import { useObservable } from 'mobx-react-lite'
 import EditIcon from "../icons/edit.svg"
+import { observer } from 'mobx-react';
 
 const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding, rows}) => {
   const input = React.useRef(null);
@@ -51,7 +52,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
     }
   }
 
-  return useObserver(() => <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
+  return <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
       <div className="value" onDoubleClick={() => onStartEdit()} onTouchEnd={() => onStartEdit()}>
         <div className="value-body">
           {value || placeholder}
@@ -216,7 +217,6 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
         }
       `}</style>
     </div>
-  );
 }
 
-export default InlineTextareaEdit
+export default observer(InlineTextareaEdit)

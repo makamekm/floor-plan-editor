@@ -10,43 +10,42 @@ const ProjectDeleteDialog = ({children}) => {
   const data = useObservable({isOpen: false, name: ""});
   const projectService = useInstance(ProjectService);
 
-  return useObserver(() => <>
-      {children(() => {
-        data.isOpen = true;
-        data.name = "";
-      })}
-      <WindowPanel
-        active={data.isOpen}
-        onClickOutside={() => {
-          data.isOpen = false;
-        }}>
-        <List borderRadius="5px">
-          {
-            [
-              {
-                key: 'header',
-                body: "Delete Project",
-                isHeader: true,
+  return <>
+    {children(() => {
+      data.isOpen = true;
+      data.name = "";
+    })}
+    <WindowPanel
+      active={data.isOpen}
+      onClickOutside={() => {
+        data.isOpen = false;
+      }}>
+      <List borderRadius="5px">
+        {
+          [
+            {
+              key: 'header',
+              body: "Delete Project",
+              isHeader: true,
+            },
+            {
+              key: 'description',
+              body: "The project will be removed completely and the changes can't be reverted",
+            },
+            {
+              key: 'action',
+              body: "Yes, Remove",
+              onClick: async () => {
+                await projectService.deleteProject();
+                data.isOpen = false;
               },
-              {
-                key: 'description',
-                body: "The project will be removed completely and the changes can't be reverted",
-              },
-              {
-                key: 'action',
-                body: "Yes, Remove",
-                onClick: async () => {
-                  await projectService.deleteProject();
-                  data.isOpen = false;
-                },
-                isClickable: true,
-              }
-            ]
-          }
-        </List>
-      </WindowPanel>
-    </>
-  )
+              isClickable: true,
+            }
+          ]
+        }
+      </List>
+    </WindowPanel>
+  </>
 }
 
 export default observer(ProjectDeleteDialog);

@@ -3,7 +3,7 @@ import { FloorplanView } from "../floorplan-view";
 import { FloorplanMode } from "../floorplan-mode.enum";
 
 export interface ItemMetadata {
-  id?: number;
+  id?: number | string;
   name: string;
   description: string;
   r: number;

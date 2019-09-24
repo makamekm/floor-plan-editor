@@ -5,6 +5,7 @@ import debounce from "debounce";
 import { FloorplanDto } from "../models/floor.dto";
 import { Utils } from "../utils/operations";
 import { ItemEnum } from "../models/floorplan-entities/item.enum";
+import { useEffect } from "react";
 
 export interface IModel {
   x: number;
@@ -28,6 +29,7 @@ export class BlueprintService {
     changeState: null,
     state: null,
   };
+  private floorplan: FloorplanDto;
   @computed public get state() {
     return this.model.changeState;
   }
@@ -44,13 +46,19 @@ export class BlueprintService {
   public setBlueprint(blueprint: Blueprint) {
     this.blueprint = blueprint;
     this.attachListeners();
+    if (this.floorplan) {
+      this.blueprint.load(this.floorplan);
+    }
   }
 
   public setFloorplan(floorplan: FloorplanDto) {
     this.model.revert.splice(0);
     this.model.history.splice(0);
     this.model.state = null;
-    this.blueprint.load(floorplan);
+    this.floorplan = floorplan;
+    if (this.blueprint) {
+      this.blueprint.load(floorplan);
+    }
   }
 
   public unsetBlueprint() {
@@ -147,15 +155,18 @@ export class BlueprintService {
   }
 
   constructor() {
-    Router.events.on("routeChangeComplete", (url) => {
-      if (this.blueprint) {
-        this.blueprint.reset();
+    useEffect(() => {
+      const resetBlueprint = () => {
+        if (this.blueprint) {
+          this.blueprint.reset();
+        }
       }
-    });
-
-    if (process.browser) {
-      this.setUndoListener();
-    }
+      Router.events.on("routeChangeComplete", resetBlueprint);
+      return () => {
+        Router.events.off("routeChangeComplete", resetBlueprint);
+        this.setUndoListener();
+      };
+    }, []);
   }
 
   destructor() {

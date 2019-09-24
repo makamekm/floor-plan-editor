@@ -15,7 +15,7 @@ export interface FloorplanDto {
 }
 
 export interface FloorplanItemDto {
-  id?: number;
+  id?: number | string;
   name: string;
   description: string;
   type: number;
@@ -25,6 +25,6 @@ export interface FloorplanItemDto {
 }
 
 export interface FloorplanDataDto {
-  id: number;
+  id: number | string;
   name: string;
 }

@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter, Router } from "next/router";
 import { observable } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
@@ -6,6 +6,7 @@ import { FloorProvider } from "./floor.provider";
 import { FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
 import { BlueprintService } from "./blueprint.service";
 import { ProjectService } from "./project.service";
+import { useEffect } from "react";
 
 export class FloorService {
   @observable loading: boolean = false;
@@ -28,11 +29,11 @@ export class FloorService {
   private router = useRouter();
 
   constructor() {
-    if (process.browser) {
+    useEffect(() => {
       if (this.router.query.id != null) {
         this.loadFloor(Number.parseInt(<string>this.router.query.id, 10));
       }
-    }
+    }, []);
   }
 
   public async loadFloor(id: number) {
@@ -56,14 +57,14 @@ export class FloorService {
     }
   }
 
-  public async openPublicFloor(id: number, projectId: number = this.projectService.project.id) {
-    await this.loadFloor(id);
+  public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
+    // this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
     this.router.push('/' + String(projectId) + '/view/' + String(id));
   }
 
-  public async openFloor(id: number, projectId: number = this.projectService.project.id) {
-    await this.loadFloor(id);
-    this.router.push('/' + String(projectId) + '/' + String(id));
+  public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
+    this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
+    // this.router.push('/' + String(projectId) + '/' + String(id));
   }
 
   public async saveFloor() {
@@ -110,7 +111,7 @@ export class FloorService {
     }
   }
 
-  public async deleteFloor(id: number = this.floor.data.id) {
+  public async deleteFloor(id: number | string = this.floor.data.id) {
     this.setLoading(true);
     try {
       const result = await this.floorProvider.deleteFloorPlan(

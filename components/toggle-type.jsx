@@ -1,5 +1,4 @@
 import React from 'react'
-import { observer } from 'mobx-react'
 
 const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
   return (
@@ -104,4 +103,4 @@ const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
   )
 }
 
-export default observer(ToggleButtonType)
+export default ToggleButtonType

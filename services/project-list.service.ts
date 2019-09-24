@@ -3,6 +3,7 @@ import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListItemDto } from "../models/project-list.dto";
+import { useEffect } from "react";
 
 export class ProjectListService {
   @observable loading: boolean = true;
@@ -16,9 +17,9 @@ export class ProjectListService {
   @inject(FloorProvider) private floorProvider: FloorProvider;
 
   constructor() {
-    if (process.browser) {
+    useEffect(() => {
       this.loadList();
-    }
+    }, []);
   }
 
   public async loadList() {

@@ -16,13 +16,14 @@ const FloorListRead = () => {
 
   const currentId = floorService.floor.data && floorService.floor.data.id;
 
-  return (<>
+  return <>
     <div onClick={() => projectService.openProjectList()}
       className={"item clickable"}>
       <WithIcon icon={BackIcon}>
         Open My Projects
       </WithIcon>
     </div>
+
     <div onClick={() => {
       copyTextToClipboard(window.location.href);
     }}
@@ -31,6 +32,7 @@ const FloorListRead = () => {
         Copy Link
       </WithIcon>
     </div>
+
     {
       floorListService.list.map(({id, name}) => {
         return (
@@ -103,7 +105,7 @@ const FloorListRead = () => {
         filter: invert(1)
       }
     `}</style>
-  </>)
+  </>
 }
 
 export default observer(FloorListRead)

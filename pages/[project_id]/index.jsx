@@ -7,6 +7,7 @@ import { FloorService } from '../../services/floor.service';
 import { useObserver } from 'mobx-react';
 import { ProjectService } from '../../services/project.service';
 import { FloorListService } from '../../services/floor-list.service';
+import AuthProtect from '../../components/auth-protect';
 
 const Page = () => {
   const floorService = useInstance(FloorService);
@@ -14,7 +15,7 @@ const Page = () => {
   const projectService = useInstance(ProjectService);
 
   return useObserver(() =>
-    <>
+    <AuthProtect>
       <BlueprintView/>
 
       <Loading active={
@@ -22,7 +23,7 @@ const Page = () => {
         || floorListService.loading
         || projectService.loading
       }></Loading>
-    </>
+    </AuthProtect>
   );
 };
 

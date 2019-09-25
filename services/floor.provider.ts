@@ -1,7 +1,9 @@
 import { FloorplanDto, FloorplanDataDto } from "../models/floor.dto";
 import { FloorplanListDto } from "../models/floor-list.dto";
 import { demoFloorData, demoPlan, demoFloorList, demoProjectList, demoProject } from "./floot.demo";
-import { ProjectListDto, ProjectListItemDto, ProjectDto } from "../models/project-list.dto";
+import { ProjectListDto, ProjectDto } from "../models/project-list.dto";
+import '../utils/firebase';
+import firebase from 'firebase/app';
 
 export class FloorProvider {
   public async getFloorplanData(projectId: number | string, id: number | string): Promise<FloorplanDataDto>{
@@ -45,7 +47,11 @@ export class FloorProvider {
   }
 
   public async getProjectList(): Promise<ProjectListDto>{
-    await new Promise(r => setTimeout(r, 1000));
+    // await new Promise(r => setTimeout(r, 1000));
+    const db = firebase.firestore();
+    const projectsRef = db.collection('projects');
+    const projects = await projectsRef.get();
+    console.log(projects.docs);
     return JSON.parse(JSON.stringify(demoProjectList));
   }
 

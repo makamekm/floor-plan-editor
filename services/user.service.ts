@@ -1,18 +1,8 @@
 import { observable, computed } from "mobx";
 import debounce from "debounce";
 import { useEffect } from "react";
+import '../utils/firebase';
 import firebase from 'firebase/app';
-import 'firebase/auth';
-import { Configuration, configAuthDomain, configApiKey } from '../utils/configuration';
-
-const config = {
-  apiKey: Configuration.getStringValue(configApiKey),
-  authDomain: Configuration.getStringValue(configAuthDomain),
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(config);
-}
 
 export class UserService {
   @observable loading: boolean = true;

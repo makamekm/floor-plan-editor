@@ -41,6 +41,7 @@ export const demoPlan: FloorplanDto = {
   ],
   items: [
     {
+      id: '123',
       name: 'test',
       description: 'sdfsdfsd',
       type: 0,

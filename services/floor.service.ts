@@ -71,13 +71,11 @@ export class FloorService {
   }
 
   public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    // this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
-    this.router.push('/' + String(projectId) + '/view/' + String(id));
+    this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
   }
 
   public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    // this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
-    this.router.push('/' + String(projectId) + '/' + String(id));
+    this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
   }
 
   public async saveFloor(floor: FloorDto) {

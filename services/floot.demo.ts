@@ -1,4 +1,4 @@
-import { FloorplanDto, FloorplanDataDto } from "../models/floor.dto";
+import { FloorplanDto, FloorplanDataDto, FloorDto } from "../models/floor.dto";
 import { FloorplanListDto } from "../models/floor-list.dto";
 import { ProjectListDto, ProjectListItemDto } from "../models/project-list.dto";
 
@@ -52,7 +52,6 @@ export const demoPlan: FloorplanDto = {
 };
 
 export const demoFloorData: FloorplanDataDto = {
-  id: 1,
   name: "Floor 2 (Kitchen)",
 };
 
@@ -94,3 +93,9 @@ export const demoProject: ProjectListItemDto = {
   id: 0,
   name: "Main Project"
 };
+
+export const demoFloor: FloorDto = {
+  id: 1,
+  data: demoProject,
+  plan: demoPlan,
+}

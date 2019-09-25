@@ -34,7 +34,7 @@ const FloorListRead = () => {
     </div>
 
     {
-      floorListService.list.map(({id, name}) => {
+      floorListService.list.map(({id, data: {name}}) => {
         return (
           <div key={id} onClick={() => floorService.openPublicFloor(id)}
             className={"item clickable" + (id === currentId ? ' active' : '')}>

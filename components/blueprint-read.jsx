@@ -75,9 +75,9 @@ class BlueprintView extends Component {
         </div>
 
         <Loading active={
-          floorService.loading
-          || floorListService.loading
-          || projectService.loading
+          this.floorService.loading
+          || this.floorListService.loading
+          || this.projectService.loading
         }></Loading>
 
         <style jsx>{`

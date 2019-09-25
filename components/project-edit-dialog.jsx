@@ -39,7 +39,8 @@ const ProjectEditDialog = ({children}) => {
                     value={projectService.data.project.name}
                     onChange={value => {
                       if (value.length > 0) {
-                        projectService.data.project.name = value;                        
+                        projectService.data.project.name = value;
+                        projectService.saveProject();
                       }
                     }}
                   />

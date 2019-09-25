@@ -18,7 +18,7 @@ const FloorPanel = () => {
   const floorListService = useInstance(FloorListService);
   const floorEditService = useInstance(FloorEditService);
 
-  const id = floorService.floor.data && floorService.floor.data.id;
+  const id = floorService.floor && floorService.floor.id;
   const isCreate = id == null;
   const name = floorService.floor.data && floorService.floor.data.name;
 

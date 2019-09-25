@@ -48,16 +48,24 @@ export class FloorplanController {
 
   public onModeChange = new Callback<FloorplanMode>();
   public onModelChange = new Callback<{
-    floorplane: FloorplanDto;
+    floorplan: FloorplanDto;
     x: number;
     y: number;
   }>();
+
+  public getModel() {
+    return {
+      x: this.originX,
+      y: this.originY,
+      floorplan: this.floorplan.exportFloorplan(),
+    };
+  }
 
   public fireChanges() {
     this.onModelChange.fire({
       x: this.originX,
       y: this.originY,
-      floorplane: this.floorplan.exportFloorplan(),
+      floorplan: this.floorplan.exportFloorplan(),
     });
   }
 

@@ -4,6 +4,7 @@ import { FloorplanDto } from "./floor.dto";
 import { FloorplanMode } from "./floorplan-mode.enum";
 import { ItemEnum } from "./floorplan-entities/item.enum";
 import { FloorplanModel } from "./floorplan-model";
+import { Utils } from "../utils/operations";
 
 /** Blueprint core application. */
 export class Blueprint {
@@ -14,7 +15,7 @@ export class Blueprint {
   public onModeChange = new Callback<string>();
   public onSelectedItemChange = new Callback<number>();
   public onModelChange = new Callback<{
-    floorplane: FloorplanDto;
+    floorplan: FloorplanDto;
     x: number;
     y: number;
   }>();
@@ -59,7 +60,7 @@ export class Blueprint {
 
   public load(floorplan: FloorplanDto) {
     this.floorplan.loadFloorplan(floorplan);
-    this.floorplanner.fireChanges();
+    return this.floorplanner.getModel();
   }
 
   public export(): FloorplanDto {
@@ -94,12 +95,14 @@ export class Blueprint {
       x,
       y,
       {
+        id: Utils.guid(),
         description: '',
         name: '',
         type,
         r: 0,
       }
     );
+    this.floorplanner.fireChanges();
     this.floorplanner.draw();
   }
 }

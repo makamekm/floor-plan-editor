@@ -8,7 +8,7 @@ export class UserService {
   @observable loading: boolean = true;
   @observable askToLogIn: boolean = false;
   @observable private data: {
-    user: Object;
+    user: firebase.User;
   } = {
     user: null,
   };
@@ -29,7 +29,7 @@ export class UserService {
       this.setLoading(true);
       const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
         (user) => {
-          console.log(user);
+          console.log(user && user.displayName, user && user.uid);
           this.data.user = user;
           this.setLoading(false);
         }

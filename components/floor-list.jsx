@@ -37,29 +37,29 @@ const FloorList = () => {
         </div>
 
         <div onClick={() => projectService.openProjectCreatePlan()}
-          className={"item clickable" + (currentId === null ? ' active' : '')}>
+          className={"item clickable" + (currentId == null ? ' active' : '')}>
           <WithIcon icon={AddIcon}>
             Create Plan
           </WithIcon>
         </div>
 
-        <div onClick={() => {
+        {currentId == null ? null : <div onClick={() => {
           copyTextToClipboard(
             window.location.origin
             + '/'
             + projectService.project.id
             + '/view/'
-            + floorService.floor.data.id,
+            + floorService.floor.id,
           );
         }}
           className={"item clickable"}>
           <WithIcon icon={CopyIcon}>
             Copy Public Link
           </WithIcon>
-        </div>
+        </div>}
 
         {
-          floorListService.list.map(({id, name}) => {
+          floorListService.list.map(({id, data: {name}}) => {
             return (
               <div key={id} onClick={() => floorService.openFloor(id)}
                 className={"item clickable" + (id === currentId ? ' active' : '')}>

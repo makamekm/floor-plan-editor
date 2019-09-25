@@ -1,14 +1,15 @@
 import React from 'react'
 import WindowPanel from './window-panel';
 import { useInstance } from 'react-ioc';
-import { FloorService } from '../services/floor.service';
 import List from './list';
 import { observer } from 'mobx-react';
 import { useObservable } from 'mobx-react-lite';
+import InlineTextEdit from './inline-text-edit';
+import { ProjectService } from '../services/project.service';
 
-const FloorDeleteDialog = ({children}) => {
+const ProjectCreateDialog = ({children}) => {
   const data = useObservable({isOpen: false, name: ""});
-  const floorService = useInstance(FloorService);
+  const projectService = useInstance(ProjectService);
 
   return <>
     {children(() => {
@@ -25,20 +26,30 @@ const FloorDeleteDialog = ({children}) => {
           [
             {
               key: 'header',
-              body: "Delete Floor",
+              body: "Create Project",
               isHeader: true,
             },
             {
-              key: 'description',
-              body: "The floor will be removed completely and the changes can't be reverted",
+              key: 'name',
+              body: (
+                <InlineTextEdit
+                  placeholder="Write project name..."
+                  value={data.name}
+                  onChange={value => {
+                    data.name = value;
+                  }}
+                />
+              ),
+              isField: true,
             },
             {
               key: 'action',
-              body: "Yes, Remove",
+              body: "Create",
               onClick: async () => {
-                await floorService.deleteFloor();
+                await projectService.createProject(data.name);
                 data.isOpen = false;
               },
+              isDisabled: data.name.length < 1,
               isClickable: true,
             }
           ]
@@ -48,4 +59,4 @@ const FloorDeleteDialog = ({children}) => {
   </>
 }
 
-export default observer(FloorDeleteDialog);
+export default observer(ProjectCreateDialog);

@@ -8,6 +8,7 @@ import { Utils } from "../utils/operations";
 import { FloorplanDto } from "./floor.dto";
 import { Item, ItemMetadata } from "./floorplan-entities/item.model";
 import { ItemDict } from "./floorplan-entities/item.dict";
+import { FloorplanMode } from "./floorplan-mode.enum";
 
 const defaultFloorPlanTolerance = 10.0;
 
@@ -156,12 +157,13 @@ export class FloorplanModel {
     return this.items;
   }
 
-  public overlappedItem(x: number, y: number): Item {
+  public overlappedItem(x: number, y: number, mode: FloorplanMode): Item {
     for (let i = 0; i < this.items.length; i++) {
       if (this.items[i].overlapped(
         x,
         y,
         this.getSelectedItem() === this.items[i],
+        mode,
       )) {
         return this.items[i];
       }

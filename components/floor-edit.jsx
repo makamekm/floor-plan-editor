@@ -2,12 +2,12 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
 import InlineTextEdit from './inline-text-edit';
-import { FloorEditService } from '../services/floor-edit.service';
 import FloorDeleteDialog from './floor-delete-dialog';
 import List from './list';
+import { FloorService } from '../services/floor.service';
 
 const FloorEdit = () => {
-  const floorEditService = useInstance(FloorEditService);
+  const floorService = useInstance(FloorService);
 
   return (
     <FloorDeleteDialog>
@@ -23,10 +23,13 @@ const FloorEdit = () => {
               key: 'name',
               body: (
                 <InlineTextEdit
-                  placeholder="Write Name..."
-                  value={floorEditService.data.name}
+                  placeholder="Write name..."
+                  value={floorService.floor.data && floorService.floor.data.name || ''}
                   onChange={value => {
-                    floorEditService.data.name = value;
+                    if (value.length > 0) {
+                      floorService.floor.data.name = value;
+                      floorService.saveState();
+                    }
                   }}
                 />
               ),

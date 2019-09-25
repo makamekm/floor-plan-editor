@@ -25,7 +25,10 @@
     "rxjs": "6.5.3",
     "three": "0.108.0",
     "next-offline": "4.0.5",
-    "react-sidebar": "3.0.2"
+    "react-sidebar": "3.0.2",
+    "firebase": "6.6.2",
+    "react-firebaseui": "4.0.0",
+    "rxfire": "3.8.2"
   },
   "devDependencies": {
     "@types/node": "12.7.5",

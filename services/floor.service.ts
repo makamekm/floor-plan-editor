@@ -1,11 +1,14 @@
 import { useRouter } from "next/router";
-import { observable } from "mobx";
+import { observable, reaction } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
-import { FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
+import { FloorDto, FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
 import { BlueprintService } from "./blueprint.service";
-import { FloorListService } from "./floor-list.service";
+import { ProjectService } from "./project.service";
+import { useEffect } from "react";
+import { useDisposable, useComputed } from "mobx-react-lite";
+import { useCallback } from "../utils/callback";
 
 export class FloorService {
   @observable loading: boolean = false;
@@ -15,39 +18,51 @@ export class FloorService {
   }, 50);
 
   @observable floor: {
+    id?: number | string;
     data: FloorplanDataDto;
-    plan: FloorplanDto;
   } = {
+    id: null,
     data: null,
-    plan: null,
   };
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
-  @inject(FloorListService) private floorListService: FloorListService;
+  @inject(ProjectService) private projectService: ProjectService;
   @inject(BlueprintService) private blueprintService: BlueprintService;
   private router = useRouter();
 
   constructor() {
-    if (process.browser) {
+    useEffect(() => {
       if (this.router.query.id != null) {
-        this.loadFloor(Number.parseInt(<string>this.router.query.id, 10));
+        this.loadFloor(String(this.router.query.id));
+      } else {
+        this.floor.id = null;
+        this.blueprintService.setFloorplan(null);
       }
-    }
+    }, []);
+
+    useCallback(this.blueprintService.onStateChange, () => {
+      this.saveState();
+    });
   }
 
-  public async loadFloor(id: number) {
+  public saveState = debounce(() => {
+    if (this.floor.id != null) {
+      const floor: FloorDto = {
+        id: this.floor.id,
+        data: this.floor.data,
+        plan: this.blueprintService.getFloorplan(),
+      };
+      this.saveFloor(floor);
+    }
+  }, 1000);
+
+  public async loadFloor(id: string | number) {
     this.setLoading(true);
+    await this.projectService.loadProject(this.projectService.project.id);
     try {
-      const [plan, data]: [
-        FloorplanDto,
-        FloorplanDataDto,
-      ] = await Promise.all([
-        this.floorProvider.getFloorplan(id),
-        this.floorProvider.getFloorplanData(id),
-      ]);
-      this.floor.plan = plan;
-      this.floor.data = data;
-      this.blueprintService.setFloorplan(plan);
+      const floor = await this.floorProvider.getFloorplan(this.projectService.project.id, id);
+      this.floor = floor;
+      this.blueprintService.setFloorplan(floor.plan);
     } catch (error) {
       console.error(error);
     } finally {
@@ -55,36 +70,52 @@ export class FloorService {
     }
   }
 
-  public openFloor(id: number) {
-    this.router.push('/' + String(id));
-    this.loadFloor(id);
+  public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
+    // this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
+    this.router.push('/' + String(projectId) + '/view/' + String(id));
   }
 
-  public async saveFloor() {
-    this.setLoading(true);
+  public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
+    // this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
+    this.router.push('/' + String(projectId) + '/' + String(id));
+  }
+
+  public async saveFloor(floor: FloorDto) {
+    // this.setLoading(true);
     try {
-      const [plan, data]: [
-        FloorplanDto,
-        FloorplanDataDto,
-      ] = await Promise.all([
-        this.floorProvider.saveFloorPlan(this.floor.data.id, this.floor.plan),
-        this.floorProvider.saveFloorplanData(this.floor.data.id, this.floor.data),
-      ]);
-      this.floor.plan = plan;
-      this.floor.data = data;
-      await this.floorListService.loadList();
+      await this.floorProvider.saveFloorplan(
+        this.projectService.project.id,
+        floor.id,
+        {
+          data: floor.data,
+          plan: floor.plan,
+        },
+      );
     } catch (error) {
       console.error(error);
     } finally {
-      this.setLoading(false);
+      // this.setLoading(false);
     }
   }
 
   public async createFloor(name: string) {
     this.setLoading(true);
     try {
-      const data = await this.floorProvider.createFloorplan(name, this.floor.plan);
-      this.router.push('/' + String(data.id));
+      const plan = this.blueprintService.getFloorplan();
+      if (plan) {
+        const data = await this.floorProvider.createFloorplan(
+          this.projectService.project.id,
+          {
+            data: {
+              name,
+            },
+            plan,
+          },
+        );
+        this.openFloor(data.id);
+      } else {
+        alert('Please draw something');
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -92,15 +123,20 @@ export class FloorService {
     }
   }
 
-  public async deleteFloor(id: number) {
+  public async deleteFloor(id: number | string = this.floor.id) {
     this.setLoading(true);
     try {
-      const result = await this.floorProvider.deleteFloorPlan(id);
+      const result = await this.floorProvider.deleteFloorplan(
+        this.projectService.project.id,
+        id,
+      );
       if (result) {
-        await this.floorListService.loadList();
-        if (this.floor.data.id === id) {
-          this.router.push('/');
-          this.floor.plan = null;
+        await this.projectService.loadProject(this.projectService.project.id);
+        if (this.floor.id === id) {
+          this.projectService.openProject(
+            this.projectService.project.id,
+          );
+          this.floor.id = null;
           this.floor.data = null;
         }
       }

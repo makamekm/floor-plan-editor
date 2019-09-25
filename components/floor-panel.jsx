@@ -18,7 +18,7 @@ const FloorPanel = () => {
   const floorListService = useInstance(FloorListService);
   const floorEditService = useInstance(FloorEditService);
 
-  const id = floorService.floor.data && floorService.floor.data.id;
+  const id = floorService.floor && floorService.floor.id;
   const isCreate = id == null;
   const name = floorService.floor.data && floorService.floor.data.name;
 
@@ -34,10 +34,10 @@ const FloorPanel = () => {
                 name: isCreate ? 'Save Plan' : name,
               }, !isCreate && {
                 key: 'edit',
-                name: <img src={EditIcon} alt=""/>,
-              }, floorListService.list.length > 0 && {
+                name: <div style={{lineHeight: 0}}><img src={EditIcon} alt=""/></div>,
+              }, {
                 key: 'menu',
-                name: <img src={ListIcon} alt=""/>,
+                name: <div style={{lineHeight: 0}}><img src={ListIcon} alt=""/></div>,
               }].filter(s => !!s)}
               onToggle={key => {
                 if (key === 'menu') {

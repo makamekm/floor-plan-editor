@@ -1,6 +1,7 @@
 import { Item } from "./item.model";
 import { Utils } from "../../utils/operations";
 import { FloorplanView } from "../floorplan-view";
+import { FloorplanMode } from "../floorplan-mode.enum";
 
 const tableHeight = 60;
 const tableWidth = 30;
@@ -86,6 +87,7 @@ export class TableItem extends Item {
     y: number,
     hover: boolean,
     selected: boolean,
+    mode: FloorplanMode,
     view: FloorplanView,
   ): void {
     const fillColor = hover ? tableColorHover : (selected ? tableColorActive : tableColor);
@@ -121,7 +123,7 @@ export class TableItem extends Item {
         edgeColor,
       );
     });
-    if (selected) {
+    if (selected && mode === FloorplanMode.MOVE) {
       view.drawTransaction((ctx) => {
         ctx.globalAlpha = this.isRotating ? 1 : (this.isRotatingHover ? 0.8 : 0.3);
         ctx.translate(x, y);
@@ -161,12 +163,13 @@ export class TableItem extends Item {
     rawX: number,
     rawY: number,
     selected: boolean,
+    mode: FloorplanMode,
   ) {
     let { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
     const sens = 5;
     const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
       && y <= (tableHeight + sens) && y >= (-tableHeight - sens);
-    if (selected) {
+    if (selected && mode === FloorplanMode.MOVE) {
       this.isRotatingHover = this.overlappedRotate(rawX, rawY);
       return isMainHover || this.isRotatingHover;
     } else {

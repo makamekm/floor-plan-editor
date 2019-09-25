@@ -1,33 +1,39 @@
 import React from 'react'
 import Head from 'next/head'
 import { provider, useInstances } from 'react-ioc'
-import { FloorProvider } from "../services/floor.provider";
+import { UserService } from '../services/user.service';
+import { FloorProvider } from '../services/floor.provider';
+import { ProjectListService } from "../services/project-list.service";
+import { ProjectService } from '../services/project.service';
+import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
 import { BlueprintService } from "../services/blueprint.service";
-import { FloorListService } from "../services/floor-list.service";
 import { FloorEditService } from '../services/floor-edit.service';
 
 const services = [
+  UserService,
   FloorProvider,
-  FloorService,
   FloorListService,
+  ProjectListService,
+  ProjectService,
+  FloorService,
   BlueprintService,
   FloorEditService,
 ];
 
 export default (Page) => {
   const Root = () => {
-    useInstances(...services);
     React.useEffect(() => {
-      if (process.browser) {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      window.addEventListener('resize', () => {
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
-        window.addEventListener('resize', () => {
-          const vh = window.innerHeight * 0.01;
-          document.documentElement.style.setProperty('--vh', `${vh}px`);
-        });
-      }
-    });
+      });
+    }, []);
+
+    useInstances(...services);
+
     return (
       <>
         <Head>

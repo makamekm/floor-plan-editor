@@ -3,17 +3,18 @@ import Sidebar from 'react-sidebar';
 import { Blueprint } from '../models/blueprint';
 import ToggleButtonType from './toggle-type';
 import Panel from './panel';
-import Loading from './loading';
 import FloorPanel from './floor-panel';
 import InlineTextEdit from './inline-text-edit';
 import InlineTextareaEdit from './inline-textarea-edit';
+import Loading from './loading';
 import List from './list';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
-import { FloorService } from '../services/floor.service';
-import { FloorListService } from '../services/floor-list.service';
 import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
+import { FloorListService } from '../services/floor-list.service';
+import { FloorService } from '../services/floor.service';
+import { ProjectService } from '../services/project.service';
 
 const itemTypeList = [
   {
@@ -37,9 +38,10 @@ class BlueprintView extends Component {
     isToolbarOpen: false,
   }
 
+  @inject(BlueprintService) blueprintService;
   @inject(FloorService) floorService;
   @inject(FloorListService) floorListService;
-  @inject(BlueprintService) blueprintService;
+  @inject(ProjectService) projectService;
 
   componentDidMount() {
     this.blueprint = new Blueprint(this.ref);
@@ -54,7 +56,17 @@ class BlueprintView extends Component {
     return (
       <Sidebar
         pullRight
-        styles={{ sidebar: { background: "white" } }}
+        styles={{
+          sidebar: {
+            background: "white",
+            overflowY: "auto",
+            maxHeight: "calc(var(--vh, 1vh) * 100)",
+          },
+          content: {
+            overflowY: "hidden",
+            maxHeight: "calc(var(--vh, 1vh) * 100)",
+          },
+        }}
         open={this.state.isToolbarOpen}
         onSetOpen={open => this.setState({ isToolbarOpen: open })}
         sidebar={
@@ -156,6 +168,7 @@ class BlueprintView extends Component {
           <Loading active={
             this.floorService.loading
             || this.floorListService.loading
+            || this.projectService.loading
           }></Loading>
 
           <style jsx>{`

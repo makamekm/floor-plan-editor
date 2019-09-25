@@ -2,6 +2,7 @@ import React from 'react'
 
 const List = ({children, onClick, borderRadius}) => {
   borderRadius = borderRadius || '0px';
+
   return (
     <div className={"list"}>
   
@@ -12,6 +13,7 @@ const List = ({children, onClick, borderRadius}) => {
             + (item.isClickable ? " is-clickable" : "")
             + (item.isHeader ? " is-header" : "")
             + (item.isField ? " is-field" : "")
+            + (item.isDisabled ? " is-disabled" : "")
           }
           onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
           {item.body}
@@ -72,6 +74,11 @@ const List = ({children, onClick, borderRadius}) => {
   
         .item.is-clickable:active {
           background-color: #e0f6ff;
+        }
+  
+        .item.is-disabled {
+          opacity: 0.3;
+          pointer-events: none;
         }
       `}</style>
     </div>

@@ -1,15 +1,18 @@
 import { Router } from "next/router";
 import { Blueprint } from "../models/blueprint";
-import { observable, observe, toJS, computed } from "mobx";
+import { observable, observe, toJS, computed, reaction } from "mobx";
 import debounce from "debounce";
 import { FloorplanDto } from "../models/floor.dto";
 import { Utils } from "../utils/operations";
 import { ItemEnum } from "../models/floorplan-entities/item.enum";
+import { useEffect } from "react";
+import { useDisposable } from "mobx-react-lite";
+import { Callback } from "../utils/callback";
 
 export interface IModel {
   x: number;
   y: number;
-  floorplane: FloorplanDto;
+  floorplan: FloorplanDto;
   selectedItem: number | null;
 }
 
@@ -28,29 +31,48 @@ export class BlueprintService {
     changeState: null,
     state: null,
   };
+  private floorplan: FloorplanDto;
   @computed public get state() {
     return this.model.changeState;
   }
   @computed public get selected() {
     return this.model.changeState
       && this.model.changeState.selectedItem != null
-      && this.model.changeState.floorplane.items[this.model.changeState.selectedItem];
+      && this.model.changeState.floorplan.items[this.model.changeState.selectedItem];
   }
-  private changes = observe(this.model, "state", ({ newValue }) => {
-    this.model.changeState = toJS(newValue);
-  });
   private blueprint: Blueprint;
+  public onStateChange = new Callback<FloorplanDto>();
 
   public setBlueprint(blueprint: Blueprint) {
     this.blueprint = blueprint;
     this.attachListeners();
+    if (this.floorplan) {
+      this.blueprint.load(this.floorplan);
+    }
+  }
+
+  public getFloorplan() {
+    const state = toJS(this.model.state)
+    return state && state.floorplan;
   }
 
   public setFloorplan(floorplan: FloorplanDto) {
     this.model.revert.splice(0);
     this.model.history.splice(0);
     this.model.state = null;
-    this.blueprint.load(floorplan);
+    this.floorplan = floorplan;
+    if (this.blueprint) {
+      if (floorplan) {
+        const model = this.blueprint.load(floorplan);
+        this.pushHistory();
+        this.model.state = {
+          ...model,
+          selectedItem: this.model.state && this.model.state.selectedItem,
+        };
+      } else {
+        this.blueprint.reset();
+      }
+    }
   }
 
   public unsetBlueprint() {
@@ -71,7 +93,7 @@ export class BlueprintService {
       ...toJS(this.model.changeState),
     };
     this.blueprint.setState(
-      this.model.state.floorplane,
+      this.model.state.floorplan,
       this.model.state.x,
       this.model.state.y,
       this.model.state.selectedItem,
@@ -84,7 +106,8 @@ export class BlueprintService {
       this.model.history.push(this.model.state);
       Utils.limitArray(this.model.history, historyLimit);
       this.model.state = state;
-      this.blueprint.setState(state.floorplane, state.x, state.y, state.selectedItem);
+      this.blueprint.setState(state.floorplan, state.x, state.y, state.selectedItem);
+      this.onStateChange.fire(this.getFloorplan());
     }
   }
 
@@ -94,7 +117,8 @@ export class BlueprintService {
       this.model.revert.push(this.model.state);
       Utils.limitArray(this.model.revert, historyLimit);
       this.model.state = state;
-      this.blueprint.setState(state.floorplane, state.x, state.y, state.selectedItem);
+      this.blueprint.setState(state.floorplan, state.x, state.y, state.selectedItem);
+      this.onStateChange.fire(this.getFloorplan());
     }
   }
 
@@ -113,13 +137,14 @@ export class BlueprintService {
   private onModelChange = (model: {
     x: number;
     y: number;
-    floorplane: FloorplanDto;
+    floorplan: FloorplanDto;
   }) => {
     this.pushHistory();
     this.model.state = {
       ...model,
       selectedItem: this.model.state && this.model.state.selectedItem,
     };
+    this.onStateChange.fire(this.getFloorplan());
   };
 
   private onSelectedItemChange = (index: number) => {
@@ -147,21 +172,32 @@ export class BlueprintService {
   }
 
   constructor() {
-    Router.events.on("routeChangeComplete", (url) => {
-      if (this.blueprint) {
-        this.blueprint.reset();
+    useEffect(() => {
+      const resetBlueprint = () => {
+        if (this.blueprint) {
+          this.blueprint.reset();
+        }
       }
-    });
-
-    if (process.browser) {
+      Router.events.on("routeChangeComplete", resetBlueprint);
       this.setUndoListener();
-    }
+      return () => {
+        Router.events.off("routeChangeComplete", resetBlueprint);
+        this.unsetUndoListener();
+      };
+    }, []);
+
+    useDisposable(() =>
+      reaction(
+        () => this.model.state,
+        state => {
+          this.model.changeState = toJS(state);
+        },
+      )
+    );
   }
 
   destructor() {
     this.unsetBlueprint();
-    this.unsetUndoListener();
-    // this.reaction.dispose();
   }
   
   private setUndoListener() {

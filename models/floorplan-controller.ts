@@ -21,7 +21,7 @@ const pixelsPerCm = 1.0 / cmPerPixel;
  */
 export class FloorplanController {
 
-  public mode = 0;
+  public mode = FloorplanMode.MOVE;
   public activeWall: Wall | null = null;
   public activeCorner: Corner | null = null;
 
@@ -48,16 +48,24 @@ export class FloorplanController {
 
   public onModeChange = new Callback<FloorplanMode>();
   public onModelChange = new Callback<{
-    floorplane: FloorplanDto;
+    floorplan: FloorplanDto;
     x: number;
     y: number;
   }>();
+
+  public getModel() {
+    return {
+      x: this.originX,
+      y: this.originY,
+      floorplan: this.floorplan.exportFloorplan(),
+    };
+  }
 
   public fireChanges() {
     this.onModelChange.fire({
       x: this.originX,
       y: this.originY,
-      floorplane: this.floorplan.exportFloorplan(),
+      floorplan: this.floorplan.exportFloorplan(),
     });
   }
 
@@ -141,7 +149,7 @@ export class FloorplanController {
     });
 
     document.addEventListener("keyup", (e) => {
-      if (e.keyCode == 27) {
+      if (e.keyCode === 27) {
         this.escapeKey();
       }
     });
@@ -156,7 +164,7 @@ export class FloorplanController {
   }
 
   private updateTarget() {
-    if (this.mode == FloorplanMode.DRAW && this.lastNode) {
+    if (this.mode === FloorplanMode.DRAW && this.lastNode) {
       if (Math.abs(this.mouseX - this.lastNode.x) < snapTolerance) {
         this.targetX = this.lastNode.x;
       } else {
@@ -184,7 +192,7 @@ export class FloorplanController {
     const selectedItem = this.floorplan.getSelectedItem();
 
     // delete
-    if (this.mode == FloorplanMode.DELETE) {
+    if (this.mode === FloorplanMode.DELETE) {
       if (this.activeCorner) {
         this.activeCorner.removeAll();
         this.emitChanges();
@@ -197,7 +205,7 @@ export class FloorplanController {
       }
     } else {
       if (selectedItem) {
-        selectedItem.mousedown(this.mouseX, this.mouseY);
+        selectedItem.mousedown(this.mouseX, this.mouseY, this.mode);
       }
     }
 
@@ -216,17 +224,17 @@ export class FloorplanController {
 
     // update target (snapped position of actual mouse)
     if (
-      this.mode == FloorplanMode.DRAW
-      || (this.mode == FloorplanMode.MOVE && this.mouseDown)
+      this.mode === FloorplanMode.DRAW
+      || (this.mode === FloorplanMode.MOVE && this.mouseDown)
     ) {
       this.updateTarget();
       this.view.draw();
     }
 
     // update object target
-    if (this.mode != FloorplanMode.DRAW && !this.mouseDown) {
+    if (this.mode !== FloorplanMode.DRAW && !this.mouseDown) {
       let draw = false;
-      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY);
+      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY, this.mode);
       if (hoverItem !== this.activeItem) {
         draw = true;
       }
@@ -238,13 +246,13 @@ export class FloorplanController {
         this.activeItem = null;
         const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
         const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
-        if (hoverCorner != this.activeCorner) {
+        if (hoverCorner !== this.activeCorner) {
           this.activeCorner = hoverCorner;
           draw = true;
         }
         // corner takes precendence
         if (this.activeCorner == null) {
-          if (hoverWall != this.activeWall) {
+          if (hoverWall !== this.activeWall) {
             this.activeWall = hoverWall;
             draw = true;
           }
@@ -267,7 +275,7 @@ export class FloorplanController {
     }
 
     // dragging
-    if (this.mode == FloorplanMode.MOVE && this.mouseDown) {
+    if (this.mouseDown) {
       if (
         selectedItem
         && selectedItem === this.activeItem
@@ -276,41 +284,51 @@ export class FloorplanController {
           this.mouseY,
           this.lastX,
           this.lastY,
+          this.mode,
         )
       ) {
         this.emitChanges();
-      } else if (this.activeItem) {
-        this.activeItem.relativeMove(
-          this.mouseX - this.lastX,
-          this.mouseY - this.lastY
-        );
-        this.emitChanges();
-      } else if (this.activeCorner) {
-        this.activeCorner.move(this.mouseX, this.mouseY);
-        this.activeCorner.snapToAxis(snapTolerance);
-        this.checkWallDuplicates();
-        this.emitChanges();
-      } else if (this.activeWall) {
-        this.activeWall.relativeMove(
-          this.mouseX - this.lastX,
-          this.mouseY - this.lastY
-        );
-        this.activeWall.snapToAxis(snapTolerance);
-        this.checkWallDuplicates();
-        this.emitChanges();
+        this.lastX = this.mouseX;
+        this.lastY = this.mouseY;
+        this.view.draw();
+      } else if (this.mode === FloorplanMode.MOVE) {
+        if (this.activeItem) {
+          this.activeItem.relativeMove(
+            this.mouseX - this.lastX,
+            this.mouseY - this.lastY
+          );
+          this.emitChanges();
+        } else if (this.activeCorner) {
+          this.activeCorner.move(this.mouseX, this.mouseY);
+          this.activeCorner.snapToAxis(snapTolerance);
+          this.checkWallDuplicates();
+          this.emitChanges();
+        } else if (this.activeWall) {
+          this.activeWall.relativeMove(
+            this.mouseX - this.lastX,
+            this.mouseY - this.lastY
+          );
+          this.activeWall.snapToAxis(snapTolerance);
+          this.checkWallDuplicates();
+          this.emitChanges();
+        }
+        this.lastX = this.mouseX;
+        this.lastY = this.mouseY;
+        this.view.draw();
       }
-      this.lastX = this.mouseX;
-      this.lastY = this.mouseY;
-      this.view.draw();
     }
   }
 
   private mouseup(clientX: number, clientY: number) {
     this.mouseDown = false;
+
+    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel;
+    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel;
+
     const selectedItem = this.floorplan.getSelectedItem();
 
     if (selectedItem) {
-      if (selectedItem.mouseup(this.mouseX, this.mouseY)) {
+      if (selectedItem.mouseup(this.mouseX, this.mouseY, this.mode)) {
         this.view.draw();
         this.emitChanges();
       };
@@ -329,7 +347,7 @@ export class FloorplanController {
       this.checkWallDuplicates();
       this.view.draw();
       this.emitChanges();
-    } else if (!this.mouseMoved && this.mode === FloorplanMode.MOVE) {
+    } else if (!this.mouseMoved && this.mode === FloorplanMode.MOVE || this.mode == null) {
       if (this.activeItem) {
         this.floorplan.setSelectedItem(this.activeItem, true);
       } else {
@@ -378,7 +396,9 @@ export class FloorplanController {
 
   public reset() {
     this.resizeView();
-    this.setMode(FloorplanMode.MOVE);
+    if (this.mode != null) {
+      this.setMode(FloorplanMode.MOVE);
+    }
     this.resetOrigin();
     this.view.draw();
   }

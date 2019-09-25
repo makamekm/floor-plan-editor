@@ -1,3 +1,4 @@
+import { ProjectListItemDto } from "./project-list.dto";
 
 export interface FloorplanDto {
   corners: {
@@ -14,7 +15,7 @@ export interface FloorplanDto {
 }
 
 export interface FloorplanItemDto {
-  id?: number;
+  id: number | string;
   name: string;
   description: string;
   type: number;
@@ -24,6 +25,11 @@ export interface FloorplanItemDto {
 }
 
 export interface FloorplanDataDto {
-  id: number;
   name: string;
+}
+
+export interface FloorDto {
+  id?: number | string;
+  data: FloorplanDataDto;
+  plan: FloorplanDto;
 }

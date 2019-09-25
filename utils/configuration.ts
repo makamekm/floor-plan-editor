@@ -8,6 +8,30 @@ export const configDimUnit = "dimUnit";
 /** The dpr unit to scale the application */
 export const configDpr = "dpr";
 
+/** Firebase */
+export const configApiKey = "apiKey";
+
+/** Firebase */
+export const configAuthDomain = "authDomain";
+
+/** Firebase */
+export const configDatabaseURL = "databaseURL";
+
+/** Firebase */
+export const configProjectId = "projectId";
+
+/** Firebase */
+export const configStorageBucket = "storageBucket";
+
+/** Firebase */
+export const configMessagingSenderId = "messagingSenderId";
+
+/** Firebase */
+export const configAppId = "appId";
+
+/** Firebase */
+export const configMeasurementId = "measurementId";
+
 // WALL:
 
 /** The initial wall thickness in cm. */
@@ -17,6 +41,14 @@ export const configWallThickness = "wallThickness";
 export class Configuration {
   /** Configuration data loaded from/stored to extern. */
   private static data: {[key: string]: any} = {
+    [configApiKey]: 'AIzaSyASRwAqeD-9Fdo6m0VsDaN4GznhZ4ygfRU',
+    [configAuthDomain]: 'localhost',
+    [configDatabaseURL]: 'https://floorplan-makamekm.firebaseio.com',
+    [configProjectId]: 'floorplan-makamekm',
+    [configStorageBucket]: 'floorplan-makamekm.appspot.com',
+    [configMessagingSenderId]: '960620520456',
+    [configAppId]: '1:960620520456:web:9a31aa6aa8ed2966479dbd',
+    [configMeasurementId]: 'G-84Z0YDFX18',
     [configDimUnit]: dimMeter,
     [configWallThickness]: 14,
     [configDpr]: process.browser ? (window.devicePixelRatio || 1) : 1,
@@ -30,6 +62,14 @@ export class Configuration {
   /** Get a string configuration parameter. */
   public static getStringValue(key: string): string {
     switch (key) {
+      case configApiKey:
+      case configAuthDomain:
+      case configDatabaseURL:
+      case configProjectId:
+      case configStorageBucket:
+      case configMessagingSenderId:
+      case configAppId:
+      case configMeasurementId:
       case configDimUnit:
         return <string>this.data[key];
       default:

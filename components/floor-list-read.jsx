@@ -14,8 +14,6 @@ const FloorListRead = () => {
   const projectService = useInstance(ProjectService);
   const floorListService = useInstance(FloorListService);
 
-  const currentId = floorService.floor.data && floorService.floor.data.id;
-
   return <>
     <div onClick={() => projectService.openProjectList()}
       className={"item clickable"}>
@@ -37,7 +35,7 @@ const FloorListRead = () => {
       floorListService.list.map(({id, data: {name}}) => {
         return (
           <div key={id} onClick={() => floorService.openPublicFloor(id)}
-            className={"item clickable" + (id === currentId ? ' active' : '')}>
+            className={"item clickable" + (id === floorService.floor.id ? ' active' : '')}>
             {name}
           </div>
         )

@@ -28,7 +28,7 @@ const Page = () => {
                 {
                   key: 'login',
                   body: <WithIcon icon={LogoutIcon}>
-                    Logout ({userService.user.displayName})
+                    Logout ({userService.user.displayName || userService.user.email})
                   </WithIcon>,
                   isClickable: true,
                   onClick: () => userService.logout(),

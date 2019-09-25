@@ -17,8 +17,6 @@ const FloorList = () => {
   const projectService = useInstance(ProjectService);
   const floorListService = useInstance(FloorListService);
 
-  const currentId = floorService.floor.data && floorService.floor.data.id;
-
   return (
     <ProjectEditDialog>
       {open => <>
@@ -37,13 +35,13 @@ const FloorList = () => {
         </div>
 
         <div onClick={() => projectService.openProjectCreatePlan()}
-          className={"item clickable" + (currentId == null ? ' active' : '')}>
+          className={"item clickable" + (floorService.floor.id == null ? ' active' : '')}>
           <WithIcon icon={AddIcon}>
             Create Plan
           </WithIcon>
         </div>
 
-        {currentId == null ? null : <div onClick={() => {
+        {floorService.floor.id == null ? null : <div onClick={() => {
           copyTextToClipboard(
             window.location.origin
             + '/'
@@ -62,7 +60,7 @@ const FloorList = () => {
           floorListService.list.map(({id, data: {name}}) => {
             return (
               <div key={id} onClick={() => floorService.openFloor(id)}
-                className={"item clickable" + (id === currentId ? ' active' : '')}>
+                className={"item clickable" + (id === floorService.floor.id ? ' active' : '')}>
                 {name}
               </div>
             )

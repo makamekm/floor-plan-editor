@@ -1,11 +1,11 @@
-import React, { memo } from 'react'
-import { useInstance } from 'react-ioc';
-import { observer } from 'mobx-react';
-import { UserService } from '../services/user.service';
-import LoginDialog from './login-dialog';
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { UserService } from "../services/user.service";
+import LoginDialog from "./login-dialog";
 
 const AuthProtect = ({
-  children
+  children,
 }: {
   children: any;
 }) => {
@@ -15,13 +15,13 @@ const AuthProtect = ({
     return () => {
       userService.askToLogIn = false;
     };
-  }, [])
+  }, []);
 
   return <>
     {!userService.user || userService.loading ? null : children}
 
     <LoginDialog active={userService.isOpenLoginDialog}/>
   </>;
-}
+};
 
 export default memo(observer(AuthProtect));

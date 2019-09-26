@@ -1,16 +1,16 @@
-import React, { memo } from 'react'
-import Panel from './panel';
-import ToggleButtonType from './toggle-type';
-import FloorList from './floor-list';
-import FloorEdit from './floor-edit';
-import WindowPanel from './window-panel';
-import { useInstance } from 'react-ioc';
-import { FloorService } from '../services/floor.service';
-import { FloorListService } from '../services/floor-list.service';
-import { FloorEditService } from '../services/floor-edit.service';
-import FloorCreateDialog from './floor-create-dialog';
-import { observer } from 'mobx-react';
-import { EditIcon, SearchIcon } from '../icons/icon';
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { EditIcon, SearchIcon } from "../icons/icon";
+import { FloorEditService } from "../services/floor-edit.service";
+import { FloorListService } from "../services/floor-list.service";
+import { FloorService } from "../services/floor.service";
+import FloorCreateDialog from "./floor-create-dialog";
+import FloorEdit from "./floor-edit";
+import FloorList from "./floor-list";
+import Panel from "./panel";
+import ToggleButtonType from "./toggle-type";
+import WindowPanel from "./window-panel";
 
 const FloorPanel = () => {
   const floorService = useInstance(FloorService);
@@ -23,27 +23,27 @@ const FloorPanel = () => {
 
   return (
     <FloorCreateDialog>
-      {open => (
+      {(open) => (
         <>
           <Panel>
             <ToggleButtonType
-              activeState={isCreate ? 'not-save' : 'save'}
+              activeState={isCreate ? "not-save" : "save"}
               items={[{
-                key: 'save',
-                name: isCreate ? 'Save Plan' : name,
+                key: "save",
+                name: isCreate ? "Save Plan" : name,
               }, !isCreate && {
-                key: 'edit',
+                key: "edit",
                 name: <div style={{lineHeight: 0}}><img src={EditIcon} alt=""/></div>,
               }, {
-                key: 'menu',
+                key: "menu",
                 name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
-              }].filter(s => !!s)}
-              onToggle={key => {
-                if (key === 'menu') {
+              }].filter((s) => !!s)}
+              onToggle={(key) => {
+                if (key === "menu") {
                   floorListService.opened = true;
-                } else if (key === 'save') {
+                } else if (key === "save") {
                   open();
-                } else if (key === 'edit') {
+                } else if (key === "edit") {
                   floorEditService.opened = true;
                 }
               }}
@@ -67,7 +67,7 @@ const FloorPanel = () => {
               </div>
             </WindowPanel>
           </Panel>
-      
+
           <style jsx>{`
             .list {
               width: calc(100vw - 20px);
@@ -79,7 +79,7 @@ const FloorPanel = () => {
         </>
       )}
     </FloorCreateDialog>
-  )
-}
+  );
+};
 
 export default memo(observer(FloorPanel));

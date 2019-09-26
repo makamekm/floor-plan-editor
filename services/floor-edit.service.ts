@@ -1,15 +1,15 @@
 import { observable } from "mobx";
-import { IRootService } from "./root-sevice.interface";
 import { useRouterChange } from "../utils/router-hook";
+import { IRootService } from "./root-sevice.interface";
 
 export class FloorEditService implements IRootService {
-  @observable opened = false;
+  @observable public opened = false;
 
-  useHook() {
+  public useHook() {
     useRouterChange(this.onRouterChange);
   }
 
-  onRouterChange = () => {
+  public onRouterChange = () => {
     this.opened = false;
   }
 }

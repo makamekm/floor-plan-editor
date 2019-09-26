@@ -1,21 +1,21 @@
-import React from 'react'
-import Head from 'next/head'
-import { provider, useInstances } from 'react-ioc'
-import { UserService } from '../services/user.service';
-import { FloorProvider } from '../services/floor.provider';
-import { ProjectListService } from "../services/project-list.service";
-import { ProjectService } from '../services/project.service';
-import { FloorListService } from "../services/floor-list.service";
-import { FloorService } from "../services/floor.service";
+import { observer } from "mobx-react";
+import Head from "next/head";
+import React from "react";
+import { provider, useInstances } from "react-ioc";
 import { BlueprintService } from "../services/blueprint.service";
-import { FloorEditService } from '../services/floor-edit.service';
-import Loading from './loading';
-import { observer } from 'mobx-react';
-import { IRootService } from '../services/root-sevice.interface';
+import { FloorEditService } from "../services/floor-edit.service";
+import { FloorListService } from "../services/floor-list.service";
+import { FloorProvider } from "../services/floor.provider";
+import { FloorService } from "../services/floor.service";
+import { ProjectListService } from "../services/project-list.service";
+import { ProjectService } from "../services/project.service";
+import { IRootService } from "../services/root-sevice.interface";
+import { UserService } from "../services/user.service";
+import Loading from "./loading";
 
-const services: (
+const services: Array<
   (new () => IRootService) | (new () => Object)
-)[] = [
+> = [
   UserService,
   FloorProvider,
   FloorListService,
@@ -34,10 +34,10 @@ const Root = ({
 }) => {
   React.useEffect(() => {
     const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-    window.addEventListener('resize', () => {
+    document.documentElement.style.setProperty("--vh", `${vh}px`);
+    window.addEventListener("resize", () => {
       const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
     });
   }, []);
 
@@ -45,18 +45,18 @@ const Root = ({
 
   let loading = false;
 
-  instances.forEach(instance => {
+  instances.forEach((instance) => {
     if (instance.useHook) {
       instance.useHook(props);
-      loading = loading || instance.loading
+      loading = loading || instance.loading;
     }
-  })
+  });
 
   return (
     <>
       <Head>
         <title>Floor Plan Editor</title>
-        <link rel='shortcut icon' type='image/x-icon' href='/static/favicon.ico' />
+        <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
         <link rel="manifest" href="/static/manifest.json" />
         <meta name="theme-color" content="#F3F7FA" />
         <meta
@@ -69,7 +69,7 @@ const Root = ({
       {children}
 
       <Loading active={loading}></Loading>
-      
+
       <style global jsx>{`
         body {
           position: fixed;
@@ -86,7 +86,7 @@ const Root = ({
       `}</style>
     </>
   );
-}
+};
 
 export default provider(
   ...services,

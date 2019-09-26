@@ -5,12 +5,12 @@ export interface FloorplanDto {
     [id: string]: {
       x: number;
       y: number;
-    }
+    },
   };
-  walls: {
+  walls: Array<{
     corner1: string;
     corner2: string;
-  }[];
+  }>;
   items: FloorplanItemDto[];
 }
 

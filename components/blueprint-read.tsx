@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, memo } from 'react';
-import { Blueprint } from '../models/blueprint';
-import Panel from './panel';
-import FloorPanelRead from './floor-panel-read';
-import List from './list';
-import { BlueprintService } from '../services/blueprint.service';
-import { observer } from 'mobx-react';
-import { ItemNameDict } from '../models/floorplan-entities/item.dict';
-import { useInstance } from 'react-ioc';
+import { observer } from "mobx-react";
+import React, { memo, useEffect, useRef } from "react";
+import { useInstance } from "react-ioc";
+import { Blueprint } from "../models/blueprint";
+import { ItemNameDict } from "../models/floorplan-entities/item.dict";
+import { BlueprintService } from "../services/blueprint.service";
+import FloorPanelRead from "./floor-panel-read";
+import List from "./list";
+import Panel from "./panel";
 
 const BlueprintView = () => {
   const canvasRef = useRef(null);
@@ -15,10 +15,10 @@ const BlueprintView = () => {
   useEffect(() => {
     const blueprint = new Blueprint(canvasRef.current);
     blueprintService.setBlueprint(blueprint);
-    blueprintService.changeMode('read');
+    blueprintService.changeMode("read");
     return () => {
       blueprintService.destructor();
-    }
+    };
   }, []);
 
   return (
@@ -32,23 +32,23 @@ const BlueprintView = () => {
           <List borderRadius="5px">
             {[
               {
-                key: 'header',
+                key: "header",
                 body: ItemNameDict[blueprintService.selected.type],
                 isHeader: true,
               },
               {
-                key: 'name',
+                key: "name",
                 body: blueprintService.selected.name,
               },
               {
-                key: 'header-description',
+                key: "header-description",
                 body: "Description",
                 isHeader: true,
               },
               {
-                key: 'description',
+                key: "description",
                 body: blueprintService.selected.description,
-              }
+              },
             ]}
           </List>
         </Panel> : null}
@@ -91,7 +91,7 @@ const BlueprintView = () => {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default memo(observer(BlueprintView))
+export default memo(observer(BlueprintView));

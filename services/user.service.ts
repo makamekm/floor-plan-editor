@@ -1,13 +1,13 @@
-import { observable, computed } from "mobx";
 import debounce from "debounce";
+import firebase from "firebase/app";
+import { computed, observable } from "mobx";
 import { useEffect } from "react";
-import '../utils/firebase';
-import firebase from 'firebase/app';
+import "../utils/firebase";
 import { IRootService } from "./root-sevice.interface";
 
 export class UserService implements IRootService {
-  @observable loading: boolean = true;
-  @observable askToLogIn: boolean = false;
+  @observable public loading: boolean = true;
+  @observable public askToLogIn: boolean = false;
   @observable private data: {
     user: firebase.User;
   } = {
@@ -21,22 +21,22 @@ export class UserService implements IRootService {
     return this.askToLogIn && !this.data.user && !this.loading;
   }
 
-  private setLoading = debounce<(value: boolean) => void>(value => {
+  private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
   }, 50);
 
-  useHook() {
+  public useHook() {
     useEffect(() => {
       this.setLoading(true);
       const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
         (user) => {
           this.data.user = user;
           this.setLoading(false);
-        }
+        },
       );
       return () => {
         unregisterAuthObserver();
-      }
+      };
     }, []);
   }
 
@@ -58,7 +58,7 @@ export class UserService implements IRootService {
 
   public get uiConfig() {
     return {
-      signInFlow: 'popup',
+      signInFlow: "popup",
       signInOptions: [
         firebase.auth.EmailAuthProvider.PROVIDER_ID,
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,

@@ -1,10 +1,10 @@
-import React, { memo } from 'react'
+import React, { memo } from "react";
 
 const Panel = ({children, className}: {
   children: any;
   className?: string;
 }) => (
-  <div className={["panel", className].join(' ')}>
+  <div className={["panel", className].join(" ")}>
     {children}
 
     <style jsx>{`
@@ -16,6 +16,6 @@ const Panel = ({children, className}: {
       }
     `}</style>
   </div>
-)
+);
 
-export default memo(Panel)
+export default memo(Panel);

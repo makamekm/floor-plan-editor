@@ -1,13 +1,13 @@
-import React, { memo } from 'react'
-import { observer } from 'mobx-react'
-import { useInstance } from 'react-ioc'
-import { FloorListService } from '../services/floor-list.service'
-import { FloorService } from '../services/floor.service'
-import { ProjectService } from '../services/project.service'
-import { EditIcon, BackIcon, AddIcon, CopyIcon } from "../icons/icon"
-import WithIcon from './with-icon'
-import ProjectEditDialog from './project-edit-dialog'
-import { copyTextToClipboard } from '../utils/clipboard'
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { AddIcon, BackIcon, CopyIcon, EditIcon } from "../icons/icon";
+import { FloorListService } from "../services/floor-list.service";
+import { FloorService } from "../services/floor.service";
+import { ProjectService } from "../services/project.service";
+import { copyTextToClipboard } from "../utils/clipboard";
+import ProjectEditDialog from "./project-edit-dialog";
+import WithIcon from "./with-icon";
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
@@ -16,7 +16,7 @@ const FloorList = () => {
 
   return (
     <ProjectEditDialog>
-      {open => <>
+      {(open) => <>
         <div onClick={() => open()}
           className={"item clickable"}>
           <WithIcon icon={EditIcon}>
@@ -32,7 +32,7 @@ const FloorList = () => {
         </div>
 
         <div onClick={() => projectService.openProjectCreatePlan()}
-          className={"item clickable" + (floorService.floor.id == null ? ' active' : '')}>
+          className={"item clickable" + (floorService.floor.id == null ? " active" : "")}>
           <WithIcon icon={AddIcon}>
             Create Plan
           </WithIcon>
@@ -41,9 +41,9 @@ const FloorList = () => {
         {floorService.floor.id == null ? null : <div onClick={() => {
           copyTextToClipboard(
             window.location.origin
-            + '/'
+            + "/"
             + projectService.project.id
-            + '/view/'
+            + "/view/"
             + floorService.floor.id,
           );
         }}
@@ -57,10 +57,10 @@ const FloorList = () => {
           floorListService.list.map(({id, data: {name}}) => {
             return (
               <div key={id} onClick={() => floorService.openFloor(id)}
-                className={"item clickable" + (id === floorService.floor.id ? ' active' : '')}>
+                className={"item clickable" + (id === floorService.floor.id ? " active" : "")}>
                 {name}
               </div>
-            )
+            );
           })
         }
 
@@ -127,7 +127,7 @@ const FloorList = () => {
         `}</style>
       </>}
     </ProjectEditDialog>
-  )
-}
+  );
+};
 
-export default memo(observer(FloorList))
+export default memo(observer(FloorList));

@@ -1,13 +1,13 @@
-import React, { memo } from 'react'
-import Panel from './panel';
-import ToggleButtonType from './toggle-type';
-import FloorListRead from './floor-list-read';
-import WindowPanel from './window-panel';
-import { useInstance } from 'react-ioc';
-import { FloorService } from '../services/floor.service';
-import { FloorListService } from '../services/floor-list.service';
-import { observer } from 'mobx-react';
-import { SearchIcon } from '../icons/icon';
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { SearchIcon } from "../icons/icon";
+import { FloorListService } from "../services/floor-list.service";
+import { FloorService } from "../services/floor.service";
+import FloorListRead from "./floor-list-read";
+import Panel from "./panel";
+import ToggleButtonType from "./toggle-type";
+import WindowPanel from "./window-panel";
 
 const FloorPanelRead = () => {
   const floorService = useInstance(FloorService);
@@ -18,16 +18,16 @@ const FloorPanelRead = () => {
   return <>
     <Panel>
       <ToggleButtonType
-        activeState={'name'}
+        activeState={"name"}
         items={[{
-          key: 'name',
-          name: name,
+          key: "name",
+          name,
         }, {
-          key: 'menu',
+          key: "menu",
           name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
         }]}
-        onToggle={key => {
-          if (key === 'menu') {
+        onToggle={(key) => {
+          if (key === "menu") {
             floorListService.opened = true;
           }
         }}
@@ -51,7 +51,7 @@ const FloorPanelRead = () => {
         max-height: calc(var(--vh, 1vh) * 100 - 20px);
       }
     `}</style>
-  </>
-}
+  </>;
+};
 
 export default memo(observer(FloorPanelRead));

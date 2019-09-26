@@ -1,11 +1,11 @@
-import React, { memo } from 'react'
-import WindowPanel from './window-panel';
-import { useInstance } from 'react-ioc';
-import List from './list';
-import { observer } from 'mobx-react';
-import { useObservable } from 'mobx-react-lite';
-import InlineTextEdit from './inline-text-edit';
-import { ProjectService } from '../services/project.service';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { ProjectService } from "../services/project.service";
+import InlineTextEdit from "./inline-text-edit";
+import List from "./list";
+import WindowPanel from "./window-panel";
 
 const ProjectCreateDialog = ({
   children,
@@ -29,17 +29,17 @@ const ProjectCreateDialog = ({
         {
           [
             {
-              key: 'header',
+              key: "header",
               body: "Create Project",
               isHeader: true,
             },
             {
-              key: 'name',
+              key: "name",
               body: (
                 <InlineTextEdit
                   placeholder="Write project name..."
                   value={data.name}
-                  onChange={value => {
+                  onChange={(value) => {
                     data.name = value;
                   }}
                 />
@@ -47,7 +47,7 @@ const ProjectCreateDialog = ({
               isField: true,
             },
             {
-              key: 'action',
+              key: "action",
               body: "Create",
               onClick: async () => {
                 await projectService.createProject(data.name);
@@ -55,12 +55,12 @@ const ProjectCreateDialog = ({
               },
               isDisabled: data.name.length < 1,
               isClickable: true,
-            }
+            },
           ]
         }
       </List>
     </WindowPanel>
-  </>
-}
+  </>;
+};
 
 export default memo(observer(ProjectCreateDialog));

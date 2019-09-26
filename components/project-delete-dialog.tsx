@@ -1,13 +1,13 @@
-import React, { memo } from 'react'
-import WindowPanel from './window-panel';
-import { useInstance } from 'react-ioc';
-import List from './list';
-import { observer } from 'mobx-react';
-import { useObservable } from 'mobx-react-lite';
-import { ProjectService } from '../services/project.service';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { ProjectService } from "../services/project.service";
+import List from "./list";
+import WindowPanel from "./window-panel";
 
 const ProjectDeleteDialog = ({
-  children
+  children,
 }: {
   children: (open: () => void) => JSX.Element;
 }) => {
@@ -28,28 +28,28 @@ const ProjectDeleteDialog = ({
         {
           [
             {
-              key: 'header',
+              key: "header",
               body: "Delete Project",
               isHeader: true,
             },
             {
-              key: 'description',
+              key: "description",
               body: "The project will be removed completely and the changes can't be reverted",
             },
             {
-              key: 'action',
+              key: "action",
               body: "Yes, Remove",
               onClick: async () => {
                 await projectService.deleteProject();
                 data.isOpen = false;
               },
               isClickable: true,
-            }
+            },
           ]
         }
       </List>
     </WindowPanel>
-  </>
-}
+  </>;
+};
 
 export default memo(observer(ProjectDeleteDialog));

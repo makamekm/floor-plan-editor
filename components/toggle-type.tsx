@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo } from "react";
 
 const ToggleButtonType = ({
   onToggle,
@@ -8,10 +8,10 @@ const ToggleButtonType = ({
 }: {
   onToggle: (key: string | number) => void;
   activeState?: string | number;
-  items: {
+  items: Array<{
     key: string | number;
     name: string | JSX.Element
-  }[];
+  }>;
   responsive?: boolean;
 }) => {
   return (
@@ -21,14 +21,14 @@ const ToggleButtonType = ({
           items.map(({key, name}) => {
             return (
               <div key={key} onClick={() => onToggle(key)}
-                className={"toggle-type-button" + (activeState === key ? ' active' : '')}>
+                className={"toggle-type-button" + (activeState === key ? " active" : "")}>
                 {name}
               </div>
-            )
+            );
           })
         }
       </div>
-      
+
       <style jsx>{`
 
         .toggle-type {
@@ -36,7 +36,7 @@ const ToggleButtonType = ({
           flex-direction: row;
           box-sizing: border-box;
         }
-  
+
         .toggle-type-button {
           white-space: nowrap;
           font-family: Open Sans;
@@ -60,7 +60,7 @@ const ToggleButtonType = ({
           text-overflow: ellipsis;
           overflow: hidden;
         }
-        
+
         .toggle-type-button:first-child {
           flex: 1;
         }
@@ -103,7 +103,7 @@ const ToggleButtonType = ({
               border-top-right-radius: 5px;
               border-bottom-left-radius: 0;
             }
-    
+
             .toggle-type-button:last-child {
               border-top-right-radius: 0;
               border-bottom-right-radius: 5px;
@@ -113,7 +113,7 @@ const ToggleButtonType = ({
         ` : ``}
       `}</style>
     </>
-  )
-}
+  );
+};
 
-export default memo(ToggleButtonType)
+export default memo(ToggleButtonType);

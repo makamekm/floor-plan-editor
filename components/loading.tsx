@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo } from "react";
 
 const Loading = ({ active }: {
   active: boolean;
@@ -70,9 +70,9 @@ const Loading = ({ active }: {
           transform: rotate(360deg);
         }
       }
-      
+
     `}</style>
   </div>
-)
+);
 
-export default memo(Loading)
+export default memo(Loading);

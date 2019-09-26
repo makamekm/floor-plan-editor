@@ -1,6 +1,6 @@
-import { Wall } from "./wall.model";
-import { FloorplanModel } from "../floorplan-model";
 import { Utils } from "../../utils/operations";
+import { FloorplanModel } from "../floorplan-model";
+import { Wall } from "./wall.model";
 
 const cornerTolerance: number = 20;
 
@@ -15,13 +15,13 @@ export class Corner {
   /** Array of end walls. */
   private wallEnds: Wall[] = [];
 
-  /** Constructs a corner. 
+  /** Constructs a corner.
    * @param floorplan The associated floorplan.
    * @param x X coordinate.
    * @param y Y coordinate.
    * @param id An optional unique id. If not set, created internally.
    */
-  constructor(private floorplan: FloorplanModel, public x: number, public y: number, public id: string = '') {
+  constructor(private floorplan: FloorplanModel, public x: number, public y: number, public id: string = "") {
     this.id = id || Utils.guid();
   }
 
@@ -29,7 +29,7 @@ export class Corner {
     // try to snap this corner to an axis
     const snapped = {
       x: false,
-      y: false
+      y: false,
     };
 
     this.adjacentCorners().forEach((corner) => {
@@ -91,30 +91,12 @@ export class Corner {
     return retArray;
   }
 
-  /** Checks if a wall is connected.
-   * @param wall A wall.
-   * @returns True in case of connection.
-   */
-  private isWallConnected(wall: Wall): boolean {
-    for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i] == wall) {
-        return true;
-      }
-    }
-    for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i] == wall) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
-   * 
+   *
    */
   public distanceFrom(x: number, y: number): number {
     const distance = Utils.distance(x, y, this.x, this.y);
-    //console.log('x,y ' + x + ',' + y + ' to ' + this.getX() + ',' + this.getY() + ' is ' + distance);
+    // console.log('x,y ' + x + ',' + y + ' to ' + this.getX() + ',' + this.getY() + ' is ' + distance);
     return distance;
   }
 
@@ -149,14 +131,14 @@ export class Corner {
    * @param wall A wall.
    */
   public attachStart(wall: Wall) {
-    this.wallStarts.push(wall)
+    this.wallStarts.push(wall);
   }
 
   /** Attaches an end wall.
    * @param wall A wall.
    */
   public attachEnd(wall: Wall) {
-    this.wallEnds.push(wall)
+    this.wallEnds.push(wall);
   }
 
   /** Get wall to corner.
@@ -193,23 +175,6 @@ export class Corner {
     return this.wallTo(corner) || this.wallFrom(corner);
   }
 
-  private combineWithCorner(corner: Corner) {
-    // update position to other corner's
-    this.x = corner.x;
-    this.y = corner.y;
-    // absorb the other corner's wallStarts and wallEnds
-    for (let i = corner.wallStarts.length - 1; i >= 0; i--) {
-      corner.wallStarts[i].setStart(this);
-    }
-    for (let i = corner.wallEnds.length - 1; i >= 0; i--) {
-      corner.wallEnds[i].setEnd(this);
-    }
-    // delete the other corner
-    corner.removeAll();
-    this.removeDuplicateWalls();
-    this.floorplan.update();
-  }
-
   public mergeWithIntersected(): boolean {
     // check corners
     for (let i = 0; i < this.floorplan.getCorners().length; i++) {
@@ -239,6 +204,41 @@ export class Corner {
     return false;
   }
 
+  /** Checks if a wall is connected.
+   * @param wall A wall.
+   * @returns True in case of connection.
+   */
+  private isWallConnected(wall: Wall): boolean {
+    for (let i = 0; i < this.wallStarts.length; i++) {
+      if (this.wallStarts[i] == wall) {
+        return true;
+      }
+    }
+    for (let i = 0; i < this.wallEnds.length; i++) {
+      if (this.wallEnds[i] == wall) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private combineWithCorner(corner: Corner) {
+    // update position to other corner's
+    this.x = corner.x;
+    this.y = corner.y;
+    // absorb the other corner's wallStarts and wallEnds
+    for (let i = corner.wallStarts.length - 1; i >= 0; i--) {
+      corner.wallStarts[i].setStart(this);
+    }
+    for (let i = corner.wallEnds.length - 1; i >= 0; i--) {
+      corner.wallEnds[i].setEnd(this);
+    }
+    // delete the other corner
+    corner.removeAll();
+    this.removeDuplicateWalls();
+    this.floorplan.update();
+  }
+
   /** Ensure we do not have duplicate walls (i.e. same start and end points) */
   private removeDuplicateWalls() {
     // delete the wall between these corners, if it exists
@@ -246,7 +246,7 @@ export class Corner {
     const wallStartpoints: { [key: string]: boolean } = {};
     for (let i = this.wallStarts.length - 1; i >= 0; i--) {
       if (this.wallStarts[i].getEnd() === this) {
-        // remove zero length wall 
+        // remove zero length wall
         this.wallStarts[i].remove();
       } else if (this.wallStarts[i].getEnd().id in wallEndpoints) {
         // remove duplicated wall
@@ -257,7 +257,7 @@ export class Corner {
     }
     for (let i = this.wallEnds.length - 1; i >= 0; i--) {
       if (this.wallEnds[i].getStart() === this) {
-        // removed zero length wall 
+        // removed zero length wall
         this.wallEnds[i].remove();
       } else if (this.wallEnds[i].getStart().id in wallStartpoints) {
         // removed duplicated wall

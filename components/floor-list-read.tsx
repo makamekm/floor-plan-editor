@@ -1,12 +1,12 @@
-import React, { memo } from 'react'
-import { observer } from 'mobx-react'
-import { useInstance } from 'react-ioc'
-import { FloorListService } from '../services/floor-list.service'
-import { FloorService } from '../services/floor.service'
-import { ProjectService } from '../services/project.service'
-import { copyTextToClipboard } from '../utils/clipboard'
-import { CopyIcon, BackIcon } from "../icons/icon"
-import WithIcon from './with-icon'
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { BackIcon, CopyIcon } from "../icons/icon";
+import { FloorListService } from "../services/floor-list.service";
+import { FloorService } from "../services/floor.service";
+import { ProjectService } from "../services/project.service";
+import { copyTextToClipboard } from "../utils/clipboard";
+import WithIcon from "./with-icon";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);
@@ -34,13 +34,13 @@ const FloorListRead = () => {
       floorListService.list.map(({id, data: {name}}) => {
         return (
           <div key={id} onClick={() => floorService.openPublicFloor(id)}
-            className={"item clickable" + (id === floorService.floor.id ? ' active' : '')}>
+            className={"item clickable" + (id === floorService.floor.id ? " active" : "")}>
             {name}
           </div>
-        )
+        );
       })
     }
-    
+
     <style jsx>{`
       .item {
         padding-left: 20px;
@@ -102,7 +102,7 @@ const FloorListRead = () => {
         filter: invert(1)
       }
     `}</style>
-  </>
-}
+  </>;
+};
 
-export default memo(observer(FloorListRead))
+export default memo(observer(FloorListRead));

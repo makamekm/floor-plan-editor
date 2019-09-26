@@ -1,7 +1,7 @@
-import React, { memo } from 'react'
-import { useObservable } from 'mobx-react-lite'
-import { observer } from 'mobx-react';
-import { EditIcon } from '../icons/icon';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo } from "react";
+import { EditIcon } from "../icons/icon";
 
 const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   value: string;
@@ -11,12 +11,12 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   padding?: string;
 }) => {
   const input = React.useRef(null);
-  const inputValue = useObservable({value: ''});
+  const inputValue = useObservable({value: ""});
   const isTryingToSave = useObservable({value: false});
   const isEditing = useObservable({value: false});
 
-  borderRadius = borderRadius || '0px';
-  padding = padding || '10px 15px';
+  borderRadius = borderRadius || "0px";
+  padding = padding || "10px 15px";
 
   const onStartEdit = () => {
     inputValue.value = value;
@@ -26,29 +26,29 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
       input.current.focus();
       input.current.select();
     });
-  }
+  };
 
   const onStopEdit = () => {
     if (!isTryingToSave.value) {
       isEditing.value = false;
     }
-  }
+  };
 
   const onSaveEdit = () => {
     isEditing.value = false;
     onChange(inputValue.value);
-  }
+  };
 
   const onSaveMouseDown = () => {
     isTryingToSave.value = true;
-  }
+  };
 
   const onSaveMouseLeave = () => {
     if (isTryingToSave.value) {
       isTryingToSave.value = false;
       isEditing.value = false;
     }
-  }
+  };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode == 27) {
@@ -56,7 +56,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
     } else if (event.keyCode == 13) {
       onSaveEdit();
     }
-  }
+  };
 
   return <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
     <div className="value"
@@ -84,7 +84,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
           placeholder="Write here..."
           type="text"
           value={inputValue.value || ""}
-          onChange={e => inputValue.value = e.currentTarget.value}/>
+          onChange={(e) => inputValue.value = e.currentTarget.value}/>
       </div>
       <div>
         <div className="input-save"
@@ -190,7 +190,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
         background-color: #000;
         color: #ffffff;
       }
-  
+
       .input-control::placeholder {
         opacity: 0.67;
         color: inherit;
@@ -228,7 +228,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
         align-items: center;
       }
     `}</style>
-  </div>
-}
+  </div>;
+};
 
-export default memo(observer(InlineTextEdit))
+export default memo(observer(InlineTextEdit));

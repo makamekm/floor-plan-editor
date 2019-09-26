@@ -1,9 +1,16 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useObservable } from 'mobx-react-lite'
-import EditIcon from "../icons/edit.svg"
 import { observer } from 'mobx-react';
+import { EditIcon } from '../icons/icon';
 
-const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding, rows}) => {
+const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding, rows}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  borderRadius?: string;
+  padding?: string;
+  rows?: number;
+}) => {
   const input = React.useRef(null);
   const inputValue = useObservable({value: ''});
   const isTryingToSave = useObservable({value: false});
@@ -44,7 +51,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
     }
   }
 
-  const onKeyDown = (event) => {
+  const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode == 27) {
       onStopEdit();
     } else if (event.keyCode == 13 && !event.shiftKey) {
@@ -69,7 +76,6 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
             onKeyDown={(event) => onKeyDown(event)}
             className="input-control"
             placeholder="Write here..."
-            type="text"
             value={inputValue.value || ""}
             rows={rows || 10}
             onChange={e => inputValue.value = e.currentTarget.value}/>
@@ -219,4 +225,4 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
     </div>
 }
 
-export default observer(InlineTextareaEdit)
+export default memo(observer(InlineTextareaEdit))

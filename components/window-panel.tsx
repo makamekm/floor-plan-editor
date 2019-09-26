@@ -1,13 +1,22 @@
-import React from 'react'
+import React, { memo } from 'react'
+import Panel from './panel';
 import Portal from './portal';
 
-const Window = ({children, active, onClickOutside}) => <Portal>
+const WindowPanel = ({children, active, onClickOutside}: {
+  children: any;
+  active: boolean;
+  onClickOutside?: (e: React.MouseEvent) => void;
+}) => <Portal>
   <div
     className={"window" + (active ? " is-open" : "")}
     onClick={(e) => onClickOutside && onClickOutside(e)}>
 
     <div className="content" onClick={e => e.stopPropagation()}>
-      {children}
+      <Panel>
+        <div className="overflow">
+          {children}
+        </div>
+      </Panel>
     </div>
 
     <style jsx>{`
@@ -50,4 +59,4 @@ const Window = ({children, active, onClickOutside}) => <Portal>
   </div>
 </Portal>
 
-export default Window
+export default memo(WindowPanel)

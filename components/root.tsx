@@ -11,8 +11,11 @@ import { BlueprintService } from "../services/blueprint.service";
 import { FloorEditService } from '../services/floor-edit.service';
 import Loading from './loading';
 import { observer } from 'mobx-react';
+import { IRootService } from '../services/root-sevice.interface';
 
-const services = [
+const services: (
+  (new () => IRootService) | (new () => Object)
+)[] = [
   UserService,
   FloorProvider,
   FloorListService,
@@ -23,7 +26,12 @@ const services = [
   FloorEditService,
 ];
 
-const Root = ({children, ...props}) => {
+const Root = ({
+  children,
+  ...props
+}: {
+  children: any;
+}) => {
   React.useEffect(() => {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -33,7 +41,7 @@ const Root = ({children, ...props}) => {
     });
   }, []);
 
-  const instances = useInstances(...services);
+  const instances: IRootService[] = (useInstances as any)(...services); // monkey patch
 
   let loading = false;
 

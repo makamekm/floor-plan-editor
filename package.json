@@ -22,18 +22,18 @@
     "@babel/plugin-proposal-decorators": "7.6.0",
     "next-images": "1.2.0",
     "debounce": "1.2.0",
-    "rxjs": "6.5.3",
     "three": "0.108.0",
     "next-offline": "4.0.5",
     "react-sidebar": "3.0.2",
     "firebase": "6.6.2",
-    "react-firebaseui": "4.0.0",
-    "rxfire": "3.8.2"
+    "react-firebaseui": "4.0.0"
   },
   "devDependencies": {
     "@types/node": "12.7.5",
     "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.1",
     "@types/debounce": "1.2.0",
+    "@types/react-sidebar": "3.0.0",
     "babel-eslint": "10.0.3",
     "eslint": "6.4.0",
     "eslint-plugin-react": "7.14.3",

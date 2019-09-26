@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const Panel = ({children, className}) => (
+const Panel = ({children, className}: {
+  children: any;
+  className?: string;
+}) => (
   <div className={["panel", className].join(' ')}>
     {children}
 
@@ -15,4 +18,4 @@ const Panel = ({children, className}) => (
   </div>
 )
 
-export default Panel
+export default memo(Panel)

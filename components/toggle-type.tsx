@@ -1,6 +1,19 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
+const ToggleButtonType = ({
+  onToggle,
+  activeState,
+  items,
+  responsive,
+}: {
+  onToggle: (key: string | number) => void;
+  activeState?: string | number;
+  items: {
+    key: string | number;
+    name: string | JSX.Element
+  }[];
+  responsive?: boolean;
+}) => {
   return (
     <>
       <div className="toggle-type">
@@ -103,4 +116,4 @@ const ToggleButtonType = ({onToggle, activeState, items, responsive}) => {
   )
 }
 
-export default ToggleButtonType
+export default memo(ToggleButtonType)

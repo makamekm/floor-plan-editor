@@ -1,14 +1,18 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
 import InlineTextEdit from './inline-text-edit';
 import ProjectDeleteDialog from './project-delete-dialog';
 import List from './list';
 import { ProjectService } from '../services/project.service';
-import { useObservable, useObserver } from 'mobx-react-lite';
+import { useObservable } from 'mobx-react-lite';
 import WindowPanel from './window-panel';
 
-const ProjectEditDialog = ({children}) => {
+const ProjectEditDialog = ({
+  children
+}: {
+  children: (open: () => void) => JSX.Element;
+}) => {
   const data = useObservable({isOpen: false});
   const projectService = useInstance(ProjectService);
   const projectName = projectService.project && projectService.project.name;
@@ -16,7 +20,6 @@ const ProjectEditDialog = ({children}) => {
   return <>
     {children(() => {
       data.isOpen = true;
-      data.name = "";
     })}
     <WindowPanel
       active={data.isOpen}
@@ -67,4 +70,4 @@ const ProjectEditDialog = ({children}) => {
   </>
 }
 
-export default observer(ProjectEditDialog)
+export default memo(observer(ProjectEditDialog))

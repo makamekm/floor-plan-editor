@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Panel from './panel';
 import ToggleButtonType from './toggle-type';
 import FloorListRead from './floor-list-read';
@@ -7,7 +7,7 @@ import { useInstance } from 'react-ioc';
 import { FloorService } from '../services/floor.service';
 import { FloorListService } from '../services/floor-list.service';
 import { observer } from 'mobx-react';
-import ListIcon from "../icons/search.svg"
+import { SearchIcon } from '../icons/icon';
 
 const FloorPanelRead = () => {
   const floorService = useInstance(FloorService);
@@ -24,7 +24,7 @@ const FloorPanelRead = () => {
           name: name,
         }, {
           key: 'menu',
-          name: <div style={{lineHeight: 0}}><img src={ListIcon} alt=""/></div>,
+          name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
         }]}
         onToggle={key => {
           if (key === 'menu') {
@@ -54,4 +54,4 @@ const FloorPanelRead = () => {
   </>
 }
 
-export default observer(FloorPanelRead);
+export default memo(observer(FloorPanelRead));

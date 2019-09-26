@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useObservable } from 'mobx-react-lite'
-import EditIcon from "../icons/edit.svg"
 import { observer } from 'mobx-react';
+import { EditIcon } from '../icons/icon';
 
-const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) => {
+const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  borderRadius?: string;
+  padding?: string;
+}) => {
   const input = React.useRef(null);
   const inputValue = useObservable({value: ''});
   const isTryingToSave = useObservable({value: false});
@@ -44,7 +50,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) =
     }
   }
 
-  const onKeyDown = (event) => {
+  const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode == 27) {
       onStopEdit();
     } else if (event.keyCode == 13) {
@@ -225,4 +231,4 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}) =
   </div>
 }
 
-export default observer(InlineTextEdit)
+export default memo(observer(InlineTextEdit))

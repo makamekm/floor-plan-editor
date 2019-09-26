@@ -1,6 +1,14 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const WithIcon = ({children, icon, padding}) => {
+const WithIcon = ({
+  children,
+  icon,
+  padding,
+}: {
+  children: any;
+  icon: string;
+  padding?: string;
+}) => {
   padding = padding || '3px';
 
   return (
@@ -32,4 +40,4 @@ const WithIcon = ({children, icon, padding}) => {
   )
 }
 
-export default WithIcon
+export default memo(WithIcon)

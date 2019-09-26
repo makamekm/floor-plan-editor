@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const Loading = ({ active }) => (
+const Loading = ({ active }: {
+  active: boolean;
+}) => (
   <div className={"loading" + (active ? " is-active" : "")}>
     <div className="spinner">
       <div></div><div></div><div></div><div></div>
@@ -73,4 +75,4 @@ const Loading = ({ active }) => (
   </div>
 )
 
-export default Loading
+export default memo(Loading)

@@ -1,6 +1,21 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const List = ({children, onClick, borderRadius}) => {
+export interface Item {
+  key: string | number;
+  onClick?: (e: React.MouseEvent) => void;
+  isClickable?: boolean;
+  isHeader?: boolean;
+  isField?: boolean;
+  isDisabled?: boolean;
+  body: any;
+}
+
+const List = ({children, onClick, borderRadius}: {
+  children: Item[];
+  onClick?: (item: Item) => void;
+  placeholder?: string;
+  borderRadius?: string;
+}) => {
   borderRadius = borderRadius || '0px';
 
   return (
@@ -85,4 +100,4 @@ const List = ({children, onClick, borderRadius}) => {
   )
 }
 
-export default List
+export default memo(List)

@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useInstance } from 'react-ioc';
 import { observer } from 'mobx-react';
 import { UserService } from '../services/user.service';
 import LoginDialog from './login-dialog';
 
-const AuthProtect = ({children}) => {
+const AuthProtect = ({
+  children
+}: {
+  children: any;
+}) => {
   const userService = useInstance(UserService);
   React.useEffect(() => {
     userService.askToLogIn = true;
@@ -20,4 +24,4 @@ const AuthProtect = ({children}) => {
   </>;
 }
 
-export default observer(AuthProtect);
+export default memo(observer(AuthProtect));

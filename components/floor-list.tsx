@@ -1,13 +1,10 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
 import { FloorListService } from '../services/floor-list.service'
 import { FloorService } from '../services/floor.service'
 import { ProjectService } from '../services/project.service'
-import EditIcon from "../icons/edit.svg"
-import BackIcon from "../icons/back.svg"
-import AddIcon from "../icons/add.svg"
-import CopyIcon from "../icons/copy.svg"
+import { EditIcon, BackIcon, AddIcon, CopyIcon } from "../icons/icon"
 import WithIcon from './with-icon'
 import ProjectEditDialog from './project-edit-dialog'
 import { copyTextToClipboard } from '../utils/clipboard'
@@ -133,4 +130,4 @@ const FloorList = () => {
   )
 }
 
-export default observer(FloorList)
+export default memo(observer(FloorList))

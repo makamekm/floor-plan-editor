@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { memo } from 'react'
 import WindowPanel from './window-panel';
 import { useInstance } from 'react-ioc';
-import { FloorService } from '../services/floor.service';
 import List from './list';
 import { observer } from 'mobx-react';
 import { useObservable } from 'mobx-react-lite';
-import InlineTextEdit from './inline-text-edit';
+import { ProjectService } from '../services/project.service';
 
-const FloorCreateDialog = ({children}) => {
+const ProjectDeleteDialog = ({
+  children
+}: {
+  children: (open: () => void) => JSX.Element;
+}) => {
   const data = useObservable({isOpen: false, name: ""});
-  const floorService = useInstance(FloorService);
+  const projectService = useInstance(ProjectService);
 
   return <>
     {children(() => {
@@ -26,30 +29,20 @@ const FloorCreateDialog = ({children}) => {
           [
             {
               key: 'header',
-              body: "Create Floor",
+              body: "Delete Project",
               isHeader: true,
             },
             {
-              key: 'name',
-              body: (
-                <InlineTextEdit
-                  placeholder="Write floor name..."
-                  value={data.name}
-                  onChange={value => {
-                    data.name = value;
-                  }}
-                />
-              ),
-              isField: true,
+              key: 'description',
+              body: "The project will be removed completely and the changes can't be reverted",
             },
             {
               key: 'action',
-              body: "Create",
+              body: "Yes, Remove",
               onClick: async () => {
-                await floorService.createFloor(data.name);
+                await projectService.deleteProject();
                 data.isOpen = false;
               },
-              isDisabled: data.name.length < 1,
               isClickable: true,
             }
           ]
@@ -59,4 +52,4 @@ const FloorCreateDialog = ({children}) => {
   </>
 }
 
-export default observer(FloorCreateDialog);
+export default memo(observer(ProjectDeleteDialog));

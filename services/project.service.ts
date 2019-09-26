@@ -1,4 +1,4 @@
-import { useRouter, Router } from "next/router";
+import { useRouter, Router, NextRouter } from "next/router";
 import { observable, computed } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
@@ -7,8 +7,9 @@ import { ProjectDto } from "../models/project-list.dto";
 import { ProjectListService } from "./project-list.service";
 import { FloorListService } from "./floor-list.service";
 import { useEffect } from "react";
+import { IRootService } from "./root-sevice.interface";
 
-export class ProjectService {
+export class ProjectService implements IRootService {
   @observable loading: boolean = false;
 
   private setLoading = debounce<(value: boolean) => void>(value => {
@@ -28,10 +29,13 @@ export class ProjectService {
   @inject(FloorProvider) private floorProvider: FloorProvider;
   @inject(ProjectListService) private projectListService: ProjectListService;
   @inject(FloorListService) private floorListService: FloorListService;
-  private router = useRouter();
+  private router: NextRouter;
 
-  constructor() {
+  useHook() {
+    this.router = useRouter();
+
     useEffect(() => {
+      Router
       if (this.router.query.project_id != null) {
         this.loadProject(<string>this.router.query.project_id);
       }

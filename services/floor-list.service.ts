@@ -4,9 +4,11 @@ import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
 import { FloorDto } from "../models/floor.dto";
+import { IRootService } from "./root-sevice.interface";
+import { useRouterChange } from "../utils/router-hook";
 
-export class FloorListService {
-  @observable loading: boolean = true;
+export class FloorListService implements IRootService {
+  @observable loading: boolean = false;
   @observable opened: boolean = false;
   @observable list: IObservableArray<FloorDto> = <any>[];
 
@@ -15,6 +17,14 @@ export class FloorListService {
   }, 50);
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
+
+  useHook() {
+    useRouterChange(this.onRouterChange);
+  }
+
+  onRouterChange = () => {
+    this.opened = false;
+  }
 
   public async loadList(projectId: number | string) {
     this.setLoading(true);

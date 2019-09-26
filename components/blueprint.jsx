@@ -6,7 +6,6 @@ import Panel from './panel';
 import FloorPanel from './floor-panel';
 import InlineTextEdit from './inline-text-edit';
 import InlineTextareaEdit from './inline-textarea-edit';
-import Loading from './loading';
 import List from './list';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
@@ -164,12 +163,6 @@ class BlueprintView extends Component {
           <div className="floor-panel">
             <FloorPanel/>
           </div>
-
-          <Loading active={
-            this.floorService.loading
-            || this.floorListService.loading
-            || this.projectService.loading
-          }></Loading>
 
           <style jsx>{`
             .view {

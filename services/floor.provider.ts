@@ -1,6 +1,4 @@
-import { FloorplanDto, FloorplanDataDto, FloorDto } from "../models/floor.dto";
-import { FloorplanListDto } from "../models/floor-list.dto";
-import { demoFloorData, demoPlan, demoFloorList, demoProjectList, demoProject } from "./floot.demo";
+import { FloorDto } from "../models/floor.dto";
 import { ProjectListDto, ProjectDto } from "../models/project-list.dto";
 import '../utils/firebase';
 import firebase from 'firebase/app';

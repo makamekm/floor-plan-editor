@@ -3,11 +3,12 @@ import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListItemDto } from "../models/project-list.dto";
-import { useComputed, useDisposable } from "mobx-react-lite";
+import { useDisposable } from "mobx-react-lite";
 import { UserService } from "./user.service";
+import { IRootService } from "./root-sevice.interface";
 
-export class ProjectListService {
-  @observable loading: boolean = true;
+export class ProjectListService implements IRootService {
+  @observable loading: boolean = false;
   @observable opened: boolean = false;
   @observable list: IObservableArray<ProjectListItemDto> = <any>[];
 
@@ -18,7 +19,7 @@ export class ProjectListService {
   @inject(FloorProvider) private floorProvider: FloorProvider;
   @inject(UserService) userService: UserService;
 
-  constructor() {
+  useHook() {
     useDisposable(() => 
       reaction(
         () => this.userService.user,

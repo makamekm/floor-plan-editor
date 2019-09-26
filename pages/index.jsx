@@ -1,5 +1,4 @@
 import React from 'react'
-import Root from '../components/root'
 import List from '../components/list'
 import { useInstance } from 'react-ioc';
 import { ProjectListService } from '../services/project-list.service';
@@ -13,7 +12,7 @@ import LogoutIcon from "../icons/logout.svg"
 import { UserService } from '../services/user.service';
 import AuthProtect from '../components/auth-protect';
 
-const Page = () => {
+export default () => {
   const projectListService = useInstance(ProjectListService);
   const projectService = useInstance(ProjectService);
   const userService = useInstance(UserService);
@@ -52,15 +51,8 @@ const Page = () => {
               ]}
             </List>
           </div>
-
-          <Loading active={
-            projectListService.loading
-            || projectService.loading
-          }></Loading>
         </>}
       </ProjectCreateDialog>
     </AuthProtect>
   );
 };
-
-export default Root(Page);

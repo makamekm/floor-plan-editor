@@ -3,8 +3,9 @@ import debounce from "debounce";
 import { useEffect } from "react";
 import '../utils/firebase';
 import firebase from 'firebase/app';
+import { IRootService } from "./root-sevice.interface";
 
-export class UserService {
+export class UserService implements IRootService {
   @observable loading: boolean = true;
   @observable askToLogIn: boolean = false;
   @observable private data: {
@@ -24,12 +25,11 @@ export class UserService {
     this.loading = value;
   }, 50);
 
-  constructor() {
+  useHook() {
     useEffect(() => {
       this.setLoading(true);
       const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
         (user) => {
-          console.log(user && user.displayName, user && user.uid);
           this.data.user = user;
           this.setLoading(false);
         }

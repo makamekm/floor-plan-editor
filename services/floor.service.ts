@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { observable, reaction } from "mobx";
+import { useRouter, NextRouter, Router } from "next/router";
+import { observable } from "mobx";
 import debounce from "debounce";
 import { inject } from "react-ioc";
 import { FloorProvider } from "./floor.provider";
@@ -7,10 +7,11 @@ import { FloorDto, FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
 import { BlueprintService } from "./blueprint.service";
 import { ProjectService } from "./project.service";
 import { useEffect } from "react";
-import { useDisposable, useComputed } from "mobx-react-lite";
 import { useCallback } from "../utils/callback";
+import { useRouterChange } from "../utils/router-hook";
+import { IRootService } from "./root-sevice.interface";
 
-export class FloorService {
+export class FloorService implements IRootService {
   @observable loading: boolean = false;
 
   private setLoading = debounce<(value: boolean) => void>(value => {
@@ -28,21 +29,23 @@ export class FloorService {
   @inject(FloorProvider) private floorProvider: FloorProvider;
   @inject(ProjectService) private projectService: ProjectService;
   @inject(BlueprintService) private blueprintService: BlueprintService;
-  private router = useRouter();
+  private router: NextRouter;
 
-  constructor() {
-    useEffect(() => {
-      if (this.router.query.id != null) {
-        this.loadFloor(String(this.router.query.id));
-      } else {
-        this.floor.id = null;
-        this.blueprintService.setFloorplan(null);
-      }
-    }, []);
-
+  useHook() {
+    this.router = useRouter();
+    useRouterChange(this.onRouterChange);
     useCallback(this.blueprintService.onStateChange, () => {
       this.saveState();
     });
+  }
+
+  onRouterChange = () => {
+    if (this.router.query.id != null) {
+      this.loadFloor(String(this.router.query.id));
+    } else {
+      this.floor.id = null;
+      this.blueprintService.setFloorplan(null);
+    }
   }
 
   public saveState = debounce(() => {
@@ -71,13 +74,11 @@ export class FloorService {
   }
 
   public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    // this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
-    this.router.push('/' + String(projectId) + '/view/' + String(id));
+    this.router.push('/[project_id]/view/[id]', '/' + String(projectId) + '/view/' + String(id));
   }
 
   public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    // this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
-    this.router.push('/' + String(projectId) + '/' + String(id));
+    this.router.push('/[project_id]/[id]', '/' + String(projectId) + '/' + String(id));
   }
 
   public async saveFloor(floor: FloorDto) {

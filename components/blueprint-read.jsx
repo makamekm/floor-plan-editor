@@ -3,7 +3,6 @@ import { Blueprint } from '../models/blueprint';
 import Panel from './panel';
 import FloorPanelRead from './floor-panel-read';
 import List from './list';
-import Loading from './loading';
 import { inject } from 'react-ioc';
 import { BlueprintService } from '../services/blueprint.service';
 import { observer } from 'mobx-react';
@@ -73,12 +72,6 @@ class BlueprintView extends Component {
         <div className="floor-panel">
           <FloorPanelRead/>
         </div>
-
-        <Loading active={
-          this.floorService.loading
-          || this.floorListService.loading
-          || this.projectService.loading
-        }></Loading>
 
         <style jsx>{`
           .view {

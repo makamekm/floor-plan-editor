@@ -8,6 +8,8 @@ import { ItemEnum } from "../models/floorplan-entities/item.enum";
 import { useEffect } from "react";
 import { useDisposable } from "mobx-react-lite";
 import { Callback } from "../utils/callback";
+import { IRootService } from "./root-sevice.interface";
+import { useRouterChange } from "../utils/router-hook";
 
 export interface IModel {
   x: number;
@@ -18,7 +20,7 @@ export interface IModel {
 
 const historyLimit = 50;
 
-export class BlueprintService {
+export class BlueprintService implements IRootService {
   @observable public mode: string = 'move';
   @observable private model: {
     history: IModel[];
@@ -171,17 +173,12 @@ export class BlueprintService {
     this.blueprint.changeMode(mode);
   }
 
-  constructor() {
+  useHook() {
+    useRouterChange(this.onRouterChange);
+
     useEffect(() => {
-      const resetBlueprint = () => {
-        if (this.blueprint) {
-          this.blueprint.reset();
-        }
-      }
-      Router.events.on("routeChangeComplete", resetBlueprint);
       this.setUndoListener();
       return () => {
-        Router.events.off("routeChangeComplete", resetBlueprint);
         this.unsetUndoListener();
       };
     }, []);
@@ -194,6 +191,12 @@ export class BlueprintService {
         },
       )
     );
+  }
+  
+  onRouterChange = () => {
+    if (this.blueprint) {
+      this.blueprint.reset();
+    }
   }
 
   destructor() {
@@ -209,7 +212,7 @@ export class BlueprintService {
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.currentTarget === document) {
+    if (event.currentTarget === document && this.blueprint) {
       if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
         this.undo();
       }

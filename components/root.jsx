@@ -9,6 +9,8 @@ import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
 import { BlueprintService } from "../services/blueprint.service";
 import { FloorEditService } from '../services/floor-edit.service';
+import Loading from './loading';
+import { observer } from 'mobx-react';
 
 const services = [
   UserService,
@@ -21,7 +23,7 @@ const services = [
   FloorEditService,
 ];
 
-const Root = ({children}) => {
+const Root = ({children, ...props}) => {
   React.useEffect(() => {
     const vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -31,7 +33,16 @@ const Root = ({children}) => {
     });
   }, []);
 
-  useInstances(...services);
+  const instances = useInstances(...services);
+
+  let loading = false;
+
+  instances.forEach(instance => {
+    if (instance.useHook) {
+      instance.useHook(props);
+      loading = loading || instance.loading
+    }
+  })
 
   return (
     <>
@@ -48,6 +59,8 @@ const Root = ({children}) => {
       </Head>
 
       {children}
+
+      <Loading active={loading}></Loading>
       
       <style global jsx>{`
         body {
@@ -69,4 +82,4 @@ const Root = ({children}) => {
 
 export default provider(
   ...services,
-)(Root);
+)(observer(Root));

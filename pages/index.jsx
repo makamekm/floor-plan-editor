@@ -51,11 +51,6 @@ export default () => {
               ]}
             </List>
           </div>
-
-          <Loading active={
-            projectListService.loading
-            || projectService.loading
-          }></Loading>
         </>}
       </ProjectCreateDialog>
     </AuthProtect>

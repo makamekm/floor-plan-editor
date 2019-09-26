@@ -11,6 +11,7 @@ import WindowPanel from './window-panel';
 const ProjectEditDialog = ({children}) => {
   const data = useObservable({isOpen: false});
   const projectService = useInstance(ProjectService);
+  const projectName = projectService.project && projectService.project.name;
 
   return <>
     {children(() => {
@@ -36,7 +37,7 @@ const ProjectEditDialog = ({children}) => {
                 body: (
                   <InlineTextEdit
                     placeholder="Write project name..."
-                    value={projectService.data.project.name}
+                    value={projectName}
                     onChange={value => {
                       if (value.length > 0) {
                         projectService.data.project.name = value;

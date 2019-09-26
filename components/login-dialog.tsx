@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Window from './window';
 import { useInstance } from 'react-ioc';
 import { observer } from 'mobx-react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { UserService } from '../services/user.service';
 
-const LoginDialog = ({active, onClickOutside}) => {
+const LoginDialog = ({active, onClickOutside}: {
+  active: boolean;
+  onClickOutside?: (e: React.MouseEvent) => void;
+}) => {
   const userService = useInstance(UserService);
 
   return <>
@@ -19,4 +22,4 @@ const LoginDialog = ({active, onClickOutside}) => {
   </>
 }
 
-export default observer(LoginDialog);
+export default memo(observer(LoginDialog));

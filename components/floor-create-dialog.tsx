@@ -1,15 +1,19 @@
-import React from 'react'
+import React, { memo } from 'react'
 import WindowPanel from './window-panel';
 import { useInstance } from 'react-ioc';
+import { FloorService } from '../services/floor.service';
 import List from './list';
 import { observer } from 'mobx-react';
 import { useObservable } from 'mobx-react-lite';
 import InlineTextEdit from './inline-text-edit';
-import { ProjectService } from '../services/project.service';
 
-const ProjectCreateDialog = ({children}) => {
+const FloorCreateDialog = ({
+  children
+}: {
+  children: (open: () => void) => JSX.Element;
+}) => {
   const data = useObservable({isOpen: false, name: ""});
-  const projectService = useInstance(ProjectService);
+  const floorService = useInstance(FloorService);
 
   return <>
     {children(() => {
@@ -26,14 +30,14 @@ const ProjectCreateDialog = ({children}) => {
           [
             {
               key: 'header',
-              body: "Create Project",
+              body: "Create Floor",
               isHeader: true,
             },
             {
               key: 'name',
               body: (
                 <InlineTextEdit
-                  placeholder="Write project name..."
+                  placeholder="Write floor name..."
                   value={data.name}
                   onChange={value => {
                     data.name = value;
@@ -46,7 +50,7 @@ const ProjectCreateDialog = ({children}) => {
               key: 'action',
               body: "Create",
               onClick: async () => {
-                await projectService.createProject(data.name);
+                await floorService.createFloor(data.name);
                 data.isOpen = false;
               },
               isDisabled: data.name.length < 1,
@@ -59,4 +63,4 @@ const ProjectCreateDialog = ({children}) => {
   </>
 }
 
-export default observer(ProjectCreateDialog);
+export default memo(observer(FloorCreateDialog));

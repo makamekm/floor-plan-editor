@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { observer } from 'mobx-react'
 import { useInstance } from 'react-ioc'
 import InlineTextEdit from './inline-text-edit';
@@ -53,4 +53,4 @@ const FloorEdit = () => {
   )
 }
 
-export default observer(FloorEdit)
+export default memo(observer(FloorEdit))

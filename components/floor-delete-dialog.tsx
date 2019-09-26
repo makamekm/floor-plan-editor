@@ -1,14 +1,18 @@
-import React from 'react'
+import React, { memo } from 'react'
 import WindowPanel from './window-panel';
 import { useInstance } from 'react-ioc';
+import { FloorService } from '../services/floor.service';
 import List from './list';
 import { observer } from 'mobx-react';
-import { useObservable, useObserver } from 'mobx-react-lite';
-import { ProjectService } from '../services/project.service';
+import { useObservable } from 'mobx-react-lite';
 
-const ProjectDeleteDialog = ({children}) => {
+const FloorDeleteDialog = ({
+  children
+}: {
+  children: (open: () => void) => JSX.Element;
+}) => {
   const data = useObservable({isOpen: false, name: ""});
-  const projectService = useInstance(ProjectService);
+  const floorService = useInstance(FloorService);
 
   return <>
     {children(() => {
@@ -25,18 +29,18 @@ const ProjectDeleteDialog = ({children}) => {
           [
             {
               key: 'header',
-              body: "Delete Project",
+              body: "Delete Floor",
               isHeader: true,
             },
             {
               key: 'description',
-              body: "The project will be removed completely and the changes can't be reverted",
+              body: "The floor will be removed completely and the changes can't be reverted",
             },
             {
               key: 'action',
               body: "Yes, Remove",
               onClick: async () => {
-                await projectService.deleteProject();
+                await floorService.deleteFloor();
                 data.isOpen = false;
               },
               isClickable: true,
@@ -48,4 +52,4 @@ const ProjectDeleteDialog = ({children}) => {
   </>
 }
 
-export default observer(ProjectDeleteDialog);
+export default memo(observer(FloorDeleteDialog));

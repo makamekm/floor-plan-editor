@@ -34,9 +34,6 @@ export class BlueprintService implements IRootService {
     state: null,
   };
   private floorplan: FloorplanDto;
-  @computed public get state() {
-    return this.model.changeState;
-  }
   @computed public get selected() {
     return this.model.changeState
       && this.model.changeState.selectedItem != null
@@ -100,6 +97,7 @@ export class BlueprintService implements IRootService {
       this.model.state.y,
       this.model.state.selectedItem,
     );
+    this.onStateChange.fire(this.getFloorplan());
   }, 100);
 
   public redo() {

@@ -1,33 +1,33 @@
-import React, { useRef, useEffect, memo } from 'react';
-import Sidebar from 'react-sidebar';
-import { Blueprint } from '../models/blueprint';
-import ToggleButtonType from './toggle-type';
-import Panel from './panel';
-import FloorPanel from './floor-panel';
-import InlineTextEdit from './inline-text-edit';
-import InlineTextareaEdit from './inline-textarea-edit';
-import List from './list';
-import { useInstance } from 'react-ioc';
-import { BlueprintService } from '../services/blueprint.service';
-import { observer } from 'mobx-react';
-import { ItemNameDict, ItemArray } from '../models/floorplan-entities/item.dict';
-import { useObservable } from 'mobx-react-lite';
-import { ItemEnum } from '../models/floorplan-entities/item.enum';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo, useEffect, useRef } from "react";
+import { useInstance } from "react-ioc";
+import Sidebar from "react-sidebar";
+import { Blueprint } from "../models/blueprint";
+import { ItemArray, ItemNameDict } from "../models/floorplan-entities/item.dict";
+import { ItemEnum } from "../models/floorplan-entities/item.enum";
+import { BlueprintService } from "../services/blueprint.service";
+import FloorPanel from "./floor-panel";
+import InlineTextEdit from "./inline-text-edit";
+import InlineTextareaEdit from "./inline-textarea-edit";
+import List from "./list";
+import Panel from "./panel";
+import ToggleButtonType from "./toggle-type";
 
 const itemTypeList = [
   {
-    key: 'move',
-    name: 'Move',
+    key: "move",
+    name: "Move",
   },
   {
-    key: 'draw',
-    name: 'Draw',
+    key: "draw",
+    name: "Draw",
   },
   {
-    key: 'delete',
-    name: 'Delete',
+    key: "delete",
+    name: "Delete",
   },
-]
+];
 
 const BlueprintView = () => {
   const isToolbarOpen = useObservable({value: false});
@@ -39,7 +39,7 @@ const BlueprintView = () => {
     blueprintService.setBlueprint(blueprint);
     return () => {
       blueprintService.destructor();
-    }
+    };
   }, []);
 
   return (
@@ -59,12 +59,12 @@ const BlueprintView = () => {
       open={isToolbarOpen.value}
       onSetOpen={(open: boolean) => isToolbarOpen.value = open}
       sidebar={
-        <List onClick={item => {
+        <List onClick={(item) => {
           blueprintService.addItem(item.key as ItemEnum);
           isToolbarOpen.value = false;
         }}>
-          {ItemArray.map(key => ({
-            key: key,
+          {ItemArray.map((key) => ({
+            key,
             body: (<>+ &nbsp;{ItemNameDict[key]}</>),
             isClickable: true,
           }))}
@@ -80,7 +80,7 @@ const BlueprintView = () => {
           <ToggleButtonType
             activeState={blueprintService.mode}
             items={itemTypeList}
-            onToggle={mode => blueprintService.changeMode(mode as string)}
+            onToggle={(mode) => blueprintService.changeMode(mode as string)}
           />
         </div>
 
@@ -90,7 +90,7 @@ const BlueprintView = () => {
               <List borderRadius="5px" onClick={(item) => {
                 blueprintService.addItem(item.key as ItemEnum);
               }}>
-                {ItemArray.map(item => ({
+                {ItemArray.map((item) => ({
                   key: item,
                   body: (<>+ &nbsp;{ItemNameDict[item]}</>),
                   isClickable: true,
@@ -105,17 +105,17 @@ const BlueprintView = () => {
             <List borderRadius="5px">
               {[
                 {
-                  key: 'header',
+                  key: "header",
                   body: ItemNameDict[blueprintService.selected.type as ItemEnum],
                   isHeader: true,
                 },
                 {
-                  key: 'name',
+                  key: "name",
                   body: (
                     <InlineTextEdit
                       placeholder="Write Name..."
                       value={blueprintService.selected.name}
-                      onChange={value => {
+                      onChange={(value) => {
                         blueprintService.selected.name = value;
                         blueprintService.applyChanges();
                       }}
@@ -124,25 +124,25 @@ const BlueprintView = () => {
                   isField: true,
                 },
                 {
-                  key: 'header-description',
+                  key: "header-description",
                   body: "Description",
                   isHeader: true,
                 },
                 {
-                  key: 'description',
+                  key: "description",
                   body: (
                     <InlineTextareaEdit
                       borderRadius="0 0 5px 5px"
                       placeholder="Write Description..."
                       value={blueprintService.selected.description}
-                      onChange={value => {
+                      onChange={(value) => {
                         blueprintService.selected.description = value;
                         blueprintService.applyChanges();
                       }}
                     />
                   ),
                   isField: true,
-                }
+                },
               ]}
             </List>
           </Panel> : null}
@@ -210,7 +210,7 @@ const BlueprintView = () => {
         `}</style>
       </div>
     </Sidebar>
-  )
-}
+  );
+};
 
-export default memo(observer(BlueprintView))
+export default memo(observer(BlueprintView));

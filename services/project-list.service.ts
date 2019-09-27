@@ -1,34 +1,34 @@
-import { observable, IObservableArray, reaction } from "mobx";
 import debounce from "debounce";
-import { inject } from "react-ioc";
-import { FloorProvider } from "./floor.provider";
-import { ProjectListItemDto } from "../models/project-list.dto";
+import { IObservableArray, observable, reaction } from "mobx";
 import { useDisposable } from "mobx-react-lite";
-import { UserService } from "./user.service";
+import { inject } from "react-ioc";
+import { ProjectListItemDto } from "../models/project-list.dto";
+import { FloorProvider } from "./floor.provider";
 import { IRootService } from "./root-sevice.interface";
+import { UserService } from "./user.service";
 
 export class ProjectListService implements IRootService {
-  @observable loading: boolean = false;
-  @observable opened: boolean = false;
-  @observable list: IObservableArray<ProjectListItemDto> = <any>[];
+  @observable public loading: boolean = false;
+  @observable public opened: boolean = false;
+  @observable public list: IObservableArray<ProjectListItemDto> = [] as any;
+  @inject(UserService) public userService: UserService;
 
-  private setLoading = debounce<(value: boolean) => void>(value => {
+  private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
   }, 50);
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
-  @inject(UserService) userService: UserService;
 
-  useHook() {
-    useDisposable(() => 
+  public useHook() {
+    useDisposable(() =>
       reaction(
         () => this.userService.user,
-        user => {
+        (user) => {
           if (user) {
             this.loadList();
           }
-        }
-      )
+        },
+      ),
     );
   }
 

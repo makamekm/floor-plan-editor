@@ -1,28 +1,28 @@
-import { FloorplanListItemDto } from "../models/floor-list.dto";
-import { observable, IObservableArray } from "mobx";
 import debounce from "debounce";
+import { IObservableArray, observable } from "mobx";
 import { inject } from "react-ioc";
-import { FloorProvider } from "./floor.provider";
+import { FloorplanListItemDto } from "../models/floor-list.dto";
 import { FloorDto } from "../models/floor.dto";
-import { IRootService } from "./root-sevice.interface";
 import { useRouterChange } from "../utils/router-hook";
+import { FloorProvider } from "./floor.provider";
+import { IRootService } from "./root-sevice.interface";
 
 export class FloorListService implements IRootService {
-  @observable loading: boolean = false;
-  @observable opened: boolean = false;
-  @observable list: IObservableArray<FloorDto> = <any>[];
+  @observable public loading: boolean = false;
+  @observable public opened: boolean = false;
+  @observable public list: IObservableArray<FloorDto> = [] as any;
 
-  private setLoading = debounce<(value: boolean) => void>(value => {
+  private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
   }, 50);
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
 
-  useHook() {
+  public useHook() {
     useRouterChange(this.onRouterChange);
   }
 
-  onRouterChange = () => {
+  public onRouterChange = () => {
     this.opened = false;
   }
 

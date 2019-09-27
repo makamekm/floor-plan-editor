@@ -1,20 +1,20 @@
-import { useRouter, Router, NextRouter } from "next/router";
-import { observable, computed } from "mobx";
 import debounce from "debounce";
-import { inject } from "react-ioc";
-import { FloorProvider } from "./floor.provider";
-import { ProjectDto } from "../models/project-list.dto";
-import { ProjectListService } from "./project-list.service";
-import { FloorListService } from "./floor-list.service";
+import { computed, observable } from "mobx";
+import { NextRouter, Router, useRouter } from "next/router";
 import { useEffect } from "react";
+import { inject } from "react-ioc";
+import { ProjectDto } from "../models/project-list.dto";
+import { FloorListService } from "./floor-list.service";
+import { FloorProvider } from "./floor.provider";
+import { ProjectListService } from "./project-list.service";
 import { IRootService } from "./root-sevice.interface";
 
 export class ProjectService implements IRootService {
-  @observable loading: boolean = false;
 
-  private setLoading = debounce<(value: boolean) => void>(value => {
-    this.loading = value;
-  }, 50);
+  @computed public get project() {
+    return this.data.project;
+  }
+  @observable public loading: boolean = false;
 
   @observable public data: {
     project: ProjectDto;
@@ -22,22 +22,22 @@ export class ProjectService implements IRootService {
     project: null,
   };
 
-  @computed public get project() {
-    return this.data.project;
-  }
+  private setLoading = debounce<(value: boolean) => void>((value) => {
+    this.loading = value;
+  }, 50);
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
   @inject(ProjectListService) private projectListService: ProjectListService;
   @inject(FloorListService) private floorListService: FloorListService;
   private router: NextRouter;
 
-  useHook() {
+  public useHook() {
     this.router = useRouter();
 
     useEffect(() => {
-      Router
+      Router;
       if (this.router.query.project_id != null) {
-        this.loadProject(<string>this.router.query.project_id);
+        this.loadProject(this.router.query.project_id as string);
       }
     }, []);
   }
@@ -45,7 +45,7 @@ export class ProjectService implements IRootService {
   public async loadProject(id: number | string = this.project.id) {
     this.data.project = {
       id,
-      name: '',
+      name: "",
     };
 
     this.setLoading(true);
@@ -69,18 +69,18 @@ export class ProjectService implements IRootService {
     const firstPlan = this.floorListService.list[0];
 
     if (firstPlan) {
-      this.router.push('/' + String(id) + '/' + String(firstPlan.id));
+      this.router.push("/" + String(id) + "/" + String(firstPlan.id));
     } else {
-      this.router.push('/[project_id]', '/' + String(id));
+      this.router.push("/[project_id]", "/" + String(id));
     }
   }
 
   public async openProjectCreatePlan(id: number | string = this.data.project.id) {
-    this.router.push('/[project_id]', '/' + String(id));
+    this.router.push("/[project_id]", "/" + String(id));
   }
 
   public async openProjectList() {
-    this.router.push('/', '/');
+    this.router.push("/", "/");
   }
 
   public async saveProject() {

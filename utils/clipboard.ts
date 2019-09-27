@@ -6,7 +6,7 @@ export function copyTextToClipboard(text: string) {
   textArea.select();
 
   try {
-    document.execCommand('copy');
+    document.execCommand("copy");
   } catch (err) {
     // Can't copy
   }

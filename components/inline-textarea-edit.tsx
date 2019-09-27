@@ -1,7 +1,7 @@
-import React, { memo } from 'react'
-import { useObservable } from 'mobx-react-lite'
-import { observer } from 'mobx-react';
-import { EditIcon } from '../icons/icon';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo } from "react";
+import { EditIcon } from "../icons/icon";
 
 const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding, rows}: {
   value: string;
@@ -12,12 +12,12 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
   rows?: number;
 }) => {
   const input = React.useRef(null);
-  const inputValue = useObservable({value: ''});
+  const inputValue = useObservable({value: ""});
   const isTryingToSave = useObservable({value: false});
   const isEditing = useObservable({value: false});
 
-  borderRadius = borderRadius || '0px';
-  padding = padding || '10px 15px';
+  borderRadius = borderRadius || "0px";
+  padding = padding || "10px 15px";
 
   const onStartEdit = () => {
     inputValue.value = value;
@@ -27,29 +27,29 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
       input.current.focus();
       input.current.select();
     });
-  }
+  };
 
   const onStopEdit = () => {
     if (!isTryingToSave.value) {
       isEditing.value = false;
     }
-  }
+  };
 
   const onSaveEdit = () => {
     isEditing.value = false;
     onChange(inputValue.value);
-  }
+  };
 
   const onSaveMouseDown = () => {
     isTryingToSave.value = true;
-  }
+  };
 
   const onSaveMouseLeave = () => {
     if (isTryingToSave.value) {
       isTryingToSave.value = false;
       isEditing.value = false;
     }
-  }
+  };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.keyCode == 27) {
@@ -57,7 +57,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
     } else if (event.keyCode == 13 && !event.shiftKey) {
       onSaveEdit();
     }
-  }
+  };
 
   return <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
       <div className="value" onDoubleClick={() => onStartEdit()} onTouchEnd={() => onStartEdit()}>
@@ -78,7 +78,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
             placeholder="Write here..."
             value={inputValue.value || ""}
             rows={rows || 10}
-            onChange={e => inputValue.value = e.currentTarget.value}/>
+            onChange={(e) => inputValue.value = e.currentTarget.value}/>
         </div>
         <div>
           <div className="input-save"
@@ -89,7 +89,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
           </div>
         </div>
       </div>
-  
+
       <style jsx>{`
         @keyframes on-appear {
           0% {
@@ -99,13 +99,13 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
             opacity: 1;
           }
         }
-  
+
         .inline-edit-input {
           display: flex;
           justify-items: stretch;
           width: 100%;
         }
-  
+
         .value {
           display: flex;
           justify-items: stretch;
@@ -122,7 +122,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
         .value-body {
           flex: 1;
         }
-  
+
         .value-edit {
           cursor: pointer;
           transition: opacity 0.2s;
@@ -130,25 +130,25 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
           font-size: 0;
           line-height: 0;
         }
-  
+
         .value:hover, .value:focus {
           border: solid 1px #F1FCFF;
           background-color: rgba(7, 22, 79, 0.05);
         }
-  
+
         .value:hover .value-edit, .value:focus .value-edit {
           opacity: 1;
           pointer-events: all;
         }
-  
+
         .value:hover  .value-edit:hover, .value:focus .value-edit:hover {
           opacity: 0.67;
         }
-  
+
         .value:hover .value-edit:active, .value:focus .value-edit:active {
           opacity: 0.4;
         }
-  
+
         .input {
           display: none;
           overflow: hidden;
@@ -167,7 +167,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
         .input-body {
           flex: 1;
         }
-  
+
         .input-control {
           padding: ${padding};
           border: none;
@@ -184,12 +184,12 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
           background-color: #000;
           color: #ffffff;
         }
-    
+
         .input-control::placeholder {
           opacity: 0.67;
           color: inherit;
         }
-  
+
         .input-save {
           padding: ${padding};
           transition: opacity 0.2s, background-color 0.2s;
@@ -201,28 +201,28 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
           background-color: rgba(255, 255, 255, 0);
           height: 100%;
         }
-  
+
         .input-save:hover {
           opacity: 0.8;
           background-color: rgba(255, 255, 255, 0.1);
         }
-  
+
         .input-save:active {
           opacity: 1;
           background-color: rgba(255, 255, 255, 0.2);
         }
-  
+
         .inline-edit-input.is-editing .value {
           display: none;
         }
-  
+
         .inline-edit-input.is-editing > .input {
           display: flex;
           justify-items: stretch;
           align-items: center;
         }
       `}</style>
-    </div>
-}
+    </div>;
+};
 
-export default memo(observer(InlineTextareaEdit))
+export default memo(observer(InlineTextareaEdit));

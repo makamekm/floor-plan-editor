@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo } from "react";
 
 const WithIcon = ({
   children,
@@ -9,7 +9,7 @@ const WithIcon = ({
   icon: string;
   padding?: string;
 }) => {
-  padding = padding || '3px';
+  padding = padding || "3px";
 
   return (
     <div className="row">
@@ -26,18 +26,18 @@ const WithIcon = ({
           display: flex;
           align-items: center;
         }
-  
+
         .row > * {
           padding-left: ${padding};
           padding-right: ${padding};
         }
-  
+
         .icon {
           line-height: 0;
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default memo(WithIcon)
+export default memo(WithIcon);

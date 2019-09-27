@@ -1,6 +1,6 @@
-import React, { memo } from 'react'
-import Panel from './panel';
-import Portal from './portal';
+import React, { memo } from "react";
+import Panel from "./panel";
+import Portal from "./portal";
 
 const WindowPanel = ({children, active, onClickOutside}: {
   children: any;
@@ -11,7 +11,7 @@ const WindowPanel = ({children, active, onClickOutside}: {
     className={"window" + (active ? " is-open" : "")}
     onClick={(e) => onClickOutside && onClickOutside(e)}>
 
-    <div className="content" onClick={e => e.stopPropagation()}>
+    <div className="content" onClick={(e) => e.stopPropagation()}>
       <Panel>
         <div className="overflow">
           {children}
@@ -57,6 +57,6 @@ const WindowPanel = ({children, active, onClickOutside}: {
       }
     `}</style>
   </div>
-</Portal>
+</Portal>;
 
-export default memo(WindowPanel)
+export default memo(WindowPanel);

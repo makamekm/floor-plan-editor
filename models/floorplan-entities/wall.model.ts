@@ -1,19 +1,16 @@
-import { HalfEdge } from "./half-edge.model";
-import { Configuration, configWallThickness } from "../../utils/configuration";
-import { Corner } from "./corner.model";
 import { Callback } from "../../utils/callback";
+import { Configuration, configWallThickness } from "../../utils/configuration";
 import { Utils } from "../../utils/operations";
 import { FloorplanModel } from "../floorplan-model";
+import { Corner } from "./corner.model";
+import { HalfEdge } from "./half-edge.model";
 
-/** 
+/**
  * A Wall is the basic element to create Rooms.
- * 
+ *
  * Walls consists of two half edges.
  */
 export class Wall {
-
-  /** The unique id of each wall. */
-  private id: string;
 
   /** Front is the plane from start to end. */
   public frontEdge: HalfEdge | null = null;
@@ -26,7 +23,10 @@ export class Wall {
   /** Wall thickness. */
   public thickness = Configuration.getNumericValue(configWallThickness);
 
-  /** 
+  /** The unique id of each wall. */
+  private id: string;
+
+  /**
    * Constructs a new wall.
    * @param start Start corner.
    * @param end End corner.
@@ -34,12 +34,8 @@ export class Wall {
   constructor(private floorplan: FloorplanModel, private start: Corner, private end: Corner) {
     this.id = this.getUuid();
 
-    this.start.attachStart(this)
+    this.start.attachStart(this);
     this.end.attachEnd(this);
-  }
-
-  private getUuid(): string {
-    return [this.start.id, this.end.id].join();
   }
 
   public resetFrontBack() {
@@ -114,7 +110,11 @@ export class Wall {
     return Utils.pointDistanceFromLine(
       x, y,
       this.getStartX(), this.getStartY(),
-      this.getEndX(), this.getEndY()
+      this.getEndX(), this.getEndY(),
     );
+  }
+
+  private getUuid(): string {
+    return [this.start.id, this.end.id].join();
   }
 }

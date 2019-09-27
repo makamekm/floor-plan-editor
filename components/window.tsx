@@ -1,5 +1,5 @@
-import React, { memo } from 'react'
-import Portal from './portal';
+import React, { memo } from "react";
+import Portal from "./portal";
 
 const Window = ({children, active, onClickOutside}: {
   children: any;
@@ -10,7 +10,7 @@ const Window = ({children, active, onClickOutside}: {
     className={"window" + (active ? " is-open" : "")}
     onClick={(e) => onClickOutside && onClickOutside(e)}>
 
-    <div className="content" onClick={e => e.stopPropagation()}>
+    <div className="content" onClick={(e) => e.stopPropagation()}>
       {children}
     </div>
 
@@ -52,6 +52,6 @@ const Window = ({children, active, onClickOutside}: {
       }
     `}</style>
   </div>
-</Portal>
+</Portal>;
 
-export default memo(Window)
+export default memo(Window);

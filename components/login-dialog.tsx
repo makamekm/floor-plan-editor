@@ -1,9 +1,9 @@
-import React, { memo } from 'react'
-import Window from './window';
-import { useInstance } from 'react-ioc';
-import { observer } from 'mobx-react';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { UserService } from '../services/user.service';
+import { observer } from "mobx-react";
+import React, { memo } from "react";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import { useInstance } from "react-ioc";
+import { UserService } from "../services/user.service";
+import Window from "./window";
 
 const LoginDialog = ({active, onClickOutside}: {
   active: boolean;
@@ -19,7 +19,7 @@ const LoginDialog = ({active, onClickOutside}: {
         uiConfig={userService.uiConfig}
         firebaseAuth={userService.auth}/>
     </Window>
-  </>
-}
+  </>;
+};
 
 export default memo(observer(LoginDialog));

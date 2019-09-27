@@ -1,14 +1,14 @@
-import React, { memo } from 'react'
-import WindowPanel from './window-panel';
-import { useInstance } from 'react-ioc';
-import { FloorService } from '../services/floor.service';
-import List from './list';
-import { observer } from 'mobx-react';
-import { useObservable } from 'mobx-react-lite';
-import InlineTextEdit from './inline-text-edit';
+import { observer } from "mobx-react";
+import { useObservable } from "mobx-react-lite";
+import React, { memo } from "react";
+import { useInstance } from "react-ioc";
+import { FloorService } from "../services/floor.service";
+import InlineTextEdit from "./inline-text-edit";
+import List from "./list";
+import WindowPanel from "./window-panel";
 
 const FloorCreateDialog = ({
-  children
+  children,
 }: {
   children: (open: () => void) => JSX.Element;
 }) => {
@@ -29,17 +29,17 @@ const FloorCreateDialog = ({
         {
           [
             {
-              key: 'header',
+              key: "header",
               body: "Create Floor",
               isHeader: true,
             },
             {
-              key: 'name',
+              key: "name",
               body: (
                 <InlineTextEdit
                   placeholder="Write floor name..."
                   value={data.name}
-                  onChange={value => {
+                  onChange={(value) => {
                     data.name = value;
                   }}
                 />
@@ -47,7 +47,7 @@ const FloorCreateDialog = ({
               isField: true,
             },
             {
-              key: 'action',
+              key: "action",
               body: "Create",
               onClick: async () => {
                 await floorService.createFloor(data.name);
@@ -55,12 +55,12 @@ const FloorCreateDialog = ({
               },
               isDisabled: data.name.length < 1,
               isClickable: true,
-            }
+            },
           ]
         }
       </List>
     </WindowPanel>
-  </>
-}
+  </>;
+};
 
 export default memo(observer(FloorCreateDialog));

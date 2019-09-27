@@ -1,6 +1,6 @@
+import { FloorplanMode } from "../floorplan-mode.enum";
 import { FloorplanModel } from "../floorplan-model";
 import { FloorplanView } from "../floorplan-view";
-import { FloorplanMode } from "../floorplan-mode.enum";
 
 export interface ItemMetadata {
   id: number | string;
@@ -12,7 +12,7 @@ export interface ItemMetadata {
 
 export abstract class Item {
 
-  /** Constructs an item. 
+  /** Constructs an item.
    * @param floorplan The associated floorplan.
    * @param x X coordinate.
    * @param y Y coordinate.
@@ -23,7 +23,7 @@ export abstract class Item {
     public y: number,
     public metadata: ItemMetadata,
   ) {
-    
+
   }
 
   /** Reset the state */

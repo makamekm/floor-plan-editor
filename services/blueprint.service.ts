@@ -1,15 +1,15 @@
-import { Router } from "next/router";
-import { Blueprint } from "../models/blueprint";
-import { observable, observe, toJS, computed, reaction } from "mobx";
 import debounce from "debounce";
-import { FloorplanDto } from "../models/floor.dto";
-import { Utils } from "../utils/operations";
-import { ItemEnum } from "../models/floorplan-entities/item.enum";
-import { useEffect } from "react";
+import { computed, observable, observe, reaction, toJS } from "mobx";
 import { useDisposable } from "mobx-react-lite";
+import { Router } from "next/router";
+import { useEffect } from "react";
+import { Blueprint } from "../models/blueprint";
+import { FloorplanDto } from "../models/floor.dto";
+import { ItemEnum } from "../models/floorplan-entities/item.enum";
 import { Callback } from "../utils/callback";
-import { IRootService } from "./root-sevice.interface";
+import { Utils } from "../utils/operations";
 import { useRouterChange } from "../utils/router-hook";
+import { IRootService } from "./root-sevice.interface";
 
 export interface IModel {
   x: number;
@@ -21,7 +21,31 @@ export interface IModel {
 const historyLimit = 50;
 
 export class BlueprintService implements IRootService {
-  @observable public mode: string = 'move';
+
+  @computed public get selected() {
+    return this.model.changeState
+      && this.model.changeState.selectedItem != null
+      && this.model.changeState.floorplan.items[this.model.changeState.selectedItem];
+  }
+
+  public onStateChange = new Callback<FloorplanDto>();
+
+  @observable public mode: string = "move";
+
+  public applyChanges = debounce(() => {
+    this.pushHistory();
+    this.model.state = {
+      ...this.model.state,
+      ...toJS(this.model.changeState),
+    };
+    this.blueprint.setState(
+      this.model.state.floorplan,
+      this.model.state.x,
+      this.model.state.y,
+      this.model.state.selectedItem,
+    );
+    this.onStateChange.fire(this.getFloorplan());
+  }, 100);
   @observable private model: {
     history: IModel[];
     revert: IModel[];
@@ -34,16 +58,7 @@ export class BlueprintService implements IRootService {
     state: null,
   };
   private floorplan: FloorplanDto;
-  @computed public get state() {
-    return this.model.changeState;
-  }
-  @computed public get selected() {
-    return this.model.changeState
-      && this.model.changeState.selectedItem != null
-      && this.model.changeState.floorplan.items[this.model.changeState.selectedItem];
-  }
   private blueprint: Blueprint;
-  public onStateChange = new Callback<FloorplanDto>();
 
   public setBlueprint(blueprint: Blueprint) {
     this.blueprint = blueprint;
@@ -54,7 +69,7 @@ export class BlueprintService implements IRootService {
   }
 
   public getFloorplan() {
-    const state = toJS(this.model.state)
+    const state = toJS(this.model.state);
     return state && state.floorplan;
   }
 
@@ -88,20 +103,6 @@ export class BlueprintService implements IRootService {
     this.blueprint.addItem(type);
   }
 
-  public applyChanges = debounce(() => {
-    this.pushHistory();
-    this.model.state = {
-      ...this.model.state,
-      ...toJS(this.model.changeState),
-    };
-    this.blueprint.setState(
-      this.model.state.floorplan,
-      this.model.state.x,
-      this.model.state.y,
-      this.model.state.selectedItem,
-    );
-  }, 100);
-
   public redo() {
     const state = this.model.revert.pop();
     if (state) {
@@ -124,9 +125,43 @@ export class BlueprintService implements IRootService {
     }
   }
 
+  public changeMode(mode: string) {
+    this.blueprint.changeMode(mode);
+  }
+
+  public useHook() {
+    useRouterChange(this.onRouterChange);
+
+    useEffect(() => {
+      this.setUndoListener();
+      return () => {
+        this.unsetUndoListener();
+      };
+    }, []);
+
+    useDisposable(() =>
+      reaction(
+        () => this.model.state,
+        (state) => {
+          this.model.changeState = toJS(state);
+        },
+      ),
+    );
+  }
+
+  public onRouterChange = () => {
+    if (this.blueprint) {
+      this.blueprint.reset();
+    }
+  }
+
+  public destructor() {
+    this.unsetBlueprint();
+  }
+
   private onModeChange = (mode: string) => {
     this.mode = mode;
-  };
+  }
 
   private pushHistory() {
     if (this.model.state) {
@@ -147,7 +182,7 @@ export class BlueprintService implements IRootService {
       selectedItem: this.model.state && this.model.state.selectedItem,
     };
     this.onStateChange.fire(this.getFloorplan());
-  };
+  }
 
   private onSelectedItemChange = (index: number) => {
     this.pushHistory();
@@ -155,7 +190,7 @@ export class BlueprintService implements IRootService {
       ...this.model.state,
       selectedItem: index,
     };
-  };
+  }
 
   private attachListeners() {
     this.blueprint.onModeChange.add(this.onModeChange);
@@ -169,54 +204,20 @@ export class BlueprintService implements IRootService {
     this.blueprint.onSelectedItemChange.remove(this.onSelectedItemChange);
   }
 
-  public changeMode(mode: string) {
-    this.blueprint.changeMode(mode);
-  }
-
-  useHook() {
-    useRouterChange(this.onRouterChange);
-
-    useEffect(() => {
-      this.setUndoListener();
-      return () => {
-        this.unsetUndoListener();
-      };
-    }, []);
-
-    useDisposable(() =>
-      reaction(
-        () => this.model.state,
-        state => {
-          this.model.changeState = toJS(state);
-        },
-      )
-    );
-  }
-  
-  onRouterChange = () => {
-    if (this.blueprint) {
-      this.blueprint.reset();
-    }
-  }
-
-  destructor() {
-    this.unsetBlueprint();
-  }
-  
   private setUndoListener() {
-    document.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener("keydown", this.onKeyDown);
   }
-  
+
   private unsetUndoListener() {
-    document.removeEventListener('keydown', this.onKeyDown);
+    document.removeEventListener("keydown", this.onKeyDown);
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget === document && this.blueprint) {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
         this.undo();
       }
-      if ((event.metaKey || event.ctrlKey) && event.key === 'y') {
+      if ((event.metaKey || event.ctrlKey) && event.key === "y") {
         this.redo();
       }
     }

@@ -3,6 +3,7 @@ import { IObservableArray, observable, reaction } from "mobx";
 import { useDisposable } from "mobx-react-lite";
 import { inject } from "react-ioc";
 import { ProjectListItemDto } from "../models/project-list.dto";
+import { useRouterChange } from "../utils/router-hook";
 import { FloorProvider } from "./floor.provider";
 import { IRootService } from "./root-sevice.interface";
 import { UserService } from "./user.service";
@@ -13,6 +14,10 @@ export class ProjectListService implements IRootService {
   @observable public list: IObservableArray<ProjectListItemDto> = [] as any;
   @inject(UserService) public userService: UserService;
 
+  public debounceLoadList = debounce(() => {
+    this.loadList();
+  });
+
   private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
   }, 50);
@@ -20,16 +25,23 @@ export class ProjectListService implements IRootService {
   @inject(FloorProvider) private floorProvider: FloorProvider;
 
   public useHook() {
+    useRouterChange(this.onRouterChange);
     useDisposable(() =>
       reaction(
         () => this.userService.user,
         (user) => {
           if (user) {
-            this.loadList();
+            this.debounceLoadList();
           }
         },
       ),
     );
+  }
+
+  public onRouterChange = () => {
+    if (this.userService.user != null) {
+      this.debounceLoadList();
+    }
   }
 
   public async loadList() {

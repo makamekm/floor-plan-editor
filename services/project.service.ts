@@ -1,7 +1,6 @@
 import debounce from "debounce";
 import { computed, observable } from "mobx";
-import { NextRouter, Router, useRouter } from "next/router";
-import { useEffect } from "react";
+import { NextRouter, useRouter } from "next/router";
 import { inject } from "react-ioc";
 import { ProjectDto } from "../models/project-list.dto";
 import { useRouterChange } from "../utils/router-hook";

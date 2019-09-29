@@ -241,28 +241,28 @@ export class Corner {
   /** Ensure we do not have duplicate walls (i.e. same start and end points) */
   private removeDuplicateWalls() {
     // delete the wall between these corners, if it exists
-    const wallEndpoints: { [key: string]: boolean } = {};
-    const wallStartpoints: { [key: string]: boolean } = {};
+    const wallEndPoints: { [key: string]: boolean } = {};
+    const wallStartPoints: { [key: string]: boolean } = {};
     for (let i = this.wallStarts.length - 1; i >= 0; i--) {
       if (this.wallStarts[i].getEnd() === this) {
         // remove zero length wall
         this.wallStarts[i].remove();
-      } else if (this.wallStarts[i].getEnd().id in wallEndpoints) {
+      } else if (this.wallStarts[i].getEnd().id in wallEndPoints) {
         // remove duplicated wall
         this.wallStarts[i].remove();
       } else {
-        wallEndpoints[this.wallStarts[i].getEnd().id] = true;
+        wallEndPoints[this.wallStarts[i].getEnd().id] = true;
       }
     }
     for (let i = this.wallEnds.length - 1; i >= 0; i--) {
       if (this.wallEnds[i].getStart() === this) {
         // removed zero length wall
         this.wallEnds[i].remove();
-      } else if (this.wallEnds[i].getStart().id in wallStartpoints) {
+      } else if (this.wallEnds[i].getStart().id in wallStartPoints) {
         // removed duplicated wall
         this.wallEnds[i].remove();
       } else {
-        wallStartpoints[this.wallEnds[i].getStart().id] = true;
+        wallStartPoints[this.wallEnds[i].getStart().id] = true;
       }
     }
   }

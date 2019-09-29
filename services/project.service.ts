@@ -4,6 +4,7 @@ import { NextRouter, Router, useRouter } from "next/router";
 import { useEffect } from "react";
 import { inject } from "react-ioc";
 import { ProjectDto } from "../models/project-list.dto";
+import { useRouterChange } from "../utils/router-hook";
 import { FloorListService } from "./floor-list.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListService } from "./project-list.service";
@@ -33,13 +34,13 @@ export class ProjectService implements IRootService {
 
   public useHook() {
     this.router = useRouter();
+    useRouterChange(this.onRouterChange);
+  }
 
-    useEffect(() => {
-      Router;
-      if (this.router.query.project_id != null) {
-        this.loadProject(this.router.query.project_id as string);
-      }
-    }, []);
+  public onRouterChange = () => {
+    if (this.router.query.project_id != null) {
+      this.loadProject(this.router.query.project_id as string);
+    }
   }
 
   public async loadProject(id: number | string = this.project.id) {
@@ -54,6 +55,7 @@ export class ProjectService implements IRootService {
       this.data.project = project;
       await this.floorListService.loadList(project.id);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -90,6 +92,7 @@ export class ProjectService implements IRootService {
       this.data.project = project;
       await this.projectListService.loadList();
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -103,6 +106,7 @@ export class ProjectService implements IRootService {
       this.projectListService.loadList();
       this.openProject(data.id);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -121,6 +125,7 @@ export class ProjectService implements IRootService {
         }
       }
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);

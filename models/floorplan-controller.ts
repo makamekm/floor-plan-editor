@@ -31,12 +31,12 @@ export class FloorplanController {
       }
     }
     const index = this.floorplan.getItems().indexOf(item);
-    this._activeItemIndex = index >= 0 ? index : null;
+    this.activeItemIndex = index >= 0 ? index : null;
   }
 
   public get activeItem() {
-    return this._activeItemIndex != null
-    ? this.floorplan.getItems()[this._activeItemIndex]
+    return this.activeItemIndex != null
+    ? this.floorplan.getItems()[this.activeItemIndex]
     : null;
   }
 
@@ -63,7 +63,7 @@ export class FloorplanController {
   /** drawing state */
   public lastNode: Corner | null = null;
 
-  private _activeItemIndex: number | null = null;
+  private activeItemIndex: number | null = null;
 
   private emitChanges = debounce(() => {
     this.fireChanges();

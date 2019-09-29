@@ -67,6 +67,7 @@ export class FloorService implements IRootService {
       this.floor = floor;
       this.blueprintService.setFloorplan(floor.plan);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -93,6 +94,7 @@ export class FloorService implements IRootService {
         },
       );
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       // this.setLoading(false);
@@ -118,6 +120,7 @@ export class FloorService implements IRootService {
         alert("Please draw something");
       }
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -142,6 +145,7 @@ export class FloorService implements IRootService {
         }
       }
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);

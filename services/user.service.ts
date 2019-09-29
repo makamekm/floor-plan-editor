@@ -46,6 +46,7 @@ export class UserService implements IRootService {
       await this.auth.signOut();
       window.location.reload(false); // monkey fix
     } catch (e) {
+      // tslint:disable-next-line
       console.error(e);
     } finally {
       this.setLoading(false);

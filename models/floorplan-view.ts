@@ -83,7 +83,7 @@ export class FloorplanView {
       this.drawCorner(corner);
     });
 
-    if (this.viewmodel.mode == FloorplanMode.DRAW) {
+    if (this.viewmodel.mode === FloorplanMode.DRAW) {
       this.drawTarget(this.viewmodel.targetX, this.viewmodel.targetY, this.viewmodel.lastNode);
     }
 
@@ -164,7 +164,11 @@ export class FloorplanView {
     this.context.stroke();
   }
 
-  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: FloorplanController, floorplan: FloorplanModel) => void) {
+  public drawTransaction(render: (
+    ctx: CanvasRenderingContext2D,
+    floorplanner: FloorplanController,
+    floorplan: FloorplanModel,
+  ) => void) {
     this.context.save();
     render(this.context, this.viewmodel, this.floorplan);
     this.context.restore();
@@ -232,7 +236,7 @@ export class FloorplanView {
   private drawWall(wall: Wall) {
     const hover = wall === this.viewmodel.activeWall && this.viewmodel.mode != null;
     let color = wallColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = wallColorHover;
@@ -278,7 +282,7 @@ export class FloorplanView {
 
   private drawEdge(edge: HalfEdge, hover: boolean) {
     let color = edgeColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover && this.viewmodel.mode != null) {
       color = edgeColorHover;
@@ -317,7 +321,7 @@ export class FloorplanView {
     if (this.viewmodel.mode != null) {
       const hover = (corner === this.viewmodel.activeCorner);
       let color = cornerColor;
-      if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+      if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
         color = deleteColor;
       } else if (hover) {
         color = cornerColorHover;

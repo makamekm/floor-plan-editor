@@ -32,6 +32,7 @@ export class FloorListService implements IRootService {
       const list = await this.floorProvider.getFloorplanList(projectId);
       this.list.replace(list);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);

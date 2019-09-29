@@ -38,6 +38,7 @@ export class ProjectListService implements IRootService {
       const list = await this.floorProvider.getProjectList();
       this.list.replace(list);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);

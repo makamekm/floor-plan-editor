@@ -14,7 +14,7 @@ import { UserService } from "../services/user.service";
 import Loading from "./loading";
 
 const services: Array<
-  (new () => IRootService) | (new () => Object)
+  (new () => IRootService) | (new () => object)
 > = [
   UserService,
   FloorProvider,
@@ -26,6 +26,11 @@ const services: Array<
   FloorEditService,
 ];
 
+const updateVH = () => {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty("--vh", `${vh}px`);
+};
+
 const Root = ({
   children,
   ...props
@@ -33,12 +38,9 @@ const Root = ({
   children: any;
 }) => {
   React.useEffect(() => {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty("--vh", `${vh}px`);
-    window.addEventListener("resize", () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    });
+    updateVH();
+    window.addEventListener("resize", updateVH);
+    return () => window.removeEventListener("resize", updateVH);
   }, []);
 
   const instances: IRootService[] = (useInstances as any)(...services); // monkey patch

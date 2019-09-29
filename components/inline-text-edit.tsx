@@ -51,9 +51,9 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.keyCode == 27) {
+    if (event.keyCode === 27) {
       onStopEdit();
-    } else if (event.keyCode == 13) {
+    } else if (event.keyCode === 13) {
       onSaveEdit();
     }
   };

@@ -108,7 +108,6 @@ const List = ({children, onClick, borderRadius}: {
         .item.is-active {
           background-color: #2196F3;
           color: #FFFFFF;
-          border-color: #2196F3;
           pointer-events: none;
         }
 

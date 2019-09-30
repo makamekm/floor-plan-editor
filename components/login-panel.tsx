@@ -34,15 +34,6 @@ const LoginPanel = () => {
         active={userService.isOpenLoginDialog}
         onClickOutside={() => userService.askToLogIn = false}
         />
-
-      <style jsx>{`
-        .list {
-          width: calc(100vw - 20px);
-          max-width: 400px;
-          overflow: auto;
-          max-height: calc(var(--vh, 1vh) * 100 - 20px);
-        }
-      `}</style>
     </>
   );
 };

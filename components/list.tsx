@@ -1,20 +1,21 @@
 import React, { memo } from "react";
 
 export interface Item {
-  key: string | number;
+  key?: string | number;
   onClick?: (e: React.MouseEvent) => void;
   isClickable?: boolean;
   isHeader?: boolean;
   isField?: boolean;
   isDisabled?: boolean;
+  isActive?: boolean;
   hasDivider?: boolean;
+  isHidden?: boolean;
   body: any;
 }
 
 const List = ({children, onClick, borderRadius}: {
   children: Item[];
   onClick?: (item: Item) => void;
-  placeholder?: string;
   borderRadius?: string;
 }) => {
   borderRadius = borderRadius || "0px";
@@ -22,14 +23,15 @@ const List = ({children, onClick, borderRadius}: {
   return (
     <div className={"list"}>
 
-      {children.map((item, index) => (
+      {children.filter((item) => !item.isHidden).map((item, index) => (
         <div
-          key={item.key}
+          key={item.key || index}
           className={"item"
             + (item.isClickable ? " is-clickable" : "")
             + (item.isHeader ? " is-header" : "")
             + (item.isField ? " is-field" : "")
             + (item.isDisabled ? " is-disabled" : "")
+            + (item.isActive ? " is-active" : "")
             + (item.hasDivider && index !== children.length - 1 ? " has-divider" : "")
           }
           onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
@@ -56,7 +58,7 @@ const List = ({children, onClick, borderRadius}: {
         }
 
         .has-divider {
-          border-bottom: 2px solid #f1f1f1;
+          border-bottom: 2px solid #e6e6e6;
         }
 
         .item.is-field {
@@ -87,6 +89,8 @@ const List = ({children, onClick, borderRadius}: {
           cursor: pointer;
           font-weight: 600;
           text-transform: uppercase;
+          transition: background-color 0.1s, color 0.1s, border-color 0.1s;
+          will-change: background-color, color, border-color;
         }
 
         .item.is-clickable:hover {
@@ -95,6 +99,21 @@ const List = ({children, onClick, borderRadius}: {
 
         .item.is-clickable:active {
           background-color: #e0f6ff;
+        }
+
+        .item.is-active {
+          background-color: #2196F3;
+          color: #FFFFFF;
+          border-color: #2196F3;
+        }
+
+        .item.is-active :global(img) {
+          transition: filter 0.1s;
+          will-change: filter;
+        }
+
+        .item.is-active :global(.icon img) {
+          filter: brightness(0) invert(1);
         }
 
         .item.is-disabled {

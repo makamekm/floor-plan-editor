@@ -3,11 +3,11 @@ import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { BackIcon, CopyIcon } from "../icons/icon";
 import { FloorListService } from "../services/floor-list.service";
+import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { copyTextToClipboard } from "../utils/clipboard";
-import WithIcon from "./with-icon";
-import { FloorRouterService } from "../services/floor-router.service";
 import List from "./list";
+import WithIcon from "./with-icon";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);
@@ -18,7 +18,7 @@ const FloorListRead = () => {
     <List borderRadius="5px">
       {[
         {
-          key: 'link',
+          key: "link",
           body: (
             <WithIcon icon={CopyIcon}>
               Copy Public Link
@@ -32,7 +32,7 @@ const FloorListRead = () => {
           hasDivider: true,
         },
         {
-          key: 'projects',
+          key: "projects",
           body: (
             <WithIcon icon={BackIcon}>
               Get Home

@@ -7,9 +7,9 @@ import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
+import List from "./list";
 import ProjectEditDialog from "./project-edit-dialog";
 import WithIcon from "./with-icon";
-import List from "./list";
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
@@ -23,7 +23,7 @@ const FloorList = () => {
         <List borderRadius="5px">
           {[
             {
-              key: 'edit',
+              key: "edit",
               body: (
                 <WithIcon icon={EditIcon}>
                   Edit Project
@@ -33,7 +33,7 @@ const FloorList = () => {
               isClickable: true,
             },
             {
-              key: 'link',
+              key: "link",
               body: (
                 <WithIcon icon={CopyIcon}>
                   Copy Public Link
@@ -52,7 +52,7 @@ const FloorList = () => {
               isHidden: floorService.floor.id == null,
             },
             {
-              key: 'projects',
+              key: "projects",
               body: (
                 <WithIcon icon={BackIcon}>
                   Get Home
@@ -62,7 +62,7 @@ const FloorList = () => {
               isClickable: true,
             },
             {
-              key: 'create',
+              key: "create",
               body: (
                 <WithIcon icon={AddIcon}>
                   Create Plan

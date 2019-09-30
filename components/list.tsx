@@ -23,7 +23,7 @@ const List = ({children, onClick, borderRadius}: {
   return (
     <div className={"list"}>
 
-      {children.filter(item => !item.isHidden).map((item, index) => (
+      {children.filter((item) => !item.isHidden).map((item, index) => (
         <div
           key={item.key || index}
           className={"item"

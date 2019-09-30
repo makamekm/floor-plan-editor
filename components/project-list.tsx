@@ -5,8 +5,8 @@ import { LogoutIcon } from "../icons/icon";
 import { FloorRouterService } from "../services/floor-router.service";
 import { ProjectListService } from "../services/project-list.service";
 import { UserService } from "../services/user.service";
-import WithIcon from "./with-icon";
 import List from "./list";
+import WithIcon from "./with-icon";
 
 const ProjectList = () => {
   const userService = useInstance(UserService);
@@ -18,7 +18,7 @@ const ProjectList = () => {
       <List borderRadius="5px">
         {[
           {
-            key: 'logout',
+            key: "logout",
             body: (
               <WithIcon icon={LogoutIcon}>
                 Logout

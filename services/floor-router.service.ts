@@ -1,10 +1,10 @@
-import { IRootService } from "./root-sevice.interface";
-import { observable } from "mobx";
 import debounce from "debounce";
+import { observable } from "mobx";
+import { NextRouter, useRouter } from "next/router";
 import { inject, useInstance } from "react-ioc";
 import { FloorListService } from "./floor-list.service";
-import { useRouter, NextRouter } from "next/router";
 import { ProjectService } from "./project.service";
+import { IRootService } from "./root-sevice.interface";
 
 export class FloorRouterService implements IRootService {
 

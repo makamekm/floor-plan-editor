@@ -2,14 +2,14 @@ import { observer } from "mobx-react";
 import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { SearchIcon } from "../icons/icon";
+import { BlueprintService } from "../services/blueprint.service";
 import { ProjectListService } from "../services/project-list.service";
 import Panel from "./panel";
 import ProjectCreateDialog from "./project-create-dialog";
 import ProjectList from "./project-list";
+import ProjectPlanCreateDialog from "./project-plan-create-dialog";
 import ToggleButtonType from "./toggle-type";
 import WindowPanel from "./window-panel";
-import { BlueprintService } from "../services/blueprint.service";
-import ProjectPlanCreateDialog from "./project-plan-create-dialog";
 
 const ProjectPanel = () => {
   const floorListService = useInstance(ProjectListService);

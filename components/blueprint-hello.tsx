@@ -13,7 +13,6 @@ import InlineTextareaEdit from "./inline-textarea-edit";
 import List from "./list";
 import LoginPanel from "./login-panel";
 import Panel from "./panel";
-import ProjectCreateDialog from "./project-create-dialog";
 import ProjectPanel from "./project-panel";
 import ToggleButtonType from "./toggle-type";
 
@@ -56,7 +55,7 @@ const BlueprintView = () => {
     blueprintService.setDemoMode(isDemoMode);
   }
 
-  return (<ProjectCreateDialog>{(open) =>
+  return (
     <Sidebar
       pullRight
       styles={{
@@ -226,7 +225,7 @@ const BlueprintView = () => {
         `}</style>
       </div>
     </Sidebar>
-  }</ProjectCreateDialog>);
+  );
 };
 
 export default memo(observer(BlueprintView));

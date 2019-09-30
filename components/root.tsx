@@ -5,6 +5,7 @@ import { provider, useInstances } from "react-ioc";
 import { BlueprintService } from "../services/blueprint.service";
 import { FloorEditService } from "../services/floor-edit.service";
 import { FloorListService } from "../services/floor-list.service";
+import { FloorRouterService } from "../services/floor-router.service";
 import { FloorProvider } from "../services/floor.provider";
 import { FloorService } from "../services/floor.service";
 import { ProjectListService } from "../services/project-list.service";
@@ -12,7 +13,6 @@ import { ProjectService } from "../services/project.service";
 import { IRootService } from "../services/root-sevice.interface";
 import { UserService } from "../services/user.service";
 import Loading from "./loading";
-import { FloorRouterService } from "../services/floor-router.service";
 
 const services: Array<
   (new () => IRootService) | (new () => object)

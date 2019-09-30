@@ -4,12 +4,12 @@ import { NextRouter, useRouter } from "next/router";
 import { inject } from "react-ioc";
 import { ProjectDto } from "../models/project-list.dto";
 import { useRouterChange } from "../utils/router-hook";
+import { BlueprintService } from "./blueprint.service";
 import { FloorListService } from "./floor-list.service";
+import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListService } from "./project-list.service";
 import { IRootService } from "./root-sevice.interface";
-import { BlueprintService } from "./blueprint.service";
-import { FloorRouterService } from "./floor-router.service";
 // import { FloorService } from "./floor.service";
 
 export class ProjectService implements IRootService {

@@ -3,12 +3,12 @@ import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { AddIcon, BackIcon, CopyIcon, EditIcon } from "../icons/icon";
 import { FloorListService } from "../services/floor-list.service";
+import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
 import ProjectEditDialog from "./project-edit-dialog";
 import WithIcon from "./with-icon";
-import { FloorRouterService } from "../services/floor-router.service";
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);

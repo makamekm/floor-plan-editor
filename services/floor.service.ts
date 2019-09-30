@@ -7,10 +7,10 @@ import { FloorDto, FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
 import { useCallback } from "../utils/callback";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
+import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
-import { FloorRouterService } from "./floor-router.service";
 
 export class FloorService implements IRootService {
   @observable public loading: boolean = false;

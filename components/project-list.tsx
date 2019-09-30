@@ -2,10 +2,10 @@ import { observer } from "mobx-react";
 import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { LogoutIcon } from "../icons/icon";
+import { FloorRouterService } from "../services/floor-router.service";
 import { ProjectListService } from "../services/project-list.service";
 import { UserService } from "../services/user.service";
 import WithIcon from "./with-icon";
-import { FloorRouterService } from "../services/floor-router.service";
 
 const ProjectList = () => {
   const userService = useInstance(UserService);

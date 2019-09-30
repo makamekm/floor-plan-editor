@@ -35,7 +35,6 @@ export class BlueprintService implements IRootService {
   public onStateChange = new Callback<FloorplanDto>();
 
   @observable public mode: string = "move";
-  private isDemoMode = false;
 
   public applyChanges = debounce(() => {
     this.pushHistory();
@@ -51,6 +50,7 @@ export class BlueprintService implements IRootService {
     );
     this.onStateChange.fire(this.getFloorplan());
   }, 100);
+  private isDemoMode = false;
   @observable private model: {
     history: IModel[];
     revert: IModel[];

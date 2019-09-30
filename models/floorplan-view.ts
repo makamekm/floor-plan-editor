@@ -184,7 +184,7 @@ export class FloorplanView {
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
     this.context.strokeStyle = "#bbbbbb";
-    this.context.lineJoin = 'round';
+    this.context.lineJoin = "round";
     this.context.lineWidth = 2;
 
     this.context.strokeText(text,

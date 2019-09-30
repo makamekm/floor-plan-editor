@@ -1,12 +1,12 @@
 import debounce from "debounce";
 import firebase from "firebase/app";
 import { computed, observable, reaction } from "mobx";
+import { useDisposable } from "mobx-react-lite";
+import { NextRouter, useRouter } from "next/router";
 import { useEffect } from "react";
 import "../utils/firebase";
-import { IRootService } from "./root-sevice.interface";
-import { useDisposable } from "mobx-react-lite";
-import { useRouter, NextRouter } from "next/router";
 import { useRouterChange } from "../utils/router-hook";
+import { IRootService } from "./root-sevice.interface";
 
 export class UserService implements IRootService {
   @observable public loading: boolean = true;
@@ -47,13 +47,12 @@ export class UserService implements IRootService {
     useEffect(() => {
       this.setLoading(true);
       const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
-        (user, ...args) => {
+        (user) => {
           this.data.user = user;
           this.setLoading(false);
-          console.log(user);
           if (user) {
             this.askToLogIn = false;
-            if (this.router.query.mode === 'select') {
+            if (this.router.query.mode === "select") {
               this.changeModeTo();
             }
           }
@@ -65,20 +64,20 @@ export class UserService implements IRootService {
     }, []);
   }
 
-  changeModeTo(mode: string = '') {
+  public changeModeTo(mode: string = "") {
     const query = {
       ...this.router.query,
       mode,
     };
-    const url = this.router.asPath.split('?')[0];
+    const url = this.router.asPath.split("?")[0];
     this.router.replace(url, url, {
       shallow: true,
       query,
     });
   }
 
-  onRouterChange = () => {
-    if (this.router.query.mode === 'select') {
+  public onRouterChange = () => {
+    if (this.router.query.mode === "select") {
       this.askToLogIn = true;
     }
   }

@@ -1,12 +1,12 @@
 import debounce from "debounce";
 import { observable } from "mobx";
-import { NextRouter, Router, useRouter } from "next/router";
-import { useEffect } from "react";
-import { inject } from "react-ioc";
-import { FloorDto, FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
+import { NextRouter, useRouter } from "next/router";
+import { useInstance } from "react-ioc";
+import { FloorDto, FloorplanDataDto } from "../models/floor.dto";
 import { useCallback } from "../utils/callback";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
+import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
@@ -37,13 +37,18 @@ export class FloorService implements IRootService {
     this.loading = value;
   }, 50);
 
-  @inject(FloorProvider) private floorProvider: FloorProvider;
-  @inject(ProjectService) private projectService: ProjectService;
-  @inject(BlueprintService) private blueprintService: BlueprintService;
   private router: NextRouter;
+  private floorProvider: FloorProvider;
+  private floorRouterService: FloorRouterService;
+  private projectService: ProjectService;
+  private blueprintService: BlueprintService;
 
   public useHook() {
     this.router = useRouter();
+    this.floorProvider = useInstance(FloorProvider);
+    this.floorRouterService = useInstance(FloorRouterService);
+    this.projectService = useInstance(ProjectService);
+    this.blueprintService = useInstance(BlueprintService);
     useRouterChange(this.onRouterChange);
     useCallback(this.blueprintService.onStateChange, () => {
       this.saveState();
@@ -67,18 +72,11 @@ export class FloorService implements IRootService {
       this.floor = floor;
       this.blueprintService.setFloorplan(floor.plan);
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
     }
-  }
-
-  public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    this.router.push("/[project_id]/view/[id]", "/" + String(projectId) + "/view/" + String(id));
-  }
-
-  public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    this.router.push("/[project_id]/[id]", "/" + String(projectId) + "/" + String(id));
   }
 
   public async saveFloor(floor: FloorDto) {
@@ -93,6 +91,7 @@ export class FloorService implements IRootService {
         },
       );
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       // this.setLoading(false);
@@ -113,11 +112,12 @@ export class FloorService implements IRootService {
             plan,
           },
         );
-        this.openFloor(data.id);
+        this.floorRouterService.openFloor(data.id);
       } else {
         alert("Please draw something");
       }
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);
@@ -134,7 +134,7 @@ export class FloorService implements IRootService {
       if (result) {
         await this.projectService.loadProject(this.projectService.project.id);
         if (this.floor.id === id) {
-          this.projectService.openProject(
+          this.floorRouterService.openProject(
             this.projectService.project.id,
           );
           this.floor.id = null;
@@ -142,6 +142,7 @@ export class FloorService implements IRootService {
         }
       }
     } catch (error) {
+      // tslint:disable-next-line
       console.error(error);
     } finally {
       this.setLoading(false);

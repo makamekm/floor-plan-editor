@@ -92,6 +92,15 @@ const ToggleButtonType = ({
           pointer-events: none;
         }
 
+        .toggle-type-button:active :global(img) {
+          transition: filter 0.1s;
+          will-change: filter;
+        }
+
+        .toggle-type-button:active :global(img), .toggle-type-button.active :global(img) {
+          filter: brightness(0) invert(1);
+        }
+
         ${responsive ? `
           @media (max-width: 766px) {
             .toggle-type {

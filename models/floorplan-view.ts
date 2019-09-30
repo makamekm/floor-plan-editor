@@ -71,6 +71,10 @@ export class FloorplanView {
 
     this.drawGrid();
 
+    if (this.floorplan.getDemoMode()) {
+      this.drawDemo();
+    }
+
     this.floorplan.getRooms().forEach((room) => {
       this.drawRoom(room);
     });
@@ -83,7 +87,7 @@ export class FloorplanView {
       this.drawCorner(corner);
     });
 
-    if (this.viewmodel.mode == FloorplanMode.DRAW) {
+    if (this.viewmodel.mode === FloorplanMode.DRAW) {
       this.drawTarget(this.viewmodel.targetX, this.viewmodel.targetY, this.viewmodel.lastNode);
     }
 
@@ -164,10 +168,34 @@ export class FloorplanView {
     this.context.stroke();
   }
 
-  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: FloorplanController, floorplan: FloorplanModel) => void) {
+  public drawTransaction(render: (
+    ctx: CanvasRenderingContext2D,
+    floorplanner: FloorplanController,
+    floorplan: FloorplanModel,
+  ) => void) {
     this.context.save();
     render(this.context, this.viewmodel, this.floorplan);
     this.context.restore();
+  }
+
+  public drawBGLabel(x: number, y: number, text: string) {
+    this.context.font = "normal 25px Arial";
+    this.context.fillStyle = "#ffffff";
+    this.context.textBaseline = "middle";
+    this.context.textAlign = "center";
+    this.context.strokeStyle = "#bbbbbb";
+    this.context.lineJoin = "round";
+    this.context.lineWidth = 2;
+
+    this.context.strokeText(text,
+      x,
+      y,
+    );
+
+    this.context.fillText(text,
+      x,
+      y,
+    );
   }
 
   public drawLabel(x: number, y: number, text: string) {
@@ -232,7 +260,7 @@ export class FloorplanView {
   private drawWall(wall: Wall) {
     const hover = wall === this.viewmodel.activeWall && this.viewmodel.mode != null;
     let color = wallColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = wallColorHover;
@@ -278,7 +306,7 @@ export class FloorplanView {
 
   private drawEdge(edge: HalfEdge, hover: boolean) {
     let color = edgeColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover && this.viewmodel.mode != null) {
       color = edgeColorHover;
@@ -317,7 +345,7 @@ export class FloorplanView {
     if (this.viewmodel.mode != null) {
       const hover = (corner === this.viewmodel.activeCorner);
       let color = cornerColor;
-      if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+      if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
         color = deleteColor;
       } else if (hover) {
         color = cornerColorHover;
@@ -370,5 +398,12 @@ export class FloorplanView {
     for (let y = 0; y <= (height / gridSpacing); y++) {
       this.drawLine(0, gridSpacing * y + offsetY, width, gridSpacing * y + offsetY, gridWidth, gridColor);
     }
+  }
+
+  private drawDemo() {
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+    this.drawBGLabel(width / 4, height / 8, "DEMO MODE");
+    this.drawBGLabel(width / 4, height / 8 + 40, "PLEASE LOGIN");
   }
 }

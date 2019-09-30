@@ -7,6 +7,7 @@ export interface Item {
   isHeader?: boolean;
   isField?: boolean;
   isDisabled?: boolean;
+  hasDivider?: boolean;
   body: any;
 }
 
@@ -21,7 +22,7 @@ const List = ({children, onClick, borderRadius}: {
   return (
     <div className={"list"}>
 
-      {children.map((item) => (
+      {children.map((item, index) => (
         <div
           key={item.key}
           className={"item"
@@ -29,6 +30,7 @@ const List = ({children, onClick, borderRadius}: {
             + (item.isHeader ? " is-header" : "")
             + (item.isField ? " is-field" : "")
             + (item.isDisabled ? " is-disabled" : "")
+            + (item.hasDivider && index !== children.length - 1 ? " has-divider" : "")
           }
           onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
           {item.body}
@@ -51,6 +53,10 @@ const List = ({children, onClick, borderRadius}: {
           font-size: 12px;
           line-height: 12px;
           border-bottom: 1px solid #f1f1f1;
+        }
+
+        .has-divider {
+          border-bottom: 2px solid #f1f1f1;
         }
 
         .item.is-field {

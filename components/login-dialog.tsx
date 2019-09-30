@@ -10,7 +10,6 @@ const LoginDialog = ({active, onClickOutside}: {
   onClickOutside?: (e: React.MouseEvent) => void;
 }) => {
   const userService = useInstance(UserService);
-
   return <>
     <Window
       active={active}

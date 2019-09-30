@@ -49,7 +49,14 @@ export class Utils {
    * @param y2 Line-Point 2's y coordinate.
    * @returns The point.
    */
-  public static closestPointOnLine(x: number, y: number, x1: number, y1: number, x2: number, y2: number): { x: number, y: number } {
+  public static closestPointOnLine(
+    x: number,
+    y: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): { x: number, y: number } {
     // Inspired by: http://stackoverflow.com/a/6853926
     const tA = x - x1;
     const tB = y - y1;
@@ -60,7 +67,8 @@ export class Utils {
     const tLenSq = tC * tC + tD * tD;
     const tParam = tDot / tLenSq;
 
-    let tXx, tYy;
+    let tXx: number;
+    let tYy: number;
 
     if (tParam < 0 || (x1 === x2 && y1 === y2)) {
       tXx = x1;
@@ -137,7 +145,7 @@ export class Utils {
     for (let tI = 0; tI < tNewPoints.length; tI++) {
       const tC1 = tNewPoints[tI];
       let tC2: { x: number, y: number };
-      if (tI == tNewPoints.length - 1) {
+      if (tI === tNewPoints.length - 1) {
         tC2 = tNewPoints[0];
       } else {
         tC2 = tNewPoints[tI + 1];
@@ -170,7 +178,7 @@ export class Utils {
       const tFirstCorner = firstCorners[tI];
       let tSecondCorner: { x: number, y: number };
 
-      if (tI == firstCorners.length - 1) {
+      if (tI === firstCorners.length - 1) {
         tSecondCorner = firstCorners[0];
       } else {
         tSecondCorner = firstCorners[tI + 1];
@@ -198,7 +206,7 @@ export class Utils {
       const tFirstCorner = corners[tI];
       let tSecondCorner: { x: number, y: number };
 
-      if (tI == corners.length - 1) {
+      if (tI === corners.length - 1) {
         tSecondCorner = corners[0];
       } else {
         tSecondCorner = corners[tI + 1];
@@ -227,20 +235,24 @@ export class Utils {
     return (tF - tB) * (tC - tA) > (tD - tB) * (tE - tA);
   }
 
-  public static lineLineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number): boolean {
+  public static lineLineIntersect(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number,
+    x4: number,
+    y4: number,
+  ): boolean {
     const tP1 = { x: x1, y: y1 };
     const tP2 = { x: x2, y: y2 };
     const tP3 = { x: x3, y: y3 };
     const tP4 = { x: x4, y: y4 };
-    return Utils.tCCW(tP1, tP3, tP4) != Utils.tCCW(tP2, tP3, tP4)
-      && Utils.tCCW(tP1, tP2, tP3) != Utils.tCCW(tP1, tP2, tP4);
+    return Utils.tCCW(tP1, tP3, tP4) !== Utils.tCCW(tP2, tP3, tP4)
+      && Utils.tCCW(tP1, tP2, tP3) !== Utils.tCCW(tP1, tP2, tP4);
   }
 
-  /**
-    @param corners Is an array of points with x,y attributes
-    @param startX X start coord for raycast
-    @param startY Y start coord for raycast
-  */
   public static pointInPolygon(
     x: number,
     y: number,
@@ -256,9 +268,9 @@ export class Utils {
     let tMinY = 0;
 
     if (startX === undefined || startY === undefined) {
-      for (let tI = 0; tI < corners.length; tI++) {
-        tMinX = Math.min(tMinX, corners[tI].x);
-        tMinY = Math.min(tMinX, corners[tI].y);
+      for (const corner of corners) {
+        tMinX = Math.min(tMinX, corner.x);
+        tMinY = Math.min(tMinX, corner.y);
       }
       startX = tMinX - 10;
       startY = tMinY - 10;
@@ -268,7 +280,7 @@ export class Utils {
     for (let tI = 0; tI < corners.length; tI++) {
       const tFirstCorner = corners[tI];
       let tSecondCorner: { x: number, y: number };
-      if (tI == corners.length - 1) {
+      if (tI === corners.length - 1) {
         tSecondCorner = corners[0];
       } else {
         tSecondCorner = corners[tI + 1];
@@ -281,7 +293,7 @@ export class Utils {
       }
     }
     // odd intersections means the point is in the polygon
-    return ((tIntersects % 2) == 1);
+    return ((tIntersects % 2) === 1);
   }
 
   /** Checks if all corners of insideCorners are inside the polygon described by outsideCorners */
@@ -294,9 +306,9 @@ export class Utils {
     startX = startX || 0;
     startY = startY || 0;
 
-    for (let tI = 0; tI < insideCorners.length; tI++) {
+    for (const corner of insideCorners) {
       if (!Utils.pointInPolygon(
-        insideCorners[tI].x, insideCorners[tI].y,
+        corner.x, corner.y,
         outsideCorners,
         startX, startY)) {
         return false;
@@ -315,9 +327,9 @@ export class Utils {
     startX = startX || 0;
     startY = startY || 0;
 
-    for (let tI = 0; tI < insideCorners.length; tI++) {
+    for (const corner of insideCorners) {
       if (Utils.pointInPolygon(
-        insideCorners[tI].x, insideCorners[tI].y,
+        corner.x, corner.y,
         outsideCorners,
         startX, startY)) {
         return false;
@@ -345,10 +357,10 @@ export class Utils {
   ): T[] {
     const tResults: T[] = [];
     const tMap: { [key: string]: boolean } = {};
-    for (let tI = 0; tI < arr.length; tI++) {
-      if (!tMap.hasOwnProperty(arr[tI])) {
-        tResults.push(arr[tI]);
-        tMap[hashFunc(arr[tI])] = true;
+    for (const item of arr) {
+      if (!tMap.hasOwnProperty(item)) {
+        tResults.push(item);
+        tMap[hashFunc(item)] = true;
       }
     }
     return tResults;

@@ -1,12 +1,17 @@
 import firebase from "firebase/app";
-import { inject } from "react-ioc";
+import { useInstance } from "react-ioc";
 import { FloorDto } from "../models/floor.dto";
 import { ProjectDto, ProjectListDto } from "../models/project-list.dto";
 import "../utils/firebase";
+import { IRootService } from "./root-sevice.interface";
 import { UserService } from "./user.service";
 
-export class FloorProvider {
-  @inject(UserService) public userService: UserService;
+export class FloorProvider implements IRootService {
+  public userService: UserService;
+
+  public useHook() {
+    this.userService = useInstance(UserService);
+  }
 
   public async getFloorplan(projectId: number | string, id: number | string): Promise<FloorDto> {
     const db = firebase.firestore();

@@ -1,4 +1,3 @@
-import { Callback } from "../../utils/callback";
 import { Configuration, configWallThickness } from "../../utils/configuration";
 import { Utils } from "../../utils/operations";
 import { FloorplanModel } from "../floorplan-model";

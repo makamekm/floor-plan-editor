@@ -3,6 +3,7 @@ import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { AddIcon, BackIcon, CopyIcon, EditIcon } from "../icons/icon";
 import { FloorListService } from "../services/floor-list.service";
+import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
@@ -13,6 +14,7 @@ const FloorList = () => {
   const floorService = useInstance(FloorService);
   const projectService = useInstance(ProjectService);
   const floorListService = useInstance(FloorListService);
+  const floorRouterService = useInstance(FloorRouterService);
 
   return (
     <ProjectEditDialog>
@@ -24,14 +26,14 @@ const FloorList = () => {
           </WithIcon>
         </div>
 
-        <div onClick={() => projectService.openProjectList()}
+        <div onClick={() => floorRouterService.openProjectList()}
           className={"item clickable"}>
           <WithIcon icon={BackIcon}>
             Open My Projects
           </WithIcon>
         </div>
 
-        <div onClick={() => projectService.openProjectCreatePlan()}
+        <div onClick={() => floorRouterService.openProjectCreatePlan()}
           className={"item clickable" + (floorService.floor.id == null ? " active" : "")}>
           <WithIcon icon={AddIcon}>
             Create Plan
@@ -56,7 +58,7 @@ const FloorList = () => {
         {
           floorListService.list.map(({id, data: {name}}) => {
             return (
-              <div key={id} onClick={() => floorService.openFloor(id)}
+              <div key={id} onClick={() => floorRouterService.openFloor(id)}
                 className={"item clickable" + (id === floorService.floor.id ? " active" : "")}>
                 {name}
               </div>

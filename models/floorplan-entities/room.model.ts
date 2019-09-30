@@ -84,15 +84,16 @@ export class Room {
         edge = new HalfEdge(wallFrom, false);
       } else {
         // something horrible has happened
-        console.log("corners arent connected by a wall, uh oh");
+        // tslint:disable-next-line
+        console.error("Corners aren't connected by a wall, uh oh");
       }
 
-      if (i == 0) {
+      if (i === 0) {
         firstEdge = edge;
       } else {
         edge.prev = prevEdge;
         prevEdge.next = edge;
-        if (i + 1 == this.corners.length) {
+        if (i + 1 === this.corners.length) {
           firstEdge.prev = edge;
           edge.next = firstEdge;
         }

@@ -51,9 +51,9 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.keyCode == 27) {
+    if (event.keyCode === 27) {
       onStopEdit();
-    } else if (event.keyCode == 13) {
+    } else if (event.keyCode === 13) {
       onSaveEdit();
     }
   };
@@ -86,11 +86,11 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
           value={inputValue.value || ""}
           onChange={(e) => inputValue.value = e.currentTarget.value}/>
       </div>
-      <div>
-        <div className="input-save"
-          onMouseDown={() => onSaveMouseDown()}
-          onClick={() => onSaveEdit()}
-          onMouseLeave={() => onSaveMouseLeave()}>
+      <div className="input-save"
+        onMouseDown={() => onSaveMouseDown()}
+        onClick={() => onSaveEdit()}
+        onMouseLeave={() => onSaveMouseLeave()}>
+        <div>
           Save
         </div>
       </div>
@@ -166,10 +166,6 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
         width: 100%;
       }
 
-      .input > * {
-        height: 100%;
-      }
-
       .input-body {
         flex: 1;
       }
@@ -198,6 +194,8 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
 
       .input-save {
         padding: ${padding};
+        padding-top: 0;
+        padding-bottom: 0;
         transition: opacity 0.2s, background-color 0.2s;
         opacity: 0.67;
         cursor: pointer;
@@ -206,6 +204,13 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
         font-size: 10px;
         background-color: rgba(255, 255, 255, 0);
         height: 100%;
+        display: flex;
+        line-height: 20px;
+      }
+
+      .input-save > * {
+        display: flex;
+        align-items: center;
       }
 
       .input-save:hover {

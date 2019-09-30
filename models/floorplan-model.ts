@@ -25,6 +25,15 @@ export class FloorplanModel {
   private rooms: Room[] = [];
   private items: Item[] = [];
   private selectedItemIndex: number | null = null;
+  private demo = false;
+
+  public setDemoMode(value: boolean) {
+    this.demo = value;
+  }
+
+  public getDemoMode() {
+    return this.demo;
+  }
 
   public setSelectedItem(value: Item | null, fire = false) {
     let index = this.items.indexOf(value);
@@ -158,14 +167,14 @@ export class FloorplanModel {
   }
 
   public overlappedItem(x: number, y: number, mode: FloorplanMode): Item {
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].overlapped(
+    for (const item of this.items) {
+      if (item.overlapped(
         x,
         y,
-        this.getSelectedItem() === this.items[i],
+        this.getSelectedItem() === item,
         mode,
       )) {
-        return this.items[i];
+        return item;
       }
     }
     return null;
@@ -173,9 +182,9 @@ export class FloorplanModel {
 
   public overlappedCorner(x: number, y: number, tolerance?: number): Corner {
     tolerance = tolerance || defaultFloorPlanTolerance;
-    for (let i = 0; i < this.corners.length; i++) {
-      if (this.corners[i].distanceFrom(x, y) < tolerance) {
-        return this.corners[i];
+    for (const corner of this.corners) {
+      if (corner.distanceFrom(x, y) < tolerance) {
+        return corner;
       }
     }
     return null;
@@ -183,9 +192,9 @@ export class FloorplanModel {
 
   public overlappedWall(x: number, y: number, tolerance?: number): Wall {
     tolerance = tolerance || defaultFloorPlanTolerance;
-    for (let i = 0; i < this.walls.length; i++) {
-      if (this.walls[i].distanceFrom(x, y) < tolerance) {
-        return this.walls[i];
+    for (const wall of this.walls) {
+      if (wall.distanceFrom(x, y) < tolerance) {
+        return wall;
       }
     }
     return null;
@@ -236,7 +245,7 @@ export class FloorplanModel {
       [id: string]: Corner;
     } = {};
 
-    for (const id in floorplan.corners) {
+    for (const id of Object.keys(floorplan.corners)) {
       const corner = floorplan.corners[id];
       corners[id] = this.newCorner(corner.x, corner.y, id);
     }
@@ -330,7 +339,7 @@ export class FloorplanModel {
     });
 
     let ret;
-    if (xMin == Infinity || xMax == -Infinity || zMin == Infinity || zMax == -Infinity) {
+    if (xMin === Infinity || xMax === -Infinity || zMin === Infinity || zMax === -Infinity) {
       ret = new Vector3();
     } else {
       if (center) {
@@ -389,10 +398,9 @@ export class FloorplanModel {
       return corner.id;
     };
     const sep = "-";
-    for (let i = 0; i < roomArray.length; i++) {
+    for (const room of roomArray) {
       // rooms are cycles, shift it around to check uniqueness
       let add = true;
-      const room = roomArray[i];
       let str: string;
       for (let j = 0; j < room.length; j++) {
         const roomShift = Utils.cycle(room, j);
@@ -402,7 +410,7 @@ export class FloorplanModel {
         }
       }
       if (add && str) {
-        results.push(roomArray[i]);
+        results.push(room);
         lookup[str] = true;
       }
     }
@@ -436,9 +444,7 @@ export class FloorplanModel {
 
       const addToStack: Corner[] = [];
       const adjacentCorners = next.corner.adjacentCorners();
-      for (let i = 0; i < adjacentCorners.length; i++) {
-        const nextCorner = adjacentCorners[i];
-
+      for (const nextCorner of adjacentCorners) {
         // is this where we came from?
         // give an exception if its the first corner and we aren't at the second corner
         if (nextCorner.id in visited &&

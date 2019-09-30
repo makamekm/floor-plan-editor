@@ -23,8 +23,6 @@ const tableTextLimit = 14;
 
 export class TableItem extends Item {
 
-
-
   public isRotating = false;
   public isRotatingHover = false;
 

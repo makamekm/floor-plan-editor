@@ -52,9 +52,9 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.keyCode == 27) {
+    if (event.keyCode === 27) {
       onStopEdit();
-    } else if (event.keyCode == 13 && !event.shiftKey) {
+    } else if (event.keyCode === 13 && !event.shiftKey) {
       onSaveEdit();
     }
   };

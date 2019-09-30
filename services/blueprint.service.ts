@@ -28,9 +28,14 @@ export class BlueprintService implements IRootService {
       && this.model.changeState.floorplan.items[this.model.changeState.selectedItem];
   }
 
+  @computed public get hasPlan() {
+    return this.model.state && !!this.model.state.floorplan;
+  }
+
   public onStateChange = new Callback<FloorplanDto>();
 
   @observable public mode: string = "move";
+  private isDemoMode = false;
 
   public applyChanges = debounce(() => {
     this.pushHistory();
@@ -66,11 +71,12 @@ export class BlueprintService implements IRootService {
     if (this.floorplan) {
       this.blueprint.load(this.floorplan);
     }
+    this.blueprint.setDemoMode(this.isDemoMode);
   }
 
   public getFloorplan() {
     const state = toJS(this.model.state);
-    return state && state.floorplan;
+    return state ? state.floorplan : null;
   }
 
   public setFloorplan(floorplan: FloorplanDto) {
@@ -127,6 +133,17 @@ export class BlueprintService implements IRootService {
 
   public changeMode(mode: string) {
     this.blueprint.changeMode(mode);
+  }
+
+  public setDemoMode(value: boolean) {
+    this.isDemoMode = value;
+    if (this.blueprint) {
+      this.blueprint.setDemoMode(this.isDemoMode);
+    }
+  }
+
+  public getDemoMode() {
+    return this.isDemoMode;
   }
 
   public useHook() {

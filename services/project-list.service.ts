@@ -26,19 +26,16 @@ export class ProjectListService implements IRootService {
 
   public useHook() {
     useRouterChange(this.onRouterChange);
-    useDisposable(() =>
-      reaction(
-        () => this.userService.user,
-        (user) => {
-          if (user) {
-            this.debounceLoadList();
-          }
-        },
-      ),
-    );
+    this.userService.useUserChange(this.onUserChange);
   }
 
-  public onRouterChange = () => {
+  private onUserChange = (user: firebase.User) => {
+    if (user) {
+      this.debounceLoadList();
+    }
+  }
+
+  private onRouterChange = () => {
     if (this.userService.user != null) {
       this.debounceLoadList();
     } else {

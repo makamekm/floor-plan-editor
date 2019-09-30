@@ -3,14 +3,14 @@ import React, { memo } from "react";
 import { useInstance } from "react-ioc";
 import { LogoutIcon } from "../icons/icon";
 import { ProjectListService } from "../services/project-list.service";
-import { ProjectService } from "../services/project.service";
 import { UserService } from "../services/user.service";
 import WithIcon from "./with-icon";
+import { FloorRouterService } from "../services/floor-router.service";
 
 const ProjectList = () => {
   const userService = useInstance(UserService);
   const projectListService = useInstance(ProjectListService);
-  const projectService = useInstance(ProjectService);
+  const floorRouterService = useInstance(FloorRouterService);
 
   return (
     <>
@@ -24,7 +24,7 @@ const ProjectList = () => {
       {
         projectListService.list.map(({id, name}) => {
           return (
-            <div key={id} onClick={() => projectService.openProject(id)}
+            <div key={id} onClick={() => floorRouterService.openProject(id)}
               className={"item clickable"}>
               {name}
             </div>

@@ -8,13 +8,16 @@ import ProjectCreateDialog from "./project-create-dialog";
 import ProjectList from "./project-list";
 import ToggleButtonType from "./toggle-type";
 import WindowPanel from "./window-panel";
+import { BlueprintService } from "../services/blueprint.service";
+import ProjectPlanCreateDialog from "./project-plan-create-dialog";
 
 const ProjectPanel = () => {
   const floorListService = useInstance(ProjectListService);
+  const blueprintService = useInstance(BlueprintService);
 
   return (
-    <ProjectCreateDialog>
-      {(open) => (
+    <ProjectPlanCreateDialog>{(openProjectPlanCreate) => (
+      <ProjectCreateDialog>{(openProjectCreate) => (
         <>
           <Panel>
             <ToggleButtonType
@@ -29,7 +32,11 @@ const ProjectPanel = () => {
                 if (key === "menu") {
                   floorListService.opened = true;
                 } else if (key === "save") {
-                  open();
+                  if (blueprintService.hasPlan) {
+                    openProjectPlanCreate();
+                  } else {
+                    openProjectCreate();
+                  }
                 }
               }}
             />
@@ -53,8 +60,8 @@ const ProjectPanel = () => {
             }
           `}</style>
         </>
-      )}
-    </ProjectCreateDialog>
+      )}</ProjectCreateDialog>
+    )}</ProjectPlanCreateDialog>
   );
 };
 

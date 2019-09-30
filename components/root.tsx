@@ -12,17 +12,19 @@ import { ProjectService } from "../services/project.service";
 import { IRootService } from "../services/root-sevice.interface";
 import { UserService } from "../services/user.service";
 import Loading from "./loading";
+import { FloorRouterService } from "../services/floor-router.service";
 
 const services: Array<
   (new () => IRootService) | (new () => object)
 > = [
+  BlueprintService,
   UserService,
+  FloorRouterService,
   FloorProvider,
   FloorListService,
   ProjectListService,
   ProjectService,
   FloorService,
-  BlueprintService,
   FloorEditService,
 ];
 

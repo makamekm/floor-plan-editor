@@ -25,6 +25,15 @@ export class FloorplanModel {
   private rooms: Room[] = [];
   private items: Item[] = [];
   private selectedItemIndex: number | null = null;
+  private demo = false;
+
+  public setDemoMode(value: boolean) {
+    this.demo = value;
+  }
+
+  public getDemoMode() {
+    return this.demo;
+  }
 
   public setSelectedItem(value: Item | null, fire = false) {
     let index = this.items.indexOf(value);

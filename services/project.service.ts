@@ -8,6 +8,9 @@ import { FloorListService } from "./floor-list.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListService } from "./project-list.service";
 import { IRootService } from "./root-sevice.interface";
+import { BlueprintService } from "./blueprint.service";
+import { FloorRouterService } from "./floor-router.service";
+// import { FloorService } from "./floor.service";
 
 export class ProjectService implements IRootService {
 
@@ -26,7 +29,9 @@ export class ProjectService implements IRootService {
     this.loading = value;
   }, 50);
 
+  @inject(FloorRouterService) private floorRouterService: FloorRouterService;
   @inject(FloorProvider) private floorProvider: FloorProvider;
+  @inject(BlueprintService) private blueprintService: BlueprintService;
   @inject(ProjectListService) private projectListService: ProjectListService;
   @inject(FloorListService) private floorListService: FloorListService;
   private router: NextRouter;
@@ -62,34 +67,11 @@ export class ProjectService implements IRootService {
     return this.project;
   }
 
-  public async openProject(id: number | string) {
-    this.setLoading(true);
-    await this.floorListService.loadList(id);
-    this.setLoading(false);
-
-    const firstPlan = this.floorListService.list[0];
-
-    if (firstPlan) {
-      this.router.push("/" + String(id) + "/" + String(firstPlan.id));
-    } else {
-      this.router.push("/[project_id]", "/" + String(id));
-    }
-  }
-
-  public async openProjectCreatePlan(id: number | string = this.data.project.id) {
-    this.router.push("/[project_id]", "/" + String(id));
-  }
-
-  public async openProjectList() {
-    this.router.push("/", "/");
-  }
-
   public async saveProject() {
     this.setLoading(true);
     try {
       const project = await this.floorProvider.saveProject(this.data.project);
       this.data.project = project;
-      await this.projectListService.loadList();
     } catch (error) {
       // tslint:disable-next-line
       console.error(error);
@@ -102,8 +84,29 @@ export class ProjectService implements IRootService {
     this.setLoading(true);
     try {
       const data = await this.floorProvider.createProject(name);
-      this.projectListService.loadList();
-      this.openProject(data.id);
+      this.floorRouterService.openProject(data.id);
+    } catch (error) {
+      // tslint:disable-next-line
+      console.error(error);
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  public async createProjectPlan(name: string, planName: string) {
+    this.setLoading(true);
+    try {
+      const plan = this.blueprintService.getFloorplan();
+      if (plan) {
+        const data = await this.floorProvider.createProject(name);
+        const floorplan = await this.floorProvider.createFloorplan(data.id, {
+          data: {
+            name: planName,
+          },
+          plan,
+        });
+        this.floorRouterService.openFloor(floorplan.id, data.id);
+      }
     } catch (error) {
       // tslint:disable-next-line
       console.error(error);
@@ -118,7 +121,7 @@ export class ProjectService implements IRootService {
       const result = await this.floorProvider.deleteProject(id);
       if (result) {
         if (this.data.project && this.data.project.id === id) {
-          this.openProjectList();
+          this.floorRouterService.openProjectList();
         } else {
           this.projectListService.loadList();
         }

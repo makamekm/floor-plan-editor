@@ -10,6 +10,7 @@ import { BlueprintService } from "./blueprint.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
+import { FloorRouterService } from "./floor-router.service";
 
 export class FloorService implements IRootService {
   @observable public loading: boolean = false;
@@ -38,6 +39,7 @@ export class FloorService implements IRootService {
   }, 50);
 
   @inject(FloorProvider) private floorProvider: FloorProvider;
+  @inject(FloorRouterService) private floorRouterService: FloorRouterService;
   @inject(ProjectService) private projectService: ProjectService;
   @inject(BlueprintService) private blueprintService: BlueprintService;
   private router: NextRouter;
@@ -74,14 +76,6 @@ export class FloorService implements IRootService {
     }
   }
 
-  public async openPublicFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    this.router.push("/[project_id]/view/[id]", "/" + String(projectId) + "/view/" + String(id));
-  }
-
-  public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
-    this.router.push("/[project_id]/[id]", "/" + String(projectId) + "/" + String(id));
-  }
-
   public async saveFloor(floor: FloorDto) {
     // this.setLoading(true);
     try {
@@ -115,7 +109,7 @@ export class FloorService implements IRootService {
             plan,
           },
         );
-        this.openFloor(data.id);
+        this.floorRouterService.openFloor(data.id);
       } else {
         alert("Please draw something");
       }
@@ -137,7 +131,7 @@ export class FloorService implements IRootService {
       if (result) {
         await this.projectService.loadProject(this.projectService.project.id);
         if (this.floor.id === id) {
-          this.projectService.openProject(
+          this.floorRouterService.openProject(
             this.projectService.project.id,
           );
           this.floor.id = null;

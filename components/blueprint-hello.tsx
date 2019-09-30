@@ -42,9 +42,19 @@ const BlueprintView = () => {
     const blueprint = new Blueprint(canvasRef.current);
     blueprintService.setBlueprint(blueprint);
     return () => {
+      blueprintService.setDemoMode(false);
       blueprintService.destructor();
     };
   }, []);
+
+  userService.useUserChange((user: firebase.User) => {
+    blueprintService.setDemoMode(!user);
+  });
+
+  const isDemoMode = !userService.isLogin;
+  if (blueprintService.getDemoMode() !== isDemoMode) {
+    blueprintService.setDemoMode(isDemoMode);
+  }
 
   return (<ProjectCreateDialog>{(open) =>
     <Sidebar

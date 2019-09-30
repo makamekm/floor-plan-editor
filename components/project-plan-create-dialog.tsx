@@ -7,18 +7,19 @@ import InlineTextEdit from "./inline-text-edit";
 import List from "./list";
 import WindowPanel from "./window-panel";
 
-const ProjectCreateDialog = ({
+const ProjectPlanCreateDialog = ({
   children,
 }: {
   children: (open: () => void) => JSX.Element;
 }) => {
-  const data = useObservable({isOpen: false, projectName: ""});
+  const data = useObservable({isOpen: false, projectName: "", planName: ""});
   const projectService = useInstance(ProjectService);
 
   return <>
     {children(() => {
       data.isOpen = true;
       data.projectName = "";
+      data.planName = "";
     })}
     <WindowPanel
       active={data.isOpen}
@@ -34,7 +35,7 @@ const ProjectCreateDialog = ({
               isHeader: true,
             },
             {
-              key: "name",
+              key: "projectName",
               body: (
                 <InlineTextEdit
                   placeholder="Write project name..."
@@ -47,13 +48,26 @@ const ProjectCreateDialog = ({
               isField: true,
             },
             {
+              key: "planName",
+              body: (
+                <InlineTextEdit
+                  placeholder="Write plan name..."
+                  value={data.planName}
+                  onChange={(value) => {
+                    data.planName = value;
+                  }}
+                />
+              ),
+              isField: true,
+            },
+            {
               key: "action",
               body: "Create",
               onClick: async () => {
-                await projectService.createProject(data.projectName);
+                await projectService.createProjectPlan(data.projectName, data.planName);
                 data.isOpen = false;
               },
-              isDisabled: data.projectName.length < 1,
+              isDisabled: data.projectName.length < 1 || data.planName.length < 1,
               isClickable: true,
             },
           ]
@@ -63,4 +77,4 @@ const ProjectCreateDialog = ({
   </>;
 };
 
-export default memo(observer(ProjectCreateDialog));
+export default memo(observer(ProjectPlanCreateDialog));

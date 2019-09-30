@@ -89,6 +89,10 @@ export class Blueprint {
     }
   }
 
+  public setDemoMode(value: boolean) {
+    this.floorplan.setDemoMode(value);
+  }
+
   public addItem(type: ItemEnum) {
     const { x, y } = this.floorplanner.getCenter();
     this.floorplan.newItem(

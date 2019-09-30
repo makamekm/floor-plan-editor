@@ -7,6 +7,7 @@ import { FloorService } from "../services/floor.service";
 import { copyTextToClipboard } from "../utils/clipboard";
 import WithIcon from "./with-icon";
 import { FloorRouterService } from "../services/floor-router.service";
+import List from "./list";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);
@@ -14,94 +15,43 @@ const FloorListRead = () => {
   const floorRouterService = useInstance(FloorRouterService);
 
   return <>
-    <div onClick={() => floorRouterService.openProjectList()}
-      className={"item clickable"}>
-      <WithIcon icon={BackIcon}>
-        Open My Projects
-      </WithIcon>
-    </div>
-
-    <div onClick={() => {
-      copyTextToClipboard(window.location.href);
-    }}
-      className={"item clickable"}>
-      <WithIcon icon={CopyIcon}>
-        Copy Link
-      </WithIcon>
-    </div>
-
-    {
-      floorListService.list.map(({id, data: {name}}) => {
-        return (
-          <div key={id} onClick={() => floorRouterService.openPublicFloor(id)}
-            className={"item clickable" + (id === floorService.floor.id ? " active" : "")}>
-            {name}
-          </div>
-        );
-      })
-    }
-
-    <style jsx>{`
-      .item {
-        padding-left: 20px;
-        padding-right: 20px;
-        transition: background-color 0.1s, border-color 0.1s;
-        will-change: background-color, border-color;
-        user-select: none;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        font-family: Open Sans;
-        font-style: normal;
-        font-size: 12px;
-        line-height: 12px;
-        border-bottom: 1px solid #f1f1f1;
-      }
-
-      .item:last-child {
-        border-bottom: none;
-      }
-
-      .item:first-child {
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
-      }
-
-      .item:last-child {
-        border-bottom-right-radius: 5px;
-        border-bottom-left-radius: 5px;
-      }
-
-      .item.header {
-        font-weight: 600;
-        text-transform: uppercase;
-        text-align: center;
-      }
-
-      .item.clickable {
-        cursor: pointer;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .item.clickable:hover {
-        background-color: #F1FCFF;
-      }
-
-      .item.clickable:active, .item.clickable.active {
-        background-color: #2196F3;
-        border-color: #2196F3;
-        color: #FFFFFF;
-      }
-
-      .item.active {
-        cursor: default;
-        pointer-events: none;
-      }
-
-      .item.clickable:active :global(.icon img), .item.clickable.active :global(.icon img) {
-        filter: invert(1)
-      }
-    `}</style>
+    <List borderRadius="5px">
+      {[
+        {
+          key: 'link',
+          body: (
+            <WithIcon icon={CopyIcon}>
+              Copy Public Link
+            </WithIcon>
+          ),
+          onClick: () => () => {
+            copyTextToClipboard(window.location.href);
+          },
+          isClickable: true,
+          isHidden: floorService.floor.id == null,
+          hasDivider: true,
+        },
+        {
+          key: 'projects',
+          body: (
+            <WithIcon icon={BackIcon}>
+              Get Home
+            </WithIcon>
+          ),
+          onClick: () => floorRouterService.openProjectList(),
+          isClickable: true,
+        },
+        ...floorListService.list.map(({id, data: {name}}) => {
+          return {
+            key: id,
+            body: name,
+            isClickable: true,
+            onClick: () => floorRouterService.openPublicFloor(id),
+            isActive: id === floorService.floor.id,
+          };
+        }),
+      ]}
+    </List>
   </>;
 };
 

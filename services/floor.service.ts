@@ -1,9 +1,8 @@
 import debounce from "debounce";
 import { observable } from "mobx";
-import { NextRouter, Router, useRouter } from "next/router";
-import { useEffect } from "react";
-import { inject } from "react-ioc";
-import { FloorDto, FloorplanDataDto, FloorplanDto } from "../models/floor.dto";
+import { NextRouter, useRouter } from "next/router";
+import { useInstance } from "react-ioc";
+import { FloorDto, FloorplanDataDto } from "../models/floor.dto";
 import { useCallback } from "../utils/callback";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
@@ -38,14 +37,18 @@ export class FloorService implements IRootService {
     this.loading = value;
   }, 50);
 
-  @inject(FloorProvider) private floorProvider: FloorProvider;
-  @inject(FloorRouterService) private floorRouterService: FloorRouterService;
-  @inject(ProjectService) private projectService: ProjectService;
-  @inject(BlueprintService) private blueprintService: BlueprintService;
   private router: NextRouter;
+  private floorProvider: FloorProvider;
+  private floorRouterService: FloorRouterService;
+  private projectService: ProjectService;
+  private blueprintService: BlueprintService;
 
   public useHook() {
     this.router = useRouter();
+    this.floorProvider = useInstance(FloorProvider);
+    this.floorRouterService = useInstance(FloorRouterService);
+    this.projectService = useInstance(ProjectService);
+    this.blueprintService = useInstance(BlueprintService);
     useRouterChange(this.onRouterChange);
     useCallback(this.blueprintService.onStateChange, () => {
       this.saveState();

@@ -1,7 +1,7 @@
 import debounce from "debounce";
 import { observable } from "mobx";
 import { NextRouter, useRouter } from "next/router";
-import { inject, useInstance } from "react-ioc";
+import { useInstance } from "react-ioc";
 import { FloorListService } from "./floor-list.service";
 import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
@@ -20,8 +20,6 @@ export class FloorRouterService implements IRootService {
 
   public useHook() {
     this.router = useRouter();
-
-    // Lazy injection
     this.floorListService = useInstance(FloorListService);
     this.projectService = useInstance(ProjectService);
   }

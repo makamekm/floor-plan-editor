@@ -1,7 +1,6 @@
 import debounce from "debounce";
 import { IObservableArray, observable } from "mobx";
-import { inject } from "react-ioc";
-import { FloorplanListItemDto } from "../models/floor-list.dto";
+import { useInstance } from "react-ioc";
 import { FloorDto } from "../models/floor.dto";
 import { useRouterChange } from "../utils/router-hook";
 import { FloorProvider } from "./floor.provider";
@@ -16,9 +15,10 @@ export class FloorListService implements IRootService {
     this.loading = value;
   }, 50);
 
-  @inject(FloorProvider) private floorProvider: FloorProvider;
+  private floorProvider: FloorProvider;
 
   public useHook() {
+    this.floorProvider = useInstance(FloorProvider);
     useRouterChange(this.onRouterChange);
   }
 

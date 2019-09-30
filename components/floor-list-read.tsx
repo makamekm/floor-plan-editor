@@ -4,17 +4,17 @@ import { useInstance } from "react-ioc";
 import { BackIcon, CopyIcon } from "../icons/icon";
 import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
-import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
 import WithIcon from "./with-icon";
+import { FloorRouterService } from "../services/floor-router.service";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);
-  const projectService = useInstance(ProjectService);
   const floorListService = useInstance(FloorListService);
+  const floorRouterService = useInstance(FloorRouterService);
 
   return <>
-    <div onClick={() => projectService.openProjectList()}
+    <div onClick={() => floorRouterService.openProjectList()}
       className={"item clickable"}>
       <WithIcon icon={BackIcon}>
         Open My Projects
@@ -33,7 +33,7 @@ const FloorListRead = () => {
     {
       floorListService.list.map(({id, data: {name}}) => {
         return (
-          <div key={id} onClick={() => floorService.openPublicFloor(id)}
+          <div key={id} onClick={() => floorRouterService.openPublicFloor(id)}
             className={"item clickable" + (id === floorService.floor.id ? " active" : "")}>
             {name}
           </div>

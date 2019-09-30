@@ -1,8 +1,8 @@
 import React, { memo } from "react";
 
-export interface Item {
+export interface Item<T = any> {
   key?: string | number;
-  onClick?: (e: React.MouseEvent) => void;
+  onClick?: (metadata: T, e: React.MouseEvent) => void;
   isClickable?: boolean;
   isHeader?: boolean;
   isField?: boolean;
@@ -11,6 +11,7 @@ export interface Item {
   hasDivider?: boolean;
   isHidden?: boolean;
   body: any;
+  metadata?: T;
 }
 
 const List = ({children, onClick, borderRadius}: {
@@ -34,7 +35,10 @@ const List = ({children, onClick, borderRadius}: {
             + (item.isActive ? " is-active" : "")
             + (item.hasDivider && index !== children.length - 1 ? " has-divider" : "")
           }
-          onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
+          onClick={item.onClick
+            ? (e) => item.onClick(item.metadata, e) :
+            (item.isClickable ? () => onClick(item) : undefined)
+          }>
           {item.body}
         </div>
       ))}
@@ -105,6 +109,7 @@ const List = ({children, onClick, borderRadius}: {
           background-color: #2196F3;
           color: #FFFFFF;
           border-color: #2196F3;
+          pointer-events: none;
         }
 
         .item.is-active :global(img) {

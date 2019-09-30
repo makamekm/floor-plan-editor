@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { AddIcon, BackIcon, CopyIcon, EditIcon } from "../icons/icon";
 import { FloorListService } from "../services/floor-list.service";
@@ -7,7 +7,7 @@ import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
-import List from "./list";
+import List, { Item } from "./list";
 import ProjectEditDialog from "./project-edit-dialog";
 import WithIcon from "./with-icon";
 
@@ -16,6 +16,24 @@ const FloorList = () => {
   const projectService = useInstance(ProjectService);
   const floorListService = useInstance(FloorListService);
   const floorRouterService = useInstance(FloorRouterService);
+  const onCopy = useCallback(() => {
+    copyTextToClipboard(
+      window.location.origin
+      + "/"
+      + projectService.project.id
+      + "/view/"
+      + floorService.floor.id,
+    );
+  }, []);
+  const onGetHome = useCallback(() => {
+    floorRouterService.openProjectList();
+  }, []);
+  const onCreatePlan = useCallback(() => {
+    floorRouterService.openProjectCreatePlan();
+  }, []);
+  const onOpenFloor = useCallback((id: string | number) => {
+    floorRouterService.openFloor(id);
+  }, []);
 
   return (
     <ProjectEditDialog>
@@ -29,7 +47,7 @@ const FloorList = () => {
                   Edit Project
                 </WithIcon>
               ),
-              onClick: () => open(),
+              onClick: open,
               isClickable: true,
             },
             {
@@ -39,15 +57,7 @@ const FloorList = () => {
                   Copy Public Link
                 </WithIcon>
               ),
-              onClick: () => () => {
-                copyTextToClipboard(
-                  window.location.origin
-                  + "/"
-                  + projectService.project.id
-                  + "/view/"
-                  + floorService.floor.id,
-                );
-              },
+              onClick: onCopy,
               isClickable: true,
               isHidden: floorService.floor.id == null,
             },
@@ -58,7 +68,7 @@ const FloorList = () => {
                   Get Home
                 </WithIcon>
               ),
-              onClick: () => floorRouterService.openProjectList(),
+              onClick: onGetHome,
               isClickable: true,
             },
             {
@@ -68,18 +78,19 @@ const FloorList = () => {
                   Create Plan
                 </WithIcon>
               ),
-              onClick: () => floorRouterService.openProjectCreatePlan(),
+              onClick: onCreatePlan,
               isClickable: true,
               hasDivider: true,
               isActive: floorService.floor.id == null,
             },
-            ...floorListService.list.map(({id, data: {name}}) => {
+            ...floorListService.list.map<Item<string | number>>(({id, data: {name}}) => {
               return {
                 key: id,
                 body: name,
                 isClickable: true,
-                onClick: () => floorRouterService.openFloor(id),
+                onClick: onOpenFloor,
                 isActive: id === floorService.floor.id,
+                metadata: id,
               };
             }),
           ]}

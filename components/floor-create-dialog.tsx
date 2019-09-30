@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
 import InlineTextEdit from "./inline-text-edit";
@@ -14,6 +14,16 @@ const FloorCreateDialog = ({
 }) => {
   const data = useObservable({isOpen: false, name: ""});
   const floorService = useInstance(FloorService);
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+  const onChangeName = useCallback((value: string) => {
+    data.name = value;
+  }, []);
+  const onCreateFloor = useCallback(async () => {
+    await floorService.createFloor(data.name);
+    data.isOpen = false;
+  }, []);
 
   return <>
     {children(() => {
@@ -22,9 +32,7 @@ const FloorCreateDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <List borderRadius="5px">
         {
           [
@@ -39,9 +47,7 @@ const FloorCreateDialog = ({
                 <InlineTextEdit
                   placeholder="Write floor name..."
                   value={data.name}
-                  onChange={(value) => {
-                    data.name = value;
-                  }}
+                  onChange={onChangeName}
                 />
               ),
               isField: true,
@@ -49,10 +55,7 @@ const FloorCreateDialog = ({
             {
               key: "action",
               body: "Create",
-              onClick: async () => {
-                await floorService.createFloor(data.name);
-                data.isOpen = false;
-              },
+              onClick: onCreateFloor,
               isDisabled: data.name.length < 1,
               isClickable: true,
             },

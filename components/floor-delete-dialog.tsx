@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
 import List from "./list";
@@ -13,6 +13,13 @@ const FloorDeleteDialog = ({
 }) => {
   const data = useObservable({isOpen: false, name: ""});
   const floorService = useInstance(FloorService);
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+  const onDeleteFloor = useCallback(async () => {
+    await floorService.deleteFloor();
+    data.isOpen = false;
+  }, []);
 
   return <>
     {children(() => {
@@ -21,9 +28,7 @@ const FloorDeleteDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <List borderRadius="5px">
         {
           [
@@ -39,10 +44,7 @@ const FloorDeleteDialog = ({
             {
               key: "action",
               body: "Yes, Remove",
-              onClick: async () => {
-                await floorService.deleteFloor();
-                data.isOpen = false;
-              },
+              onClick: onDeleteFloor,
               isClickable: true,
             },
           ]

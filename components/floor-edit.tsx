@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
 import FloorDeleteDialog from "./floor-delete-dialog";
@@ -8,6 +8,12 @@ import List from "./list";
 
 const FloorEdit = () => {
   const floorService = useInstance(FloorService);
+  const onChangeName = useCallback((value: string) => {
+    if (value.length > 0) {
+      floorService.floor.data.name = value;
+      floorService.saveState();
+    }
+  }, []);
 
   return (
     <FloorDeleteDialog>
@@ -25,12 +31,7 @@ const FloorEdit = () => {
                 <InlineTextEdit
                   placeholder="Write name..."
                   value={floorService.floor.data && floorService.floor.data.name || ""}
-                  onChange={(value) => {
-                    if (value.length > 0) {
-                      floorService.floor.data.name = value;
-                      floorService.saveState();
-                    }
-                  }}
+                  onChange={onChangeName}
                 />
               ),
               isField: true,
@@ -43,7 +44,7 @@ const FloorEdit = () => {
             {
               key: "delete",
               body: "Delete",
-              onClick: () => open(),
+              onClick: open,
               isClickable: true,
             },
           ]

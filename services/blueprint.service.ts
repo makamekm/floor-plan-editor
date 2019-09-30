@@ -1,7 +1,6 @@
 import debounce from "debounce";
-import { computed, observable, observe, reaction, toJS } from "mobx";
+import { computed, observable, reaction, toJS } from "mobx";
 import { useDisposable } from "mobx-react-lite";
-import { Router } from "next/router";
 import { useEffect } from "react";
 import { Blueprint } from "../models/blueprint";
 import { FloorplanDto } from "../models/floor.dto";

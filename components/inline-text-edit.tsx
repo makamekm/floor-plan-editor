@@ -13,7 +13,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   const input = React.useRef(null);
   const inputValue = useObservable({value: ""});
   const isTryingToSave = useObservable({value: false});
-  const isEditing = useObservable({value: true});
+  const isEditing = useObservable({value: false});
 
   borderRadius = borderRadius || "0px";
   padding = padding || "10px 15px";

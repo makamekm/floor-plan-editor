@@ -91,6 +91,7 @@ export class Blueprint {
 
   public setDemoMode(value: boolean) {
     this.floorplan.setDemoMode(value);
+    this.floorplanner.draw();
   }
 
   public addItem(type: ItemEnum) {

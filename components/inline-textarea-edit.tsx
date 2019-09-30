@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { EditIcon } from "../icons/icon";
 
 const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding, rows}: {
@@ -19,7 +19,7 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
   borderRadius = borderRadius || "0px";
   padding = padding || "10px 15px";
 
-  const onStartEdit = () => {
+  const onStartEdit = useCallback(() => {
     inputValue.value = value;
     isEditing.value = true;
     isTryingToSave.value = false;
@@ -27,64 +27,77 @@ const InlineTextareaEdit = ({value, onChange, placeholder, borderRadius, padding
       input.current.focus();
       input.current.select();
     });
-  };
+  }, []);
 
-  const onStopEdit = () => {
+  const onStartEditByClick = useCallback(() => {
+    if (!value) {
+      onStartEdit();
+    }
+  }, []);
+
+  const onStopEdit = useCallback(() => {
     if (!isTryingToSave.value) {
       isEditing.value = false;
     }
-  };
+  }, []);
 
-  const onSaveEdit = () => {
+  const onSaveEdit = useCallback(() => {
     isEditing.value = false;
     onChange(inputValue.value);
-  };
+  }, []);
 
-  const onSaveMouseDown = () => {
+  const onSaveMouseDown = useCallback(() => {
     isTryingToSave.value = true;
-  };
+  }, []);
 
-  const onSaveMouseLeave = () => {
+  const onSaveMouseLeave = useCallback(() => {
     if (isTryingToSave.value) {
       isTryingToSave.value = false;
       isEditing.value = false;
     }
-  };
+  }, []);
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
+  const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.keyCode === 27) {
       onStopEdit();
     } else if (event.keyCode === 13 && !event.shiftKey) {
       onSaveEdit();
     }
-  };
+  }, []);
+
+  const onChangeValue = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    inputValue.value = event.currentTarget.value;
+  }, []);
 
   return <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
-      <div className="value" onDoubleClick={() => onStartEdit()} onTouchEnd={() => onStartEdit()}>
+      <div className="value"
+        onClick={onStartEditByClick}
+        onDoubleClick={onStartEdit}
+        onTouchEnd={onStartEdit}>
         <div className="value-body">
           {value || placeholder}
         </div>
         <div className="value-edit">
-          <img src={EditIcon} onClick={() => onStartEdit()} alt=""/>
+          <img src={EditIcon} onClick={onStartEdit} alt=""/>
         </div>
       </div>
       <div className="input">
         <div className="input-body">
           <textarea
             ref={input}
-            onBlur={() => onStopEdit()}
-            onKeyDown={(event) => onKeyDown(event)}
+            onBlur={onStopEdit}
+            onKeyDown={onKeyDown}
             className="input-control"
             placeholder="Write here..."
             value={inputValue.value || ""}
             rows={rows || 10}
-            onChange={(e) => inputValue.value = e.currentTarget.value}/>
+            onChange={onChangeValue}/>
         </div>
         <div>
           <div className="input-save"
-            onMouseDown={() => onSaveMouseDown()}
-            onClick={() => onSaveEdit()}
-            onMouseLeave={() => onSaveMouseLeave()}>
+            onMouseDown={onSaveMouseDown}
+            onClick={onSaveEdit}
+            onMouseLeave={onSaveMouseLeave}>
             Save
           </div>
         </div>

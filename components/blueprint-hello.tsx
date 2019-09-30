@@ -50,7 +50,7 @@ const BlueprintView = () => {
     blueprintService.setDemoMode(!user);
   });
 
-  const isDemoMode = !userService.isLogin;
+  const isDemoMode = userService.isGuest;
   if (blueprintService.getDemoMode() !== isDemoMode) {
     blueprintService.setDemoMode(isDemoMode);
   }

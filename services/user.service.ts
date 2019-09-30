@@ -21,8 +21,8 @@ export class UserService implements IRootService {
   @computed get user() {
     return this.data.user;
   }
-  @computed get isLogin() {
-    return !!this.data.user && !this.loading;
+  @computed get isGuest() {
+    return !this.data.user && !this.loading;
   }
   @computed get isOpenLoginDialog() {
     return this.askToLogIn && !this.data.user && !this.loading;

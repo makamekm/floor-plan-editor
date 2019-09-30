@@ -41,6 +41,8 @@ export class ProjectListService implements IRootService {
   public onRouterChange = () => {
     if (this.userService.user != null) {
       this.debounceLoadList();
+    } else {
+      this.list.replace([]);
     }
   }
 

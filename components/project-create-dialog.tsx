@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
@@ -15,6 +15,19 @@ const ProjectCreateDialog = ({
   const data = useObservable({isOpen: false, projectName: ""});
   const projectService = useInstance(ProjectService);
 
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+
+  const onChangeProjectName = useCallback((value: string) => {
+    data.projectName = value;
+  }, []);
+
+  const onCreateProject = useCallback(async () => {
+    await projectService.createProject(data.projectName);
+    data.isOpen = false;
+  }, []);
+
   return <>
     {children(() => {
       data.isOpen = true;
@@ -22,9 +35,7 @@ const ProjectCreateDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <List borderRadius="5px">
         {
           [
@@ -39,9 +50,7 @@ const ProjectCreateDialog = ({
                 <InlineTextEdit
                   placeholder="Write project name..."
                   value={data.projectName}
-                  onChange={(value) => {
-                    data.projectName = value;
-                  }}
+                  onChange={onChangeProjectName}
                 />
               ),
               isField: true,
@@ -49,10 +58,7 @@ const ProjectCreateDialog = ({
             {
               key: "action",
               body: "Create",
-              onClick: async () => {
-                await projectService.createProject(data.projectName);
-                data.isOpen = false;
-              },
+              onClick: onCreateProject,
               isDisabled: data.projectName.length < 1,
               isClickable: true,
             },

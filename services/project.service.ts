@@ -1,7 +1,7 @@
 import debounce from "debounce";
 import { computed, observable } from "mobx";
 import { NextRouter, useRouter } from "next/router";
-import { inject } from "react-ioc";
+import { inject, useInstance } from "react-ioc";
 import { ProjectDto } from "../models/project-list.dto";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
@@ -10,7 +10,6 @@ import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
 import { ProjectListService } from "./project-list.service";
 import { IRootService } from "./root-sevice.interface";
-// import { FloorService } from "./floor.service";
 
 export class ProjectService implements IRootService {
 
@@ -29,7 +28,7 @@ export class ProjectService implements IRootService {
     this.loading = value;
   }, 50);
 
-  @inject(FloorRouterService) private floorRouterService: FloorRouterService;
+  private floorRouterService: FloorRouterService;
   @inject(FloorProvider) private floorProvider: FloorProvider;
   @inject(BlueprintService) private blueprintService: BlueprintService;
   @inject(ProjectListService) private projectListService: ProjectListService;
@@ -38,6 +37,7 @@ export class ProjectService implements IRootService {
 
   public useHook() {
     this.router = useRouter();
+    this.floorRouterService = useInstance(FloorRouterService);
     useRouterChange(this.onRouterChange);
   }
 

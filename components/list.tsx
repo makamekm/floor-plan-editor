@@ -9,6 +9,7 @@ export interface Item {
   isDisabled?: boolean;
   isActive?: boolean;
   hasDivider?: boolean;
+  isHidden?: boolean;
   body: any;
 }
 
@@ -22,7 +23,7 @@ const List = ({children, onClick, borderRadius}: {
   return (
     <div className={"list"}>
 
-      {children.map((item, index) => (
+      {children.filter(item => !item.isHidden).map((item, index) => (
         <div
           key={item.key || index}
           className={"item"

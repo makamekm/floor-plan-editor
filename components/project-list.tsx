@@ -28,6 +28,7 @@ const ProjectList = () => {
       </ListItem>
       {projectListService.list.map(({id, name}) => {
         return <ListItem
+          borderRadius="5px"
           key={id}
           metadata={id}
           onClick={onOpenProject}>

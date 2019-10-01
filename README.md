@@ -4,7 +4,7 @@
 
 _Floor Plan Editor | Demo | React, Next_
 
-The project reflects the idea of creating floor plan in a 3d editor.
+The project reflects the idea of creating floor plan in a 2d editor.
 
 ## Development:
 

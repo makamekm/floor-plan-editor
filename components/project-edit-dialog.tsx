@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
@@ -17,15 +17,24 @@ const ProjectEditDialog = ({
   const projectService = useInstance(ProjectService);
   const projectName = projectService.project && projectService.project.name;
 
+  const onClickOutside = useCallback(async () => {
+    data.isOpen = false;
+  }, []);
+
+  const onDeleteProject = useCallback((value: string) => {
+    if (value.length > 0) {
+      projectService.data.project.name = value;
+      projectService.saveProject();
+    }
+  }, []);
+
   return <>
     {children(() => {
       data.isOpen = true;
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <ProjectDeleteDialog>
         {(open) => <List borderRadius="5px">
           {
@@ -41,12 +50,7 @@ const ProjectEditDialog = ({
                   <InlineTextEdit
                     placeholder="Write project name..."
                     value={projectName}
-                    onChange={(value) => {
-                      if (value.length > 0) {
-                        projectService.data.project.name = value;
-                        projectService.saveProject();
-                      }
-                    }}
+                    onChange={onDeleteProject}
                   />
                 ),
                 isField: true,
@@ -59,7 +63,7 @@ const ProjectEditDialog = ({
               {
                 key: "delete",
                 body: "Delete",
-                onClick: () => open(),
+                onClick: open,
                 isClickable: true,
               },
             ]

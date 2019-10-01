@@ -1,17 +1,23 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { LogoutIcon } from "../icons/icon";
 import { FloorRouterService } from "../services/floor-router.service";
 import { ProjectListService } from "../services/project-list.service";
 import { UserService } from "../services/user.service";
-import List from "./list";
+import List, { Item } from "./list";
 import WithIcon from "./with-icon";
 
 const ProjectList = () => {
   const userService = useInstance(UserService);
   const projectListService = useInstance(ProjectListService);
   const floorRouterService = useInstance(FloorRouterService);
+  const onLogout = useCallback(() => {
+    userService.logout();
+  }, []);
+  const onOpenProject = useCallback((id: string | number) => {
+    floorRouterService.openProject(id);
+  }, []);
 
   return (
     <>
@@ -24,16 +30,17 @@ const ProjectList = () => {
                 Logout
               </WithIcon>
             ),
-            onClick: () => userService.logout(),
+            onClick: onLogout,
             isClickable: true,
             hasDivider: true,
           },
-          ...projectListService.list.map(({id, name}) => {
+          ...projectListService.list.map<Item<string | number>>(({id, name}) => {
             return {
               key: id,
               body: name,
               isClickable: true,
-              onClick: () => floorRouterService.openProject(id),
+              metadata: id,
+              onClick: onOpenProject,
             };
           }),
         ]}

@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
@@ -15,6 +15,23 @@ const ProjectPlanCreateDialog = ({
   const data = useObservable({isOpen: false, projectName: "", planName: ""});
   const projectService = useInstance(ProjectService);
 
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+
+  const onChangeProjectName = useCallback((value: string) => {
+    data.projectName = value;
+  }, []);
+
+  const onChangePlanName = useCallback((value: string) => {
+    data.planName = value;
+  }, []);
+
+  const onCreateProjectPlan = useCallback(async () => {
+    await projectService.createProjectPlan(data.projectName, data.planName);
+    data.isOpen = false;
+  }, []);
+
   return <>
     {children(() => {
       data.isOpen = true;
@@ -23,9 +40,7 @@ const ProjectPlanCreateDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <List borderRadius="5px">
         {
           [
@@ -40,9 +55,7 @@ const ProjectPlanCreateDialog = ({
                 <InlineTextEdit
                   placeholder="Write project name..."
                   value={data.projectName}
-                  onChange={(value) => {
-                    data.projectName = value;
-                  }}
+                  onChange={onChangeProjectName}
                 />
               ),
               isField: true,
@@ -53,9 +66,7 @@ const ProjectPlanCreateDialog = ({
                 <InlineTextEdit
                   placeholder="Write plan name..."
                   value={data.planName}
-                  onChange={(value) => {
-                    data.planName = value;
-                  }}
+                  onChange={onChangePlanName}
                 />
               ),
               isField: true,
@@ -63,10 +74,7 @@ const ProjectPlanCreateDialog = ({
             {
               key: "action",
               body: "Create",
-              onClick: async () => {
-                await projectService.createProjectPlan(data.projectName, data.planName);
-                data.isOpen = false;
-              },
+              onClick: onCreateProjectPlan,
               isDisabled: data.projectName.length < 1 || data.planName.length < 1,
               isClickable: true,
             },

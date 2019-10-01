@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import List from "./list";
@@ -14,6 +14,15 @@ const ProjectDeleteDialog = ({
   const data = useObservable({isOpen: false, name: ""});
   const projectService = useInstance(ProjectService);
 
+  const onClickOutside = useCallback(async () => {
+    data.isOpen = false;
+  }, []);
+
+  const onDeleteProject = useCallback(async () => {
+    await projectService.deleteProject();
+    data.isOpen = false;
+  }, []);
+
   return <>
     {children(() => {
       data.isOpen = true;
@@ -21,9 +30,7 @@ const ProjectDeleteDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <List borderRadius="5px">
         {
           [
@@ -39,10 +46,7 @@ const ProjectDeleteDialog = ({
             {
               key: "action",
               body: "Yes, Remove",
-              onClick: async () => {
-                await projectService.deleteProject();
-                data.isOpen = false;
-              },
+              onClick: onDeleteProject,
               isClickable: true,
             },
           ]

@@ -1,7 +1,8 @@
 import { Utils } from "../../utils/operations";
 import { FloorplanMode } from "../floorplan-mode.enum";
+import { FloorplanModel } from "../floorplan-model";
 import { FloorplanView } from "../floorplan-view";
-import { Item } from "./item.model";
+import { Item, ItemMetadata } from "./item.model";
 
 const tableHeight = 60;
 const tableWidth = 30;
@@ -25,6 +26,17 @@ export class TableItem extends Item {
 
   public isRotating = false;
   public isRotatingHover = false;
+
+  constructor(
+    floorplan: FloorplanModel,
+    x: number,
+    y: number,
+    metadata: ItemMetadata,
+  ) {
+    super(floorplan, x, y, metadata);
+    this.metadata.height = this.metadata.height || 0;
+    this.metadata.width = this.metadata.width || 0;
+  }
 
   public mousedown(x: number, y: number) {
     const isRotating = this.overlappedRotate(x, y);

@@ -2,10 +2,9 @@ import { observer } from "mobx-react";
 import React, { memo, useEffect, useRef } from "react";
 import { useInstance } from "react-ioc";
 import { Blueprint } from "../models/blueprint";
-import { ItemNameDict } from "../models/floorplan-entities/item.dict";
 import { BlueprintService } from "../services/blueprint.service";
 import FloorPanelRead from "./floor-panel-read";
-import ListItem from "./list-item";
+import ItemProperty from "./item-property-read";
 import Panel from "./panel";
 
 const BlueprintView = () => {
@@ -29,18 +28,7 @@ const BlueprintView = () => {
 
       <div className="property-panel">
         {blueprintService.selected ? <Panel>
-          <ListItem borderRadius="5px" isHeader>
-            {ItemNameDict[blueprintService.selected.type]}
-          </ListItem>
-          <ListItem borderRadius="5px">
-            {blueprintService.selected.name}
-          </ListItem>
-          <ListItem borderRadius="5px" isHeader>
-            Description
-          </ListItem>
-          <ListItem borderRadius="5px">
-            {blueprintService.selected.description}
-          </ListItem>
+          <ItemProperty/>
         </Panel> : null}
       </div>
 

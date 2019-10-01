@@ -8,8 +8,7 @@ import { ItemArray, ItemNameDict } from "../models/floorplan-entities/item.dict"
 import { ItemEnum } from "../models/floorplan-entities/item.enum";
 import { BlueprintService } from "../services/blueprint.service";
 import { UserService } from "../services/user.service";
-import InlineTextEdit from "./inline-text-edit";
-import InlineTextareaEdit from "./inline-textarea-edit";
+import ItemProperty from "./item-property";
 import ListItem from "./list-item";
 import LoginPanel from "./login-panel";
 import Panel from "./panel";
@@ -61,16 +60,6 @@ const BlueprintView = () => {
 
   const onToggleMode = useCallback((mode: string | number) => {
     blueprintService.changeMode(mode as string);
-  }, []);
-
-  const onChangeItemName = useCallback((value: string) => {
-    blueprintService.selected.name = value;
-    blueprintService.applyChanges();
-  }, []);
-
-  const onChangeItemDescription = useCallback((value: string) => {
-    blueprintService.selected.description = value;
-    blueprintService.applyChanges();
   }, []);
 
   const isDemoMode = userService.isGuest;
@@ -134,27 +123,7 @@ const BlueprintView = () => {
 
         <div className="property-panel">
           {blueprintService.selected ? <Panel>
-            <ListItem borderRadius="5px" isHeader>
-              {ItemNameDict[blueprintService.selected.type as ItemEnum]}
-            </ListItem>
-            <ListItem borderRadius="5px" isField>
-              <InlineTextEdit
-                placeholder="Write Name..."
-                value={blueprintService.selected.name}
-                onChange={onChangeItemName}
-              />
-            </ListItem>
-            <ListItem borderRadius="5px" isHeader>
-              Description
-            </ListItem>
-            <ListItem borderRadius="5px" isField>
-              <InlineTextareaEdit
-                borderRadius="0 0 5px 5px"
-                placeholder="Write Description..."
-                value={blueprintService.selected.description}
-                onChange={onChangeItemDescription}
-              />
-            </ListItem>
+            <ItemProperty/>
           </Panel> : null}
         </div>
 

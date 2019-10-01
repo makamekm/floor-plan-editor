@@ -18,6 +18,7 @@ export abstract class Item {
    * @param floorplan The associated floorplan.
    * @param x X coordinate.
    * @param y Y coordinate.
+   * @param metadata specific item data.
    */
   constructor(
     private floorplan: FloorplanModel,
@@ -25,7 +26,12 @@ export abstract class Item {
     public y: number,
     public metadata: ItemMetadata,
   ) {
-
+    this.x = this.x || 0;
+    this.y = this.y || 0;
+    this.metadata.name = this.metadata.name || "";
+    this.metadata.description = this.metadata.description || "";
+    this.metadata.height = this.metadata.height || 0;
+    this.metadata.width = this.metadata.width || 0;
   }
 
   /** Reset the state */

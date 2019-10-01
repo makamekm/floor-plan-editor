@@ -19,18 +19,6 @@ const ProjectPanel = () => {
     floorListService.opened = false;
   }, []);
 
-  // const onToggle = useCallback((key: string) => {
-  //   if (key === "menu") {
-  //     floorListService.opened = true;
-  //   } else if (key === "save") {
-  //     if (blueprintService.hasPlan) {
-  //       openProjectPlanCreate();
-  //     } else {
-  //       openProjectCreate();
-  //     }
-  //   }
-  // }, []);
-
   return (
     <ProjectPlanCreateDialog>{(openProjectPlanCreate) => (
       <ProjectCreateDialog>{(openProjectCreate) => (

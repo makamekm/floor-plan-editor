@@ -10,3 +10,13 @@ export function useRouterChange(onRouterChange: () => void) {
     };
   }, []);
 }
+
+export function useRouterChangeStart(onRouterChange: () => void) {
+  useEffect(() => {
+    onRouterChange();
+    Router.events.on("routeChangeStart", onRouterChange);
+    return () => {
+      Router.events.off("routeChangeStart", onRouterChange);
+    };
+  }, []);
+}

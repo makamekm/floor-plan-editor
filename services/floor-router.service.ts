@@ -1,7 +1,9 @@
 import debounce from "debounce";
 import { observable } from "mobx";
 import { NextRouter, useRouter } from "next/router";
+import { useEffect } from "react";
 import { useInstance } from "react-ioc";
+import { useRouterChange, useRouterChangeStart } from "../utils/router-hook";
 import { FloorListService } from "./floor-list.service";
 import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
@@ -12,7 +14,7 @@ export class FloorRouterService implements IRootService {
 
   private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
-  }, 50);
+  }, 500);
 
   private floorListService: FloorListService;
   private projectService: ProjectService;
@@ -22,15 +24,18 @@ export class FloorRouterService implements IRootService {
     this.router = useRouter();
     this.floorListService = useInstance(FloorListService);
     this.projectService = useInstance(ProjectService);
+    useRouterChange(this.onRouterChange);
+    useRouterChangeStart(this.onRouterChangeStart);
+    useEffect(() => {
+      window.onbeforeunload = () => {
+        this.loading = true;
+      };
+    }, []);
   }
 
   public async openProject(id: number | string) {
-    this.setLoading(true);
     await this.floorListService.loadList(id);
-    this.setLoading(false);
-
     const firstPlan = this.floorListService.list[0];
-
     if (firstPlan) {
       this.router.push("/" + String(id) + "/" + String(firstPlan.id));
     } else {
@@ -52,5 +57,13 @@ export class FloorRouterService implements IRootService {
 
   public async openFloor(id: number | string, projectId: number | string = this.projectService.project.id) {
     this.router.push("/[project_id]/[id]", "/" + String(projectId) + "/" + String(id));
+  }
+
+  private onRouterChangeStart = () => {
+    this.loading = true;
+  }
+
+  private onRouterChange = () => {
+    this.setLoading(false);
   }
 }

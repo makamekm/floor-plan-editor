@@ -26,7 +26,7 @@ const ProjectList = () => {
           Logout
         </WithIcon>
       </ListItem>
-      {...projectListService.list.map(({id, name}) => {
+      {projectListService.list.map(({id, name}) => {
         return <ListItem
           key={id}
           metadata={id}

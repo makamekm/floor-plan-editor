@@ -58,15 +58,15 @@ const FloorList = () => {
             Create Plan
           </WithIcon>
         </ListItem>
-        {...floorListService.list.map(({id, data: {name}}) => {
-          return <ListItem
+        {floorListService.list.map(({id, data: {name}}) => (
+          <ListItem
             key={id}
             metadata={id}
             onClick={onOpenFloor}
             isActive={id === floorService.floor.id}>
             {name}
-          </ListItem>;
-        })}
+          </ListItem>
+        ))}
       </>}
     </ProjectEditDialog>
   );

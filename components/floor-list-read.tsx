@@ -34,7 +34,7 @@ const FloorListRead = () => {
         Get Home
       </WithIcon>
     </ListItem>
-    {...floorListService.list.map(({id, data: {name}}) => {
+    {floorListService.list.map(({id, data: {name}}) => {
       return <ListItem
         key={id}
         metadata={id}

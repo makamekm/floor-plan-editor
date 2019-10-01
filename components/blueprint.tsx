@@ -42,9 +42,27 @@ const BlueprintView = () => {
     };
   }, []);
 
+  const onToggleSidebar = useCallback((open: boolean) => {
+    isToolbarOpen.value = open;
+  }, []);
+
   const onAddItem = useCallback((key: ItemEnum) => {
     blueprintService.addItem(key);
     isToolbarOpen.value = false;
+  }, []);
+
+  const onToggleMode = useCallback((mode: string | number) => {
+    blueprintService.changeMode(mode as string);
+  }, []);
+
+  const onChangeItemName = useCallback((value: string) => {
+    blueprintService.selected.name = value;
+    blueprintService.applyChanges();
+  }, []);
+
+  const onChangeItemDescription = useCallback((value: string) => {
+    blueprintService.selected.description = value;
+    blueprintService.applyChanges();
   }, []);
 
   return (
@@ -62,7 +80,7 @@ const BlueprintView = () => {
         },
       }}
       open={isToolbarOpen.value}
-      onSetOpen={(open: boolean) => isToolbarOpen.value = open}
+      onSetOpen={onToggleSidebar}
       sidebar={
         <>
           {ItemArray.map((key) => <ListItem
@@ -83,7 +101,7 @@ const BlueprintView = () => {
           <ToggleButtonType
             activeState={blueprintService.mode}
             items={itemTypeList}
-            onToggle={(mode) => blueprintService.changeMode(mode as string)}
+            onToggle={onToggleMode}
           />
         </div>
 
@@ -110,10 +128,7 @@ const BlueprintView = () => {
               <InlineTextEdit
                 placeholder="Write Name..."
                 value={blueprintService.selected.name}
-                onChange={(value) => {
-                  blueprintService.selected.name = value;
-                  blueprintService.applyChanges();
-                }}
+                onChange={onChangeItemName}
               />
             </ListItem>
             <ListItem borderRadius="5px" isHeader>
@@ -124,10 +139,7 @@ const BlueprintView = () => {
                 borderRadius="0 0 5px 5px"
                 placeholder="Write Description..."
                 value={blueprintService.selected.description}
-                onChange={(value) => {
-                  blueprintService.selected.description = value;
-                  blueprintService.applyChanges();
-                }}
+                onChange={onChangeItemDescription}
               />
             </ListItem>
           </Panel> : null}

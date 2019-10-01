@@ -6,8 +6,8 @@ import { FloorListService } from "../services/floor-list.service";
 import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { copyTextToClipboard } from "../utils/clipboard";
-import WithIcon from "./with-icon";
 import ListItem from "./list-item";
+import WithIcon from "./with-icon";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);

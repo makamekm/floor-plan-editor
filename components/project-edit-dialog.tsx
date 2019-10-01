@@ -4,9 +4,9 @@ import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
+import ListItem from "./list-item";
 import ProjectDeleteDialog from "./project-delete-dialog";
 import WindowPanel from "./window-panel";
-import ListItem from "./list-item";
 
 const ProjectEditDialog = ({
   children,

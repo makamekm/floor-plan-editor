@@ -3,8 +3,8 @@ import { useObservable } from "mobx-react-lite";
 import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
-import WindowPanel from "./window-panel";
 import ListItem from "./list-item";
+import WindowPanel from "./window-panel";
 
 const FloorDeleteDialog = ({
   children,

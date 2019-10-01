@@ -5,8 +5,8 @@ import { Blueprint } from "../models/blueprint";
 import { ItemNameDict } from "../models/floorplan-entities/item.dict";
 import { BlueprintService } from "../services/blueprint.service";
 import FloorPanelRead from "./floor-panel-read";
-import Panel from "./panel";
 import ListItem from "./list-item";
+import Panel from "./panel";
 
 const BlueprintView = () => {
   const canvasRef = useRef(null);

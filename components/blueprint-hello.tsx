@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo, useEffect, useRef, useCallback } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 import { useInstance } from "react-ioc";
 import Sidebar from "react-sidebar";
 import { Blueprint } from "../models/blueprint";
@@ -10,11 +10,11 @@ import { BlueprintService } from "../services/blueprint.service";
 import { UserService } from "../services/user.service";
 import InlineTextEdit from "./inline-text-edit";
 import InlineTextareaEdit from "./inline-textarea-edit";
+import ListItem from "./list-item";
 import LoginPanel from "./login-panel";
 import Panel from "./panel";
 import ProjectPanel from "./project-panel";
 import ToggleButtonType from "./toggle-type";
-import ListItem from "./list-item";
 
 const itemTypeList = [
   {

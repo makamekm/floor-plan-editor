@@ -22,6 +22,8 @@ export interface FloorplanItemDto {
   x: number;
   y: number;
   r: number;
+  height: number;
+  width: number;
 }
 
 export interface FloorplanDataDto {

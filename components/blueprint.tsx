@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo, useEffect, useRef, useCallback } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 import { useInstance } from "react-ioc";
 import Sidebar from "react-sidebar";
 import { Blueprint } from "../models/blueprint";
@@ -8,11 +8,10 @@ import { ItemArray, ItemNameDict } from "../models/floorplan-entities/item.dict"
 import { ItemEnum } from "../models/floorplan-entities/item.enum";
 import { BlueprintService } from "../services/blueprint.service";
 import FloorPanel from "./floor-panel";
-import InlineTextEdit from "./inline-text-edit";
-import InlineTextareaEdit from "./inline-textarea-edit";
+import ItemProperty from "./item-property";
+import ListItem from "./list-item";
 import Panel from "./panel";
 import ToggleButtonType from "./toggle-type";
-import ListItem from "./list-item";
 
 const itemTypeList = [
   {
@@ -42,9 +41,17 @@ const BlueprintView = () => {
     };
   }, []);
 
+  const onToggleSidebar = useCallback((open: boolean) => {
+    isToolbarOpen.value = open;
+  }, []);
+
   const onAddItem = useCallback((key: ItemEnum) => {
     blueprintService.addItem(key);
     isToolbarOpen.value = false;
+  }, []);
+
+  const onToggleMode = useCallback((mode: string | number) => {
+    blueprintService.changeMode(mode as string);
   }, []);
 
   return (
@@ -62,7 +69,7 @@ const BlueprintView = () => {
         },
       }}
       open={isToolbarOpen.value}
-      onSetOpen={(open: boolean) => isToolbarOpen.value = open}
+      onSetOpen={onToggleSidebar}
       sidebar={
         <>
           {ItemArray.map((key) => <ListItem
@@ -83,7 +90,7 @@ const BlueprintView = () => {
           <ToggleButtonType
             activeState={blueprintService.mode}
             items={itemTypeList}
-            onToggle={(mode) => blueprintService.changeMode(mode as string)}
+            onToggle={onToggleMode}
           />
         </div>
 
@@ -103,33 +110,7 @@ const BlueprintView = () => {
 
         <div className="property-panel">
           {blueprintService.selected ? <Panel>
-            <ListItem borderRadius="5px" isHeader>
-              {ItemNameDict[blueprintService.selected.type as ItemEnum]}
-            </ListItem>
-            <ListItem borderRadius="5px" isField>
-              <InlineTextEdit
-                placeholder="Write Name..."
-                value={blueprintService.selected.name}
-                onChange={(value) => {
-                  blueprintService.selected.name = value;
-                  blueprintService.applyChanges();
-                }}
-              />
-            </ListItem>
-            <ListItem borderRadius="5px" isHeader>
-              Description
-            </ListItem>
-            <ListItem borderRadius="5px" isField>
-              <InlineTextareaEdit
-                borderRadius="0 0 5px 5px"
-                placeholder="Write Description..."
-                value={blueprintService.selected.description}
-                onChange={(value) => {
-                  blueprintService.selected.description = value;
-                  blueprintService.applyChanges();
-                }}
-              />
-            </ListItem>
+            <ItemProperty/>
           </Panel> : null}
         </div>
 

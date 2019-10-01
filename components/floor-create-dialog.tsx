@@ -4,8 +4,8 @@ import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
 import InlineTextEdit from "./inline-text-edit";
-import WindowPanel from "./window-panel";
 import ListItem from "./list-item";
+import WindowPanel from "./window-panel";
 
 const FloorCreateDialog = ({
   children,

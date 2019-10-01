@@ -105,6 +105,8 @@ export class Blueprint {
         name: "",
         type,
         r: 0,
+        height: 0,
+        width: 0,
       },
     );
     this.floorplanner.fireChanges();

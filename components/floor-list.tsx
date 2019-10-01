@@ -7,9 +7,9 @@ import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
+import ListItem from "./list-item";
 import ProjectEditDialog from "./project-edit-dialog";
 import WithIcon from "./with-icon";
-import ListItem from "./list-item";
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);

@@ -8,6 +8,8 @@ export interface ItemMetadata {
   description: string;
   r: number;
   type: number;
+  height: number;
+  width: number;
 }
 
 export abstract class Item {

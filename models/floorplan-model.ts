@@ -230,6 +230,8 @@ export class FloorplanModel {
         description: item.metadata.description,
         name: item.metadata.name,
         type: item.metadata.type,
+        height: item.metadata.height,
+        width: item.metadata.width,
       });
     });
 
@@ -266,6 +268,8 @@ export class FloorplanModel {
           name: item.name,
           type: item.type,
           r: item.r,
+          height: item.height,
+          width: item.width,
         },
       );
     });

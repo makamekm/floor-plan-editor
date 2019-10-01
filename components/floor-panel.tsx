@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { EditIcon, SearchIcon } from "../icons/icon";
 import { FloorEditService } from "../services/floor-edit.service";
@@ -16,6 +16,19 @@ const FloorPanel = () => {
   const floorService = useInstance(FloorService);
   const floorListService = useInstance(FloorListService);
   const floorEditService = useInstance(FloorEditService);
+  const onToggleClick = useCallback((key: string | number) => {
+    if (key === "menu") {
+      floorListService.opened = true;
+    } else if (key === "edit") {
+      floorEditService.opened = true;
+    }
+  }, []);
+  const onClickOutsideFloorList = useCallback(() => {
+    floorListService.opened = false;
+  }, []);
+  const onClickOutsideFloorEdit = useCallback(() => {
+    floorEditService.opened = false;
+  }, []);
 
   const id = floorService.floor && floorService.floor.id;
   const isCreate = id == null;
@@ -31,6 +44,7 @@ const FloorPanel = () => {
               items={[{
                 key: "save",
                 name: isCreate ? "Save Plan" : name,
+                onClick: open,
               }, !isCreate && {
                 key: "edit",
                 name: <div style={{lineHeight: 0}}><img src={EditIcon} alt=""/></div>,
@@ -38,30 +52,18 @@ const FloorPanel = () => {
                 key: "menu",
                 name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
               }].filter((s) => !!s)}
-              onToggle={(key) => {
-                if (key === "menu") {
-                  floorListService.opened = true;
-                } else if (key === "save") {
-                  open();
-                } else if (key === "edit") {
-                  floorEditService.opened = true;
-                }
-              }}
+              onToggle={onToggleClick}
             />
             <WindowPanel
               active={floorListService.opened}
-              onClickOutside={() => {
-                floorListService.opened = false;
-              }}>
+              onClickOutside={onClickOutsideFloorList}>
               <div className="list">
                 <FloorList/>
               </div>
             </WindowPanel>
             <WindowPanel
               active={floorEditService.opened}
-              onClickOutside={() => {
-                floorEditService.opened = false;
-              }}>
+              onClickOutside={onClickOutsideFloorEdit}>
               <div className="list">
                 <FloorEdit/>
               </div>

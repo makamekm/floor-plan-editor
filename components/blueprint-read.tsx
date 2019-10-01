@@ -5,8 +5,8 @@ import { Blueprint } from "../models/blueprint";
 import { ItemNameDict } from "../models/floorplan-entities/item.dict";
 import { BlueprintService } from "../services/blueprint.service";
 import FloorPanelRead from "./floor-panel-read";
-import List from "./list";
 import Panel from "./panel";
+import ListItem from "./list-item";
 
 const BlueprintView = () => {
   const canvasRef = useRef(null);
@@ -29,28 +29,18 @@ const BlueprintView = () => {
 
       <div className="property-panel">
         {blueprintService.selected ? <Panel>
-          <List borderRadius="5px">
-            {[
-              {
-                key: "header",
-                body: ItemNameDict[blueprintService.selected.type],
-                isHeader: true,
-              },
-              {
-                key: "name",
-                body: blueprintService.selected.name,
-              },
-              {
-                key: "header-description",
-                body: "Description",
-                isHeader: true,
-              },
-              {
-                key: "description",
-                body: blueprintService.selected.description,
-              },
-            ]}
-          </List>
+          <ListItem borderRadius="5px" isHeader>
+            {ItemNameDict[blueprintService.selected.type]}
+          </ListItem>
+          <ListItem borderRadius="5px">
+            {blueprintService.selected.name}
+          </ListItem>
+          <ListItem borderRadius="5px" isHeader>
+            Description
+          </ListItem>
+          <ListItem borderRadius="5px">
+            {blueprintService.selected.description}
+          </ListItem>
         </Panel> : null}
       </div>
 

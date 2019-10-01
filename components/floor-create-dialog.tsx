@@ -1,11 +1,11 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
 import InlineTextEdit from "./inline-text-edit";
-import List from "./list";
 import WindowPanel from "./window-panel";
+import ListItem from "./list-item";
 
 const FloorCreateDialog = ({
   children,
@@ -14,6 +14,16 @@ const FloorCreateDialog = ({
 }) => {
   const data = useObservable({isOpen: false, name: ""});
   const floorService = useInstance(FloorService);
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+  const onChangeName = useCallback((value: string) => {
+    data.name = value;
+  }, []);
+  const onCreateFloor = useCallback(async () => {
+    await floorService.createFloor(data.name);
+    data.isOpen = false;
+  }, []);
 
   return <>
     {children(() => {
@@ -22,43 +32,20 @@ const FloorCreateDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
-      <List borderRadius="5px">
-        {
-          [
-            {
-              key: "header",
-              body: "Create Floor",
-              isHeader: true,
-            },
-            {
-              key: "name",
-              body: (
-                <InlineTextEdit
-                  placeholder="Write floor name..."
-                  value={data.name}
-                  onChange={(value) => {
-                    data.name = value;
-                  }}
-                />
-              ),
-              isField: true,
-            },
-            {
-              key: "action",
-              body: "Create",
-              onClick: async () => {
-                await floorService.createFloor(data.name);
-                data.isOpen = false;
-              },
-              isDisabled: data.name.length < 1,
-              isClickable: true,
-            },
-          ]
-        }
-      </List>
+      onClickOutside={onClickOutside}>
+      <ListItem isHeader borderRadius="5px">
+        Create Floor
+      </ListItem>
+      <ListItem isField borderRadius="5px">
+        <InlineTextEdit
+          placeholder="Write floor name..."
+          value={data.name}
+          onChange={onChangeName}
+        />
+      </ListItem>
+      <ListItem borderRadius="5px" onClick={onCreateFloor} isDisabled={data.name.length < 1}>
+        Create
+      </ListItem>
     </WindowPanel>
   </>;
 };

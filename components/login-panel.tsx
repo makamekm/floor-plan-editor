@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { UserService } from "../services/user.service";
 import LoginDialog from "./login-dialog";
@@ -14,6 +14,12 @@ const LoginPanel = () => {
     };
   }, []);
 
+  const onToggle = useCallback((key: string | number) => {
+    if (key === "login") {
+      userService.askToLogIn = true;
+    }
+  }, []);
+
   return (
     <>
       <Panel>
@@ -22,11 +28,7 @@ const LoginPanel = () => {
             key: "login",
             name: "Login",
           }]}
-          onToggle={(key) => {
-            if (key === "login") {
-              userService.askToLogIn = true;
-            }
-          }}
+          onToggle={onToggle}
         />
       </Panel>
 

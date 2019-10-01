@@ -1,12 +1,12 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
-import List from "./list";
 import ProjectDeleteDialog from "./project-delete-dialog";
 import WindowPanel from "./window-panel";
+import ListItem from "./list-item";
 
 const ProjectEditDialog = ({
   children,
@@ -17,54 +17,43 @@ const ProjectEditDialog = ({
   const projectService = useInstance(ProjectService);
   const projectName = projectService.project && projectService.project.name;
 
+  const onClickOutside = useCallback(async () => {
+    data.isOpen = false;
+  }, []);
+
+  const onChangeProjectName = useCallback((value: string) => {
+    if (value.length > 0) {
+      projectService.data.project.name = value;
+      projectService.saveProject();
+    }
+  }, []);
+
   return <>
     {children(() => {
       data.isOpen = true;
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
+      onClickOutside={onClickOutside}>
       <ProjectDeleteDialog>
-        {(open) => <List borderRadius="5px">
-          {
-            [
-              {
-                key: "name-header",
-                body: "Project name",
-                isHeader: true,
-              },
-              {
-                key: "name",
-                body: (
-                  <InlineTextEdit
-                    placeholder="Write project name..."
-                    value={projectName}
-                    onChange={(value) => {
-                      if (value.length > 0) {
-                        projectService.data.project.name = value;
-                        projectService.saveProject();
-                      }
-                    }}
-                  />
-                ),
-                isField: true,
-              },
-              {
-                key: "operations",
-                body: "Operations",
-                isHeader: true,
-              },
-              {
-                key: "delete",
-                body: "Delete",
-                onClick: () => open(),
-                isClickable: true,
-              },
-            ]
-          }
-        </List>}
+        {(open) => <>
+          <ListItem isHeader borderRadius="5px">
+            Project name
+          </ListItem>
+          <ListItem isField borderRadius="5px">
+            <InlineTextEdit
+              placeholder="Write project name..."
+              value={projectName}
+              onChange={onChangeProjectName}
+            />
+          </ListItem>
+          <ListItem isHeader borderRadius="5px">
+            Operations
+          </ListItem>
+          <ListItem borderRadius="5px" onClick={open}>
+            Delete
+          </ListItem>
+        </>}
       </ProjectDeleteDialog>
     </WindowPanel>
   </>;

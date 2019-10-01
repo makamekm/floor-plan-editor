@@ -1,50 +1,53 @@
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 
-export interface Item {
-  key?: string | number;
-  onClick?: (e: React.MouseEvent) => void;
-  isClickable?: boolean;
+const ListItem = ({
+  children,
+  borderRadius,
+  onClick,
+  metadata,
+  isHeader,
+  isField,
+  isDisabled,
+  isActive,
+  hasDivider,
+  isHidden,
+}: {
+  children: any;
+  borderRadius?: string;
+  onClick?: (metadata: any, e: React.MouseEvent) => void;
+  metadata?: any;
   isHeader?: boolean;
   isField?: boolean;
   isDisabled?: boolean;
   isActive?: boolean;
   hasDivider?: boolean;
   isHidden?: boolean;
-  body: any;
-}
-
-const List = ({children, onClick, borderRadius}: {
-  children: Item[];
-  onClick?: (item: Item) => void;
-  borderRadius?: string;
 }) => {
   borderRadius = borderRadius || "0px";
 
-  return (
-    <div className={"list"}>
+  const onClickContent = useCallback((event: React.MouseEvent) => {
+    if (onClick) {
+      onClick(metadata, event);
+    }
+  }, []);
 
-      {children.filter((item) => !item.isHidden).map((item, index) => (
-        <div
-          key={item.key || index}
-          className={"item"
-            + (item.isClickable ? " is-clickable" : "")
-            + (item.isHeader ? " is-header" : "")
-            + (item.isField ? " is-field" : "")
-            + (item.isDisabled ? " is-disabled" : "")
-            + (item.isActive ? " is-active" : "")
-            + (item.hasDivider && index !== children.length - 1 ? " has-divider" : "")
-          }
-          onClick={item.onClick || (item.isClickable ? () => onClick(item) : undefined)}>
-          {item.body}
-        </div>
-      ))}
+  return (
+    <>
+      {!isHidden ? <div
+        className={
+          "item"
+          + (onClick ? " is-clickable" : "")
+          + (isHeader ? " is-header" : "")
+          + (isField ? " is-field" : "")
+          + (isDisabled ? " is-disabled" : "")
+          + (isActive ? " is-active" : "")
+          + (hasDivider ? " has-divider" : "")
+        }
+        onClick={onClickContent}>
+        {children}
+      </div> : null}
 
       <style jsx>{`
-
-        .list {
-          min-width: 200px;
-        }
-
         .item {
           padding: 10px 15px;
           transition: background-color 0.1s;
@@ -55,9 +58,10 @@ const List = ({children, onClick, borderRadius}: {
           font-size: 12px;
           line-height: 12px;
           border-bottom: 1px solid #f1f1f1;
+          min-width: 200px;
         }
 
-        .has-divider {
+        .item.has-divider:not(:last-child) {
           border-bottom: 2px solid #e6e6e6;
         }
 
@@ -104,7 +108,7 @@ const List = ({children, onClick, borderRadius}: {
         .item.is-active {
           background-color: #2196F3;
           color: #FFFFFF;
-          border-color: #2196F3;
+          pointer-events: none;
         }
 
         .item.is-active :global(img) {
@@ -121,8 +125,8 @@ const List = ({children, onClick, borderRadius}: {
           pointer-events: none;
         }
       `}</style>
-    </div>
+    </>
   );
 };
 
-export default memo(List);
+export default memo(ListItem);

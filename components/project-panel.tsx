@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { SearchIcon } from "../icons/icon";
 import { BlueprintService } from "../services/blueprint.service";
@@ -14,6 +14,22 @@ import WindowPanel from "./window-panel";
 const ProjectPanel = () => {
   const floorListService = useInstance(ProjectListService);
   const blueprintService = useInstance(BlueprintService);
+
+  const onClickOutside = useCallback(() => {
+    floorListService.opened = false;
+  }, []);
+
+  // const onToggle = useCallback((key: string) => {
+  //   if (key === "menu") {
+  //     floorListService.opened = true;
+  //   } else if (key === "save") {
+  //     if (blueprintService.hasPlan) {
+  //       openProjectPlanCreate();
+  //     } else {
+  //       openProjectCreate();
+  //     }
+  //   }
+  // }, []);
 
   return (
     <ProjectPlanCreateDialog>{(openProjectPlanCreate) => (
@@ -42,9 +58,7 @@ const ProjectPanel = () => {
             />
             <WindowPanel
               active={floorListService.opened}
-              onClickOutside={() => {
-                floorListService.opened = false;
-              }}>
+              onClickOutside={onClickOutside}>
               <div className="list">
                 <ProjectList/>
               </div>

@@ -10,7 +10,8 @@ const ToggleButtonType = ({
   activeState?: string | number;
   items: Array<{
     key: string | number;
-    name: string | JSX.Element
+    name: string | JSX.Element;
+    onClick?: () => void
   }>;
   responsive?: boolean;
 }) => {
@@ -18,9 +19,9 @@ const ToggleButtonType = ({
     <>
       <div className="toggle-type">
         {
-          items.map(({key, name}) => {
+          items.map(({key, name, onClick}) => {
             return (
-              <div key={key} onClick={() => onToggle(key)}
+              <div key={key} onClick={onClick || (() => onToggle(key))}
                 className={"toggle-type-button" + (activeState === key ? " active" : "")}>
                 {name}
               </div>

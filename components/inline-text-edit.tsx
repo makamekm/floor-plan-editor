@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { EditIcon } from "../icons/icon";
 
 const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
@@ -18,7 +18,7 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
   borderRadius = borderRadius || "0px";
   padding = padding || "10px 15px";
 
-  const onStartEdit = () => {
+  const onStartEdit = useCallback(() => {
     inputValue.value = value;
     isEditing.value = true;
     isTryingToSave.value = false;
@@ -26,70 +26,76 @@ const InlineTextEdit = ({value, onChange, placeholder, borderRadius, padding}: {
       input.current.focus();
       input.current.select();
     });
-  };
+  }, []);
 
-  const onStopEdit = () => {
+  const onStartEditByClick = useCallback(() => {
+    if (!value) {
+      onStartEdit();
+    }
+  }, []);
+
+  const onStopEdit = useCallback(() => {
     if (!isTryingToSave.value) {
       isEditing.value = false;
     }
-  };
+  }, []);
 
-  const onSaveEdit = () => {
+  const onSaveEdit = useCallback(() => {
     isEditing.value = false;
     onChange(inputValue.value);
-  };
+  }, []);
 
-  const onSaveMouseDown = () => {
+  const onSaveMouseDown = useCallback(() => {
     isTryingToSave.value = true;
-  };
+  }, []);
 
-  const onSaveMouseLeave = () => {
+  const onSaveMouseLeave = useCallback(() => {
     if (isTryingToSave.value) {
       isTryingToSave.value = false;
       isEditing.value = false;
     }
-  };
+  }, []);
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
+  const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.keyCode === 27) {
       onStopEdit();
     } else if (event.keyCode === 13) {
       onSaveEdit();
     }
-  };
+  }, []);
+
+  const onChangeValue = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    inputValue.value = event.currentTarget.value;
+  }, []);
 
   return <div className={"inline-edit-input" + (isEditing.value ? " is-editing" : "")}>
     <div className="value"
-      onClick={() => {
-        if (!value) {
-          onStartEdit();
-        }
-      }}
-      onDoubleClick={() => onStartEdit()}
-      onTouchEnd={() => onStartEdit()}>
+      onClick={onStartEditByClick}
+      onDoubleClick={onStartEdit}
+      onTouchEnd={onStartEdit}>
       <div className="value-body">
         {value || placeholder}
       </div>
       <div className="value-edit">
-        <img src={EditIcon} onClick={() => onStartEdit()} alt=""/>
+        <img src={EditIcon} onClick={onStartEdit} alt=""/>
       </div>
     </div>
     <div className="input">
       <div className="input-body">
         <input
           ref={input}
-          onBlur={() => onStopEdit()}
-          onKeyDown={(event) => onKeyDown(event)}
+          onBlur={onStopEdit}
+          onKeyDown={onKeyDown}
           className="input-control"
           placeholder="Write here..."
           type="text"
           value={inputValue.value || ""}
-          onChange={(e) => inputValue.value = e.currentTarget.value}/>
+          onChange={onChangeValue}/>
       </div>
       <div className="input-save"
-        onMouseDown={() => onSaveMouseDown()}
-        onClick={() => onSaveEdit()}
-        onMouseLeave={() => onSaveMouseLeave()}>
+        onMouseDown={onSaveMouseDown}
+        onClick={onSaveEdit}
+        onMouseLeave={onSaveMouseLeave}>
         <div>
           Save
         </div>

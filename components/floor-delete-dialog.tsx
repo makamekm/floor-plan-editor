@@ -1,10 +1,10 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { FloorService } from "../services/floor.service";
-import List from "./list";
 import WindowPanel from "./window-panel";
+import ListItem from "./list-item";
 
 const FloorDeleteDialog = ({
   children,
@@ -13,6 +13,13 @@ const FloorDeleteDialog = ({
 }) => {
   const data = useObservable({isOpen: false, name: ""});
   const floorService = useInstance(FloorService);
+  const onClickOutside = useCallback(() => {
+    data.isOpen = false;
+  }, []);
+  const onDeleteFloor = useCallback(async () => {
+    await floorService.deleteFloor();
+    data.isOpen = false;
+  }, []);
 
   return <>
     {children(() => {
@@ -21,33 +28,16 @@ const FloorDeleteDialog = ({
     })}
     <WindowPanel
       active={data.isOpen}
-      onClickOutside={() => {
-        data.isOpen = false;
-      }}>
-      <List borderRadius="5px">
-        {
-          [
-            {
-              key: "header",
-              body: "Delete Floor",
-              isHeader: true,
-            },
-            {
-              key: "description",
-              body: "The floor will be removed completely and the changes can't be reverted",
-            },
-            {
-              key: "action",
-              body: "Yes, Remove",
-              onClick: async () => {
-                await floorService.deleteFloor();
-                data.isOpen = false;
-              },
-              isClickable: true,
-            },
-          ]
-        }
-      </List>
+      onClickOutside={onClickOutside}>
+      <ListItem isHeader borderRadius="5px">
+        Delete Floor
+      </ListItem>
+      <ListItem borderRadius="5px">
+        The floor will be removed completely and the changes can't be reverted
+      </ListItem>
+      <ListItem borderRadius="5px" onClick={onDeleteFloor}>
+        Yes, Remove
+      </ListItem>
     </WindowPanel>
   </>;
 };

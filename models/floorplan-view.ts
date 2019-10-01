@@ -1,12 +1,12 @@
+import { configDpr, Configuration } from "../utils/configuration";
 import { FloorplanController } from "./floorplan-controller";
-import { FloorplanModel } from "./floorplan-model";
-import { Wall } from "./floorplan-entities/wall.model";
-import { HalfEdge } from "./floorplan-entities/half-edge.model";
-import { Room } from "./floorplan-entities/room.model";
 import { Corner } from "./floorplan-entities/corner.model";
-import { Configuration, configDpr } from "../utils/configuration";
-import { FloorplanMode } from "./floorplan-mode.enum";
+import { HalfEdge } from "./floorplan-entities/half-edge.model";
 import { Item } from "./floorplan-entities/item.model";
+import { Room } from "./floorplan-entities/room.model";
+import { Wall } from "./floorplan-entities/wall.model";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { FloorplanModel } from "./floorplan-model";
 
 // grid parameters
 const gridSpacing = 20; // pixels
@@ -19,19 +19,19 @@ const roomColor = "#f9f9f9";
 // wall config
 const wallWidth = 5;
 const wallWidthHover = 7;
-const wallColor = "#dddddd"
-const wallColorHover = "#008cba"
-const edgeColor = "#888888"
-const edgeColorHover = "#008cba"
-const edgeWidth = 1
+const wallColor = "#dddddd";
+const wallColorHover = "#008cba";
+const edgeColor = "#888888";
+const edgeColorHover = "#008cba";
+const edgeWidth = 1;
 
 const deleteColor = "#ff0000";
 
 // corner config
-const cornerRadius = 4
-const cornerRadiusHover = 7
-const cornerColor = "#888888"
-const cornerColorHover = "#2196F3"
+const cornerRadius = 4;
+const cornerRadiusHover = 7;
+const cornerColor = "#888888";
+const cornerColorHover = "#2196F3";
 
 /**
  * The View to be used by a Floorplanner to render in/interact with.
@@ -41,10 +41,14 @@ export class FloorplanView {
   /** The 2D context. */
   private context: CanvasRenderingContext2D;
 
-  constructor(private floorplan: FloorplanModel, private viewmodel: FloorplanController, private canvasElement: HTMLCanvasElement) {
-    this.context = <CanvasRenderingContext2D>this.canvasElement.getContext('2d');
+  constructor(
+    private floorplan: FloorplanModel,
+    private viewmodel: FloorplanController,
+    private canvasElement: HTMLCanvasElement,
+  ) {
+    this.context = (this.canvasElement.getContext("2d") as CanvasRenderingContext2D);
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       setTimeout(() => this.handleWindowResize(), 0);
     });
 
@@ -52,7 +56,7 @@ export class FloorplanView {
   }
 
   public handleWindowResize() {
-    const parent = <HTMLElement>this.canvasElement.parentElement;
+    const parent = this.canvasElement.parentElement as HTMLElement;
     const dpr = Configuration.getNumericValue(configDpr);
     this.canvasElement.height = parent.getBoundingClientRect().height * dpr;
     this.canvasElement.width = parent.getBoundingClientRect().width * dpr;
@@ -67,9 +71,13 @@ export class FloorplanView {
 
     this.drawGrid();
 
+    if (this.floorplan.getDemoMode()) {
+      this.drawDemo();
+    }
+
     this.floorplan.getRooms().forEach((room) => {
       this.drawRoom(room);
-    })
+    });
 
     this.floorplan.getWalls().forEach((wall) => {
       this.drawWall(wall);
@@ -79,7 +87,7 @@ export class FloorplanView {
       this.drawCorner(corner);
     });
 
-    if (this.viewmodel.mode == FloorplanMode.DRAW) {
+    if (this.viewmodel.mode === FloorplanMode.DRAW) {
       this.drawTarget(this.viewmodel.targetX, this.viewmodel.targetY, this.viewmodel.lastNode);
     }
 
@@ -96,6 +104,117 @@ export class FloorplanView {
     if (this.floorplan.getSelectedItem()) {
       this.drawSelectedItem();
     }
+  }
+
+  public drawLine(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    width: number,
+    color: string,
+  ) {
+    // width is an integer
+    // color is a hex string, i.e. #ff0000
+    this.context.beginPath();
+    this.context.moveTo(startX, startY);
+    this.context.lineTo(endX, endY);
+    this.context.lineWidth = width;
+    this.context.strokeStyle = color;
+    this.context.stroke();
+  }
+
+  public drawPolygon(
+    xArr: number[],
+    yArr: number[],
+    fill: boolean,
+    fillColor?: string,
+    stroke?: boolean,
+    strokeColor?: string,
+    strokeWidth?: number,
+  ) {
+    // fillColor is a hex string, i.e. #ff0000
+    fill = fill || false;
+    stroke = stroke || false;
+    this.context.beginPath();
+    this.context.moveTo(xArr[0], yArr[0]);
+    for (let i = 1; i < xArr.length; i++) {
+      this.context.lineTo(xArr[i], yArr[i]);
+    }
+    this.context.closePath();
+    if (fill) {
+      this.context.fillStyle = (fillColor as string);
+      this.context.fill();
+    }
+    if (stroke) {
+      this.context.lineWidth = (strokeWidth as number);
+      this.context.strokeStyle = (strokeColor as string);
+      this.context.stroke();
+    }
+  }
+
+  public drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
+    this.context.beginPath();
+    this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    this.context.fillStyle = fillColor;
+    this.context.fill();
+  }
+
+  public drawCircleStroke(centerX: number, centerY: number, radius: number, fillColor: string, lineWidth: number) {
+    this.context.beginPath();
+    this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    this.context.strokeStyle = fillColor;
+    this.context.lineWidth = lineWidth;
+    this.context.stroke();
+  }
+
+  public drawTransaction(render: (
+    ctx: CanvasRenderingContext2D,
+    floorplanner: FloorplanController,
+    floorplan: FloorplanModel,
+  ) => void) {
+    this.context.save();
+    render(this.context, this.viewmodel, this.floorplan);
+    this.context.restore();
+  }
+
+  public drawBGLabel(x: number, y: number, text: string) {
+    this.context.font = "normal 25px Arial";
+    this.context.fillStyle = "#ffffff";
+    this.context.textBaseline = "middle";
+    this.context.textAlign = "center";
+    this.context.strokeStyle = "#bbbbbb";
+    this.context.lineJoin = "round";
+    this.context.lineWidth = 2;
+
+    this.context.strokeText(text,
+      x,
+      y,
+    );
+
+    this.context.fillText(text,
+      x,
+      y,
+    );
+  }
+
+  public drawLabel(x: number, y: number, text: string) {
+    this.context.font = "normal 12px Arial";
+    this.context.fillStyle = "#000000";
+    this.context.textBaseline = "middle";
+    this.context.textAlign = "center";
+    this.context.strokeStyle = "#ffffff";
+    this.context.lineWidth = 4;
+
+    this.context.strokeText(text,
+      this.viewmodel.convertX(x),
+      this.viewmodel.convertY(y),
+    );
+
+    this.context.fillText(text,
+      this.viewmodel.convertX(x),
+      this.viewmodel.convertY(y),
+    );
   }
 
   private drawSelectedItem() {
@@ -141,7 +260,7 @@ export class FloorplanView {
   private drawWall(wall: Wall) {
     const hover = wall === this.viewmodel.activeWall && this.viewmodel.mode != null;
     let color = wallColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover) {
       color = wallColorHover;
@@ -152,7 +271,7 @@ export class FloorplanView {
       this.viewmodel.convertX(wall.getEndX()),
       this.viewmodel.convertY(wall.getEndY()),
       hover ? wallWidthHover : wallWidth,
-      color
+      color,
     );
     if (!hover && wall.frontEdge) {
       this.drawEdge(wall.frontEdge, hover);
@@ -187,7 +306,7 @@ export class FloorplanView {
 
   private drawEdge(edge: HalfEdge, hover: boolean) {
     let color = edgeColor;
-    if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+    if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
       color = deleteColor;
     } else if (hover && this.viewmodel.mode != null) {
       color = edgeColorHover;
@@ -195,30 +314,30 @@ export class FloorplanView {
     const corners = edge.corners();
 
     this.drawPolygon(
-      corners.map(corner => {
+      corners.map((corner) => {
         return this.viewmodel.convertX(corner.x);
       }),
-      corners.map(corner => {
+      corners.map((corner) => {
         return this.viewmodel.convertY(corner.y);
       }),
       false,
       undefined,
       true,
       color,
-      edgeWidth
+      edgeWidth,
     );
   }
 
   private drawRoom(room: Room) {
     this.drawPolygon(
-      room.corners.map(corner => {
+      room.corners.map((corner) => {
         return this.viewmodel.convertX(corner.x);
       }),
-      room.corners.map(corner =>  {
+      room.corners.map((corner) =>  {
         return this.viewmodel.convertY(corner.y);
       }),
       true,
-      roomColor
+      roomColor,
     );
   }
 
@@ -226,7 +345,7 @@ export class FloorplanView {
     if (this.viewmodel.mode != null) {
       const hover = (corner === this.viewmodel.activeCorner);
       let color = cornerColor;
-      if (hover && this.viewmodel.mode == FloorplanMode.DELETE) {
+      if (hover && this.viewmodel.mode === FloorplanMode.DELETE) {
         color = deleteColor;
       } else if (hover) {
         color = cornerColorHover;
@@ -235,7 +354,7 @@ export class FloorplanView {
         this.viewmodel.convertX(corner.x),
         this.viewmodel.convertY(corner.y),
         hover ? cornerRadiusHover : cornerRadius,
-        color
+        color,
       );
     }
   }
@@ -245,7 +364,7 @@ export class FloorplanView {
       this.viewmodel.convertX(x),
       this.viewmodel.convertY(y),
       cornerRadiusHover,
-      cornerColorHover
+      cornerColorHover,
     );
     if (lastNode) {
       this.drawLine(
@@ -254,7 +373,7 @@ export class FloorplanView {
         this.viewmodel.convertX(x),
         this.viewmodel.convertY(y),
         wallWidthHover,
-        wallColorHover
+        wallColorHover,
       );
     }
   }
@@ -281,90 +400,10 @@ export class FloorplanView {
     }
   }
 
-  public drawLine(
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number,
-    width: number,
-    color: string,
-  ) {
-    // width is an integer
-    // color is a hex string, i.e. #ff0000
-    this.context.beginPath();
-    this.context.moveTo(startX, startY);
-    this.context.lineTo(endX, endY);
-    this.context.lineWidth = width;
-    this.context.strokeStyle = color;
-    this.context.stroke();
-  }
-
-  public drawPolygon(
-    xArr: number[],
-    yArr: number[],
-    fill: boolean,
-    fillColor?: string,
-    stroke?: boolean,
-    strokeColor?: string,
-    strokeWidth?: number,
-  ) {
-    // fillColor is a hex string, i.e. #ff0000
-    fill = fill || false;
-    stroke = stroke || false;
-    this.context.beginPath();
-    this.context.moveTo(xArr[0], yArr[0]);
-    for (let i = 1; i < xArr.length; i++) {
-      this.context.lineTo(xArr[i], yArr[i]);
-    }
-    this.context.closePath();
-    if (fill) {
-      this.context.fillStyle = <string>fillColor;
-      this.context.fill();
-    }
-    if (stroke) {
-      this.context.lineWidth = <number>strokeWidth;
-      this.context.strokeStyle = <string>strokeColor;
-      this.context.stroke();
-    }
-  }
-
-  public drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
-    this.context.beginPath();
-    this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.context.fillStyle = fillColor;
-    this.context.fill();
-  }
-
-  public drawCircleStroke(centerX: number, centerY: number, radius: number, fillColor: string, lineWidth: number) {
-    this.context.beginPath();
-    this.context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.context.strokeStyle = fillColor;
-    this.context.lineWidth = lineWidth;
-    this.context.stroke();
-  }
-
-  public drawTransaction(render: (ctx: CanvasRenderingContext2D, floorplanner: FloorplanController, floorplan: FloorplanModel) => void) {
-    this.context.save();
-    render(this.context, this.viewmodel, this.floorplan);
-    this.context.restore();
-  }
-
-  public drawLabel(x: number, y: number, text: string) {
-    this.context.font = "normal 12px Arial";
-    this.context.fillStyle = "#000000";
-    this.context.textBaseline = "middle";
-    this.context.textAlign = "center";
-    this.context.strokeStyle = "#ffffff";
-    this.context.lineWidth = 4;
-
-    this.context.strokeText(text,
-      this.viewmodel.convertX(x),
-      this.viewmodel.convertY(y),
-    );
-
-    this.context.fillText(text,
-      this.viewmodel.convertX(x),
-      this.viewmodel.convertY(y),
-    );
+  private drawDemo() {
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+    this.drawBGLabel(width / 4, height / 8, "DEMO MODE");
+    this.drawBGLabel(width / 4, height / 8 + 40, "PLEASE LOGIN");
   }
 }

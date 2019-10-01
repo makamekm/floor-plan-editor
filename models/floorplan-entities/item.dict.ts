@@ -14,4 +14,4 @@ export const ItemNameDict = {
 
 export const ItemArray = [
   ItemEnum.Table,
-]
+];

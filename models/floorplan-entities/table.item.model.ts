@@ -1,7 +1,8 @@
-import { Item } from "./item.model";
 import { Utils } from "../../utils/operations";
-import { FloorplanView } from "../floorplan-view";
 import { FloorplanMode } from "../floorplan-mode.enum";
+import { FloorplanModel } from "../floorplan-model";
+import { FloorplanView } from "../floorplan-view";
+import { Item, ItemMetadata } from "./item.model";
 
 const tableHeight = 60;
 const tableWidth = 30;
@@ -26,29 +27,32 @@ export class TableItem extends Item {
   public isRotating = false;
   public isRotatingHover = false;
 
-  private overlappedRotate(x: number, y: number): boolean {
-    const dist = Utils.pointDistance(this.x, this.y, x, y);
-    return dist > rotateRadius * 2 - rotateLineWidth
-      && dist < rotateRadius * 2 + rotateLineWidth;
+  constructor(
+    floorplan: FloorplanModel,
+    x: number,
+    y: number,
+    metadata: ItemMetadata,
+  ) {
+    super(floorplan, x, y, metadata);
+    this.metadata.height = this.metadata.height || 0;
+    this.metadata.width = this.metadata.width || 0;
   }
 
-  mousedown(x: number, y: number) {
+  public mousedown(x: number, y: number) {
     const isRotating = this.overlappedRotate(x, y);
     if (isRotating !== this.isRotating) {
       this.isRotating = isRotating;
     }
   }
 
-  startActive(): void {
+  public startActive(): void {
     // Skip
-  };
-
-  endActive(): void {
+  }
+  public endActive(): void {
     this.isRotating = false;
     this.isRotatingHover = false;
-  };
-
-  mouseup(x: number, y: number) {
+  }
+  public mouseup(x: number, y: number) {
     if (this.isRotating) {
       this.isRotating = false;
       this.roundAngle();
@@ -56,7 +60,7 @@ export class TableItem extends Item {
     }
   }
 
-  mousemove(
+  public mousemove(
     mouseX: number, mouseY: number,
     lastMouseX: number, lastMouseY: number,
   ) {
@@ -74,15 +78,7 @@ export class TableItem extends Item {
     }
   }
 
-  private getClosestAngle(sens = 5) {
-    return Utils.findClosestAngle(this.metadata.r, [15, 45], sens);
-  }
-
-  private roundAngle() {
-    this.metadata.r = this.getClosestAngle();
-  }
-
-  render(
+  public render(
     x: number,
     y: number,
     hover: boolean,
@@ -141,31 +137,31 @@ export class TableItem extends Item {
     }
   }
 
-  limitText(text: string) {
+  public limitText(text: string) {
     if (text.length > tableTextLimit) {
-      return text.substr(0, tableTextLimit) + '...';
+      return text.substr(0, tableTextLimit) + "...";
     } else {
       return text;
     }
   }
 
-  rotateVector(x: number, y: number, ang: number) {
-    ang = -ang * (Math.PI/180);
+  public rotateVector(x: number, y: number, ang: number) {
+    ang = -ang * (Math.PI / 180);
     const cos = Math.cos(ang);
     const sin = Math.sin(ang);
     return {
       x: (x * cos - y * sin),
       y: (x * sin + y * cos),
-    }
+    };
   }
 
-  overlapped(
+  public overlapped(
     rawX: number,
     rawY: number,
     selected: boolean,
     mode: FloorplanMode,
   ) {
-    let { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
+    const { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
     const sens = 5;
     const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
       && y <= (tableHeight + sens) && y >= (-tableHeight - sens);
@@ -175,5 +171,19 @@ export class TableItem extends Item {
     } else {
       return isMainHover;
     }
+  }
+
+  private overlappedRotate(x: number, y: number): boolean {
+    const dist = Utils.pointDistance(this.x, this.y, x, y);
+    return dist > rotateRadius * 2 - rotateLineWidth
+      && dist < rotateRadius * 2 + rotateLineWidth;
+  }
+
+  private getClosestAngle(sens = 5) {
+    return Utils.findClosestAngle(this.metadata.r, [15, 45], sens);
+  }
+
+  private roundAngle() {
+    this.metadata.r = this.getClosestAngle();
   }
 }

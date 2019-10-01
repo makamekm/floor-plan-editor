@@ -1,12 +1,12 @@
-import { FloorplanView } from "./floorplan-view";
-import { FloorplanModel } from "./floorplan-model";
-import { Corner } from "./floorplan-entities/corner.model";
-import { Wall } from "./floorplan-entities/wall.model";
-import { Callback } from "../utils/callback";
-import { FloorplanMode } from "./floorplan-mode.enum";
-import { Item } from "./floorplan-entities/item.model";
-import { FloorplanDto } from "./floor.dto";
 import debounce from "debounce";
+import { Callback } from "../utils/callback";
+import { FloorplanDto } from "./floor.dto";
+import { Corner } from "./floorplan-entities/corner.model";
+import { Item } from "./floorplan-entities/item.model";
+import { Wall } from "./floorplan-entities/wall.model";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { FloorplanModel } from "./floorplan-model";
+import { FloorplanView } from "./floorplan-view";
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
@@ -16,16 +16,10 @@ const pixelsPerFoot = 15.0;
 const cmPerPixel = cmPerFoot * (1.0 / pixelsPerFoot);
 const pixelsPerCm = 1.0 / cmPerPixel;
 
-/** 
+/**
  * The FloorplanController implements an interactive tool for creation of floorplans.
  */
 export class FloorplanController {
-
-  public mode = FloorplanMode.MOVE;
-  public activeWall: Wall | null = null;
-  public activeCorner: Corner | null = null;
-
-  private _activeItemIndex: number | null = null;
   public set activeItem(item: Item) {
     const activeItem = this.activeItem;
     if (item !== activeItem) {
@@ -37,14 +31,18 @@ export class FloorplanController {
       }
     }
     const index = this.floorplan.getItems().indexOf(item);
-    this._activeItemIndex = index >= 0 ? index : null;
-  };
+    this.activeItemIndex = index >= 0 ? index : null;
+  }
 
   public get activeItem() {
-    return this._activeItemIndex != null
-    ? this.floorplan.getItems()[this._activeItemIndex]
+    return this.activeItemIndex != null
+    ? this.floorplan.getItems()[this.activeItemIndex]
     : null;
-  };
+  }
+
+  public mode = FloorplanMode.MOVE;
+  public activeWall: Wall | null = null;
+  public activeCorner: Corner | null = null;
 
   public onModeChange = new Callback<FloorplanMode>();
   public onModelChange = new Callback<{
@@ -52,26 +50,6 @@ export class FloorplanController {
     x: number;
     y: number;
   }>();
-
-  public getModel() {
-    return {
-      x: this.originX,
-      y: this.originY,
-      floorplan: this.floorplan.exportFloorplan(),
-    };
-  }
-
-  public fireChanges() {
-    this.onModelChange.fire({
-      x: this.originX,
-      y: this.originY,
-      floorplan: this.floorplan.exportFloorplan(),
-    });
-  }
-
-  private emitChanges = debounce(() => {
-    this.fireChanges();
-  });
 
   public originX = 0;
   public originY = 0;
@@ -84,6 +62,12 @@ export class FloorplanController {
 
   /** drawing state */
   public lastNode: Corner | null = null;
+
+  private activeItemIndex: number | null = null;
+
+  private emitChanges = debounce(() => {
+    this.fireChanges();
+  });
 
   private view: FloorplanView;
   private mouseDown = false;
@@ -157,6 +141,67 @@ export class FloorplanController {
     floorplan.roomLoadedCallbacks.add(() => {
       this.reset();
     });
+  }
+
+  public getModel() {
+    return {
+      x: this.originX,
+      y: this.originY,
+      floorplan: this.floorplan.exportFloorplan(),
+    };
+  }
+
+  public fireChanges() {
+    this.onModelChange.fire({
+      x: this.originX,
+      y: this.originY,
+      floorplan: this.floorplan.exportFloorplan(),
+    });
+  }
+
+  public draw() {
+    this.view.draw();
+  }
+
+  public reset() {
+    this.resizeView();
+    if (this.mode != null) {
+      this.setMode(FloorplanMode.MOVE);
+    }
+    this.resetOrigin();
+    this.view.draw();
+  }
+
+  public setMode(mode: FloorplanMode) {
+    this.activeWall = null;
+    this.activeCorner = null;
+    this.activeItem = null;
+    this.lastNode = null;
+    this.floorplan.setSelectedItem(null, true);
+    this.mode = mode;
+    this.updateTarget();
+    this.onModeChange.fire(mode);
+    this.view.draw();
+  }
+
+  /** Gets the center of the view */
+  public getCenter() {
+    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
+    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
+    return {
+      x: (this.originX + centerX) * cmPerPixel,
+      y: (this.originY + centerY) * cmPerPixel,
+    };
+  }
+
+  /** Convert from THREEjs coords to canvas coords. */
+  public convertX(x: number): number {
+    return (x - this.originX * cmPerPixel) * pixelsPerCm;
+  }
+
+  /** Convert from THREEjs coords to canvas coords. */
+  public convertY(y: number): number {
+    return (y - this.originY * cmPerPixel) * pixelsPerCm;
   }
 
   private escapeKey() {
@@ -295,7 +340,7 @@ export class FloorplanController {
         if (this.activeItem) {
           this.activeItem.relativeMove(
             this.mouseX - this.lastX,
-            this.mouseY - this.lastY
+            this.mouseY - this.lastY,
           );
           this.emitChanges();
         } else if (this.activeCorner) {
@@ -306,7 +351,7 @@ export class FloorplanController {
         } else if (this.activeWall) {
           this.activeWall.relativeMove(
             this.mouseX - this.lastX,
-            this.mouseY - this.lastY
+            this.mouseY - this.lastY,
           );
           this.activeWall.snapToAxis(snapTolerance);
           this.checkWallDuplicates();
@@ -331,7 +376,7 @@ export class FloorplanController {
       if (selectedItem.mouseup(this.mouseX, this.mouseY, this.mode)) {
         this.view.draw();
         this.emitChanges();
-      };
+      }
     }
 
     // drawing
@@ -387,36 +432,11 @@ export class FloorplanController {
     this.activeWall = null;
     this.activeItem = null;
     this.view.draw();
-    //scope.setMode(scope.modes.MOVE);
-  }
-
-  public draw() {
-    this.view.draw();
-  }
-
-  public reset() {
-    this.resizeView();
-    if (this.mode != null) {
-      this.setMode(FloorplanMode.MOVE);
-    }
-    this.resetOrigin();
-    this.view.draw();
+    // scope.setMode(scope.modes.MOVE);
   }
 
   private resizeView() {
     this.view.handleWindowResize();
-  }
-
-  public setMode(mode: FloorplanMode) {
-    this.activeWall = null;
-    this.activeCorner = null;
-    this.activeItem = null;
-    this.lastNode = null;
-    this.floorplan.setSelectedItem(null, true);
-    this.mode = mode;
-    this.updateTarget();
-    this.onModeChange.fire(mode);
-    this.view.draw();
   }
 
   /** Sets the origin so that floorplan is centered */
@@ -426,25 +446,5 @@ export class FloorplanController {
     const centerFloorplan = this.floorplan.getCenter();
     this.originX = centerFloorplan.x * pixelsPerCm - centerX;
     this.originY = centerFloorplan.z * pixelsPerCm - centerY;
-  }
-
-  /** Gets the center of the view */
-  public getCenter() {
-    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
-    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
-    return {
-      x: (this.originX + centerX) * cmPerPixel,
-      y: (this.originY + centerY) * cmPerPixel,
-    };
-  }
-
-  /** Convert from THREEjs coords to canvas coords. */
-  public convertX(x: number): number {
-    return (x - this.originX * cmPerPixel) * pixelsPerCm;
-  }
-
-  /** Convert from THREEjs coords to canvas coords. */
-  public convertY(y: number): number {
-    return (y - this.originY * cmPerPixel) * pixelsPerCm;
   }
 }

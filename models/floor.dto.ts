@@ -1,16 +1,16 @@
-import { ProjectListItemDto } from "./project-list.dto";
+import { ItemEnum } from "./floorplan-entities/item.enum";
 
 export interface FloorplanDto {
   corners: {
     [id: string]: {
       x: number;
       y: number;
-    }
+    },
   };
-  walls: {
+  walls: Array<{
     corner1: string;
     corner2: string;
-  }[];
+  }>;
   items: FloorplanItemDto[];
 }
 
@@ -18,10 +18,12 @@ export interface FloorplanItemDto {
   id: number | string;
   name: string;
   description: string;
-  type: number;
+  type: ItemEnum;
   x: number;
   y: number;
   r: number;
+  height: number;
+  width: number;
 }
 
 export interface FloorplanDataDto {

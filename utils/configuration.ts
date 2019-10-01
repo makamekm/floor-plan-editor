@@ -1,4 +1,4 @@
-import { dimMeter, dimInch, dimMilliMeter, dimCentiMeter } from "./dimensioning";
+import { dimCentiMeter, dimInch, dimMeter, dimMilliMeter } from "./dimensioning";
 
 // GENERAL:
 
@@ -39,20 +39,6 @@ export const configWallThickness = "wallThickness";
 
 /** Global configuration to customize the whole system.  */
 export class Configuration {
-  /** Configuration data loaded from/stored to extern. */
-  private static data: {[key: string]: any} = {
-    [configApiKey]: 'AIzaSyASRwAqeD-9Fdo6m0VsDaN4GznhZ4ygfRU',
-    [configAuthDomain]: 'localhost',
-    [configDatabaseURL]: 'https://floorplan-makamekm.firebaseio.com',
-    [configProjectId]: 'floorplan-makamekm',
-    [configStorageBucket]: 'floorplan-makamekm.appspot.com',
-    [configMessagingSenderId]: '960620520456',
-    [configAppId]: '1:960620520456:web:9a31aa6aa8ed2966479dbd',
-    [configMeasurementId]: 'G-84Z0YDFX18',
-    [configDimUnit]: dimMeter,
-    [configWallThickness]: 14,
-    [configDpr]: process.browser ? (window.devicePixelRatio || 1) : 1,
-  };
 
   /** Set a configuration parameter. */
   public static setValue(key: string, value: string | number) {
@@ -71,7 +57,7 @@ export class Configuration {
       case configAppId:
       case configMeasurementId:
       case configDimUnit:
-        return <string>this.data[key];
+        return this.data[key] as string;
       default:
         throw new Error("Invalid string configuration parameter: " + key);
     }
@@ -82,7 +68,7 @@ export class Configuration {
     switch (key) {
       case configDpr:
       case configWallThickness:
-        return <number>this.data[key];
+        return this.data[key] as number;
       default:
         throw new Error("Invalid numeric configuration parameter: " + key);
     }
@@ -108,4 +94,18 @@ export class Configuration {
         return "" + Math.round(10 * cm) / 1000 + " m";
     }
   }
+  /** Configuration data loaded from/stored to extern. */
+  private static data: {[key: string]: any} = {
+    [configApiKey]: "AIzaSyASRwAqeD-9Fdo6m0VsDaN4GznhZ4ygfRU",
+    [configAuthDomain]: "localhost",
+    [configDatabaseURL]: "https://floorplan-makamekm.firebaseio.com",
+    [configProjectId]: "floorplan-makamekm",
+    [configStorageBucket]: "floorplan-makamekm.appspot.com",
+    [configMessagingSenderId]: "960620520456",
+    [configAppId]: "1:960620520456:web:9a31aa6aa8ed2966479dbd",
+    [configMeasurementId]: "G-84Z0YDFX18",
+    [configDimUnit]: dimMeter,
+    [configWallThickness]: 14,
+    [configDpr]: process.browser ? (window.devicePixelRatio || 1) : 1,
+  };
 }

@@ -1,6 +1,6 @@
-import { Wall } from "./wall.model";
-import { FloorplanModel } from "../floorplan-model";
 import { Utils } from "../../utils/operations";
+import { FloorplanModel } from "../floorplan-model";
+import { Wall } from "./wall.model";
 
 const cornerTolerance: number = 20;
 
@@ -15,13 +15,13 @@ export class Corner {
   /** Array of end walls. */
   private wallEnds: Wall[] = [];
 
-  /** Constructs a corner. 
+  /** Constructs a corner.
    * @param floorplan The associated floorplan.
    * @param x X coordinate.
    * @param y Y coordinate.
    * @param id An optional unique id. If not set, created internally.
    */
-  constructor(private floorplan: FloorplanModel, public x: number, public y: number, public id: string = '') {
+  constructor(private floorplan: FloorplanModel, public x: number, public y: number, public id: string = "") {
     this.id = id || Utils.guid();
   }
 
@@ -29,7 +29,7 @@ export class Corner {
     // try to snap this corner to an axis
     const snapped = {
       x: false,
-      y: false
+      y: false,
     };
 
     this.adjacentCorners().forEach((corner) => {
@@ -60,9 +60,10 @@ export class Corner {
 
   /** Removes all walls. */
   public removeAll() {
-    let wall: Wall;
-    while (wall = this.wallStarts[0] || this.wallEnds[0]) {
+    let wall = this.wallStarts[0];
+    while (wall || this.wallEnds[0]) {
       wall.remove();
+      wall = this.wallStarts[0];
     }
     this.remove();
   }
@@ -82,39 +83,21 @@ export class Corner {
    */
   public adjacentCorners(): Corner[] {
     const retArray = [];
-    for (let i = 0; i < this.wallStarts.length; i++) {
-      retArray.push(this.wallStarts[i].getEnd());
+    for (const wall of this.wallStarts) {
+      retArray.push(wall.getEnd());
     }
-    for (let i = 0; i < this.wallEnds.length; i++) {
-      retArray.push(this.wallEnds[i].getStart());
+    for (const wall of this.wallEnds) {
+      retArray.push(wall.getStart());
     }
     return retArray;
   }
 
-  /** Checks if a wall is connected.
-   * @param wall A wall.
-   * @returns True in case of connection.
-   */
-  private isWallConnected(wall: Wall): boolean {
-    for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i] == wall) {
-        return true;
-      }
-    }
-    for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i] == wall) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
-   * 
+   *
    */
   public distanceFrom(x: number, y: number): number {
     const distance = Utils.distance(x, y, this.x, this.y);
-    //console.log('x,y ' + x + ',' + y + ' to ' + this.getX() + ',' + this.getY() + ' is ' + distance);
+    // console.log('x,y ' + x + ',' + y + ' to ' + this.getX() + ',' + this.getY() + ' is ' + distance);
     return distance;
   }
 
@@ -140,7 +123,7 @@ export class Corner {
   public detachWall(wall: Wall) {
     Utils.removeValue(this.wallStarts, wall);
     Utils.removeValue(this.wallEnds, wall);
-    if (this.wallStarts.length == 0 && this.wallEnds.length == 0) {
+    if (this.wallStarts.length === 0 && this.wallEnds.length === 0) {
       this.remove();
     }
   }
@@ -149,14 +132,14 @@ export class Corner {
    * @param wall A wall.
    */
   public attachStart(wall: Wall) {
-    this.wallStarts.push(wall)
+    this.wallStarts.push(wall);
   }
 
   /** Attaches an end wall.
    * @param wall A wall.
    */
   public attachEnd(wall: Wall) {
-    this.wallEnds.push(wall)
+    this.wallEnds.push(wall);
   }
 
   /** Get wall to corner.
@@ -164,9 +147,9 @@ export class Corner {
    * @return The associated wall or null.
    */
   public wallTo(corner: Corner): Wall | null {
-    for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i].getEnd() === corner) {
-        return this.wallStarts[i];
+    for (const wall of this.wallStarts) {
+      if (wall.getEnd() === corner) {
+        return wall;
       }
     }
     return null;
@@ -177,9 +160,9 @@ export class Corner {
    * @return The associated wall or null.
    */
   public wallFrom(corner: Corner): Wall | null {
-    for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i].getStart() === corner) {
-        return this.wallEnds[i];
+    for (const wall of this.wallEnds) {
+      if (wall.getStart() === corner) {
+        return wall;
       }
     }
     return null;
@@ -191,6 +174,51 @@ export class Corner {
    */
   public wallToOrFrom(corner: Corner): Wall | null {
     return this.wallTo(corner) || this.wallFrom(corner);
+  }
+
+  public mergeWithIntersected(): boolean {
+    // check corners
+    for (const corner of this.floorplan.getCorners()) {
+      if (this.distanceFromCorner(corner) < cornerTolerance && corner !== this) {
+        this.combineWithCorner(corner);
+        return true;
+      }
+    }
+    // check walls
+    for (const wall of this.floorplan.getWalls()) {
+      if (this.distanceFromWall(wall) < cornerTolerance && !this.isWallConnected(wall)) {
+        // update position to be on wall
+        const intersection = Utils.closestPointOnLine(this.x, this.y,
+          wall.getStart().x, wall.getStart().y,
+          wall.getEnd().x, wall.getEnd().y);
+        this.x = intersection.x;
+        this.y = intersection.y;
+        // merge this corner into wall by breaking wall into two parts
+        this.floorplan.newWall(this, wall.getEnd());
+        wall.setEnd(this);
+        this.floorplan.update();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Checks if a wall is connected.
+   * @param wall A wall.
+   * @returns True in case of connection.
+   */
+  private isWallConnected(wall: Wall): boolean {
+    for (const wallStart of this.wallStarts) {
+      if (wallStart === wall) {
+        return true;
+      }
+    }
+    for (const wallEnd of this.wallEnds) {
+      if (wallEnd === wall) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private combineWithCorner(corner: Corner) {
@@ -210,60 +238,31 @@ export class Corner {
     this.floorplan.update();
   }
 
-  public mergeWithIntersected(): boolean {
-    // check corners
-    for (let i = 0; i < this.floorplan.getCorners().length; i++) {
-      const corner = this.floorplan.getCorners()[i];
-      if (this.distanceFromCorner(corner) < cornerTolerance && corner != this) {
-        this.combineWithCorner(corner);
-        return true;
-      }
-    }
-    // check walls
-    for (let i = 0; i < this.floorplan.getWalls().length; i++) {
-      const wall = this.floorplan.getWalls()[i];
-      if (this.distanceFromWall(wall) < cornerTolerance && !this.isWallConnected(wall)) {
-        // update position to be on wall
-        const intersection = Utils.closestPointOnLine(this.x, this.y,
-          wall.getStart().x, wall.getStart().y,
-          wall.getEnd().x, wall.getEnd().y);
-        this.x = intersection.x;
-        this.y = intersection.y;
-        // merge this corner into wall by breaking wall into two parts
-        this.floorplan.newWall(this, wall.getEnd());
-        wall.setEnd(this);
-        this.floorplan.update();
-        return true;
-      }
-    }
-    return false;
-  }
-
   /** Ensure we do not have duplicate walls (i.e. same start and end points) */
   private removeDuplicateWalls() {
     // delete the wall between these corners, if it exists
-    const wallEndpoints: { [key: string]: boolean } = {};
-    const wallStartpoints: { [key: string]: boolean } = {};
+    const wallEndPoints: { [key: string]: boolean } = {};
+    const wallStartPoints: { [key: string]: boolean } = {};
     for (let i = this.wallStarts.length - 1; i >= 0; i--) {
       if (this.wallStarts[i].getEnd() === this) {
-        // remove zero length wall 
+        // remove zero length wall
         this.wallStarts[i].remove();
-      } else if (this.wallStarts[i].getEnd().id in wallEndpoints) {
+      } else if (this.wallStarts[i].getEnd().id in wallEndPoints) {
         // remove duplicated wall
         this.wallStarts[i].remove();
       } else {
-        wallEndpoints[this.wallStarts[i].getEnd().id] = true;
+        wallEndPoints[this.wallStarts[i].getEnd().id] = true;
       }
     }
     for (let i = this.wallEnds.length - 1; i >= 0; i--) {
       if (this.wallEnds[i].getStart() === this) {
-        // removed zero length wall 
+        // removed zero length wall
         this.wallEnds[i].remove();
-      } else if (this.wallEnds[i].getStart().id in wallStartpoints) {
+      } else if (this.wallEnds[i].getStart().id in wallStartPoints) {
         // removed duplicated wall
         this.wallEnds[i].remove();
       } else {
-        wallStartpoints[this.wallEnds[i].getStart().id] = true;
+        wallStartPoints[this.wallEnds[i].getStart().id] = true;
       }
     }
   }

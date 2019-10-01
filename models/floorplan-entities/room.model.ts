@@ -1,18 +1,18 @@
-import { Corner } from "./corner.model";
-import { Shape, Vector2, Mesh, ShapeGeometry, MeshBasicMaterial, DoubleSide } from "three";
-import { HalfEdge } from "./half-edge.model";
+import { DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } from "three";
 import { Callback } from "../../utils/callback";
+import { Corner } from "./corner.model";
+import { HalfEdge } from "./half-edge.model";
 
-/** 
- * A Room is the combination of a Floorplan with a floor plane. 
+/**
+ * A Room is the combination of a Floorplan with a floor plane.
  */
 export class Room {
 
   public interiorCorners: Vector2[] = [];
-  private edgePointer: HalfEdge = null;
 
   /** floor plane for intersection testing */
   public floorPlane: Mesh = null;
+  private edgePointer: HalfEdge = null;
 
   private floorChangeCallbacks = new Callback();
 
@@ -44,7 +44,7 @@ export class Room {
       }));
     this.floorPlane.visible = false;
     this.floorPlane.rotation.set(Math.PI / 2, 0, 0);
-    (<any>this.floorPlane).room = this; // js monkey patch
+    (this.floorPlane as any).room = this; // js monkey patch
   }
 
   private updateInteriorCorners() {
@@ -60,7 +60,7 @@ export class Room {
     }
   }
 
-  /** 
+  /**
    * Populates each wall's half edge relating to this room
    * this creates a fancy doubly connected edge list (DCEL)
    */
@@ -84,15 +84,16 @@ export class Room {
         edge = new HalfEdge(wallFrom, false);
       } else {
         // something horrible has happened
-        console.log("corners arent connected by a wall, uh oh");
+        // tslint:disable-next-line
+        console.error("Corners aren't connected by a wall, uh oh");
       }
 
-      if (i == 0) {
+      if (i === 0) {
         firstEdge = edge;
       } else {
         edge.prev = prevEdge;
         prevEdge.next = edge;
-        if (i + 1 == this.corners.length) {
+        if (i + 1 === this.corners.length) {
           firstEdge.prev = edge;
           edge.next = firstEdge;
         }

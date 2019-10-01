@@ -1,27 +1,39 @@
-import { Wall } from "./floorplan-entities/wall.model";
-import { Corner } from "./floorplan-entities/corner.model";
-import { Room } from "./floorplan-entities/room.model";
-import { Callback } from "../utils/callback";
-import { HalfEdge } from "./floorplan-entities/half-edge.model";
 import { Mesh, Vector3 } from "three";
+import { Callback } from "../utils/callback";
 import { Utils } from "../utils/operations";
 import { FloorplanDto } from "./floor.dto";
-import { Item, ItemMetadata } from "./floorplan-entities/item.model";
+import { Corner } from "./floorplan-entities/corner.model";
+import { HalfEdge } from "./floorplan-entities/half-edge.model";
 import { ItemDict } from "./floorplan-entities/item.dict";
+import { Item, ItemMetadata } from "./floorplan-entities/item.model";
+import { Room } from "./floorplan-entities/room.model";
+import { Wall } from "./floorplan-entities/wall.model";
 import { FloorplanMode } from "./floorplan-mode.enum";
 
 const defaultFloorPlanTolerance = 10.0;
 
-/** 
+/**
  * A Floorplan represents a number of Walls, Corners and Rooms.
  */
 export class FloorplanModel {
+
+  public onSelectedItemChange = new Callback<number>();
+  public roomLoadedCallbacks = new Callback();
 
   private walls: Wall[] = [];
   private corners: Corner[] = [];
   private rooms: Room[] = [];
   private items: Item[] = [];
   private selectedItemIndex: number | null = null;
+  private demo = false;
+
+  public setDemoMode(value: boolean) {
+    this.demo = value;
+  }
+
+  public getDemoMode() {
+    return this.demo;
+  }
 
   public setSelectedItem(value: Item | null, fire = false) {
     let index = this.items.indexOf(value);
@@ -37,9 +49,6 @@ export class FloorplanModel {
       ? this.items[this.selectedItemIndex]
       : null;
   }
-
-  public onSelectedItemChange = new Callback<number>();
-  public roomLoadedCallbacks = new Callback();
 
   // hack
   public wallEdges(): HalfEdge[] {
@@ -121,7 +130,7 @@ export class FloorplanModel {
    * @returns The new item.
    */
   public newItem(x: number, y: number, metadata: ItemMetadata): Item {
-    const item = new (<any>ItemDict[metadata.type])(this, x, y, metadata);
+    const item = new (ItemDict[metadata.type] as any)(this, x, y, metadata);
     this.items.push(item);
     return item;
   }
@@ -158,14 +167,14 @@ export class FloorplanModel {
   }
 
   public overlappedItem(x: number, y: number, mode: FloorplanMode): Item {
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].overlapped(
+    for (const item of this.items) {
+      if (item.overlapped(
         x,
         y,
-        this.getSelectedItem() === this.items[i],
+        this.getSelectedItem() === item,
         mode,
       )) {
-        return this.items[i];
+        return item;
       }
     }
     return null;
@@ -173,9 +182,9 @@ export class FloorplanModel {
 
   public overlappedCorner(x: number, y: number, tolerance?: number): Corner {
     tolerance = tolerance || defaultFloorPlanTolerance;
-    for (let i = 0; i < this.corners.length; i++) {
-      if (this.corners[i].distanceFrom(x, y) < tolerance) {
-        return this.corners[i];
+    for (const corner of this.corners) {
+      if (corner.distanceFrom(x, y) < tolerance) {
+        return corner;
       }
     }
     return null;
@@ -183,9 +192,9 @@ export class FloorplanModel {
 
   public overlappedWall(x: number, y: number, tolerance?: number): Wall {
     tolerance = tolerance || defaultFloorPlanTolerance;
-    for (let i = 0; i < this.walls.length; i++) {
-      if (this.walls[i].distanceFrom(x, y) < tolerance) {
-        return this.walls[i];
+    for (const wall of this.walls) {
+      if (wall.distanceFrom(x, y) < tolerance) {
+        return wall;
       }
     }
     return null;
@@ -196,12 +205,12 @@ export class FloorplanModel {
       corners: {},
       walls: [],
       items: [],
-    }
+    };
 
     this.corners.forEach((corner) => {
       floorplan.corners[corner.id] = {
         x: corner.x,
-        y: corner.y
+        y: corner.y,
       };
     });
 
@@ -221,6 +230,8 @@ export class FloorplanModel {
         description: item.metadata.description,
         name: item.metadata.name,
         type: item.metadata.type,
+        height: item.metadata.height,
+        width: item.metadata.width,
       });
     });
 
@@ -236,14 +247,14 @@ export class FloorplanModel {
       [id: string]: Corner;
     } = {};
 
-    for (const id in floorplan.corners) {
+    for (const id of Object.keys(floorplan.corners)) {
       const corner = floorplan.corners[id];
       corners[id] = this.newCorner(corner.x, corner.y, id);
     }
 
     floorplan.walls.forEach((wall) => {
       this.newWall(
-        corners[wall.corner1], corners[wall.corner2]
+        corners[wall.corner1], corners[wall.corner2],
       );
     });
 
@@ -257,6 +268,8 @@ export class FloorplanModel {
           name: item.name,
           type: item.type,
           r: item.r,
+          height: item.height,
+          width: item.width,
         },
       );
     });
@@ -275,19 +288,19 @@ export class FloorplanModel {
     const tmpItems = this.items.slice(0);
     tmpCorners.forEach((corner) => {
       corner.remove();
-    })
+    });
     tmpWalls.forEach((wall) => {
       wall.remove();
-    })
+    });
     tmpItems.forEach((item) => {
       item.remove();
-    })
+    });
     this.corners = [];
     this.walls = [];
     this.items = [];
   }
 
-  /** 
+  /**
    * Update rooms
    */
   public update() {
@@ -304,7 +317,7 @@ export class FloorplanModel {
     this.assignOrphanEdges();
   }
 
-  /** 
+  /**
    * Returns the center of the floorplan in the y plane
    */
   public getCenter() {
@@ -323,14 +336,14 @@ export class FloorplanModel {
     let zMin = Infinity;
     let zMax = -Infinity;
     this.corners.forEach((corner) => {
-      if (corner.x < xMin) xMin = corner.x;
-      if (corner.x > xMax) xMax = corner.x;
-      if (corner.y < zMin) zMin = corner.y;
-      if (corner.y > zMax) zMax = corner.y;
+      if (corner.x < xMin) { xMin = corner.x; }
+      if (corner.x > xMax) { xMax = corner.x; }
+      if (corner.y < zMin) { zMin = corner.y; }
+      if (corner.y > zMax) { zMax = corner.y; }
     });
 
     let ret;
-    if (xMin == Infinity || xMax == -Infinity || zMin == Infinity || zMax == -Infinity) {
+    if (xMin === Infinity || xMax === -Infinity || zMin === Infinity || zMax === -Infinity) {
       ret = new Vector3();
     } else {
       if (center) {
@@ -342,23 +355,6 @@ export class FloorplanModel {
       }
     }
     return ret;
-  }
-
-  private assignOrphanEdges() {
-    // kinda hacky
-    // find orphaned wall segments (i.e. not part of rooms) and
-    // give them edges
-    const orphanWalls = []
-    this.walls.forEach(wall => {
-      if (!wall.backEdge && !wall.frontEdge) {
-        wall.orphan = true;
-        const back = new HalfEdge(wall, false);
-        back.generatePlane();
-        const front = new HalfEdge(wall, true);
-        front.generatePlane();
-        orphanWalls.push(wall);
-      }
-    });
   }
 
   /*
@@ -381,35 +377,34 @@ export class FloorplanModel {
     // remove duplicates
     const uniqueLoops = this.removeDuplicateRooms(loops);
 
-    //remove CW loops
-    const uniqueCCWLoops = uniqueLoops.filter(i => !Utils.isClockwise(i));
+    // remove CW loops
+    const uniqueCCWLoops = uniqueLoops.filter((i) => !Utils.isClockwise(i));
 
     return uniqueCCWLoops;
   }
 
-  calculateTheta(previousCorner: Corner, currentCorner: Corner, nextCorner: Corner) {
+  public calculateTheta(previousCorner: Corner, currentCorner: Corner, nextCorner: Corner) {
     const theta = Utils.angle2pi(
       previousCorner.x - currentCorner.x,
       previousCorner.y - currentCorner.y,
       nextCorner.x - currentCorner.x,
-      nextCorner.y - currentCorner.y
+      nextCorner.y - currentCorner.y,
     );
     return theta;
   }
 
-  removeDuplicateRooms(roomArray: Corner[][]): Corner[][] {
+  public removeDuplicateRooms(roomArray: Corner[][]): Corner[][] {
     const results: Corner[][] = [];
     const lookup: {
       [id: string]: boolean;
     } = {};
     const hashFunc = (corner: Corner) => {
-      return corner.id
+      return corner.id;
     };
-    const sep = '-';
-    for (let i = 0; i < roomArray.length; i++) {
+    const sep = "-";
+    for (const room of roomArray) {
       // rooms are cycles, shift it around to check uniqueness
       let add = true;
-      const room = roomArray[i];
       let str: string;
       for (let j = 0; j < room.length; j++) {
         const roomShift = Utils.cycle(room, j);
@@ -419,22 +414,22 @@ export class FloorplanModel {
         }
       }
       if (add && str) {
-        results.push(roomArray[i]);
+        results.push(room);
         lookup[str] = true;
       }
     }
     return results;
   }
 
-  findTightestCycle(firstCorner: Corner, secondCorner: Corner): Corner[] {
-    const stack: {
+  public findTightestCycle(firstCorner: Corner, secondCorner: Corner): Corner[] {
+    const stack: Array<{
       corner: Corner,
-      previousCorners: Corner[]
-    }[] = [];
+      previousCorners: Corner[],
+    }> = [];
 
     let next = {
       corner: secondCorner,
-      previousCorners: [firstCorner]
+      previousCorners: [firstCorner],
     };
     const visited: {
       [id: string]: boolean;
@@ -453,9 +448,7 @@ export class FloorplanModel {
 
       const addToStack: Corner[] = [];
       const adjacentCorners = next.corner.adjacentCorners();
-      for (let i = 0; i < adjacentCorners.length; i++) {
-        const nextCorner = adjacentCorners[i];
-
+      for (const nextCorner of adjacentCorners) {
         // is this where we came from?
         // give an exception if its the first corner and we aren't at the second corner
         if (nextCorner.id in visited &&
@@ -463,7 +456,7 @@ export class FloorplanModel {
           continue;
         }
 
-        // nope, throw it on the queue  
+        // nope, throw it on the queue
         addToStack.push(nextCorner);
       }
 
@@ -482,8 +475,8 @@ export class FloorplanModel {
         // add to the stack
         addToStack.forEach((corner) => {
           stack.push({
-            corner: corner,
-            previousCorners: previousCorners
+            corner,
+            previousCorners,
           });
         });
       }
@@ -492,5 +485,22 @@ export class FloorplanModel {
       next = stack.pop();
     }
     return [];
+  }
+
+  private assignOrphanEdges() {
+    // kinda hacky
+    // find orphaned wall segments (i.e. not part of rooms) and
+    // give them edges
+    const orphanWalls = [];
+    this.walls.forEach((wall) => {
+      if (!wall.backEdge && !wall.frontEdge) {
+        wall.orphan = true;
+        const back = new HalfEdge(wall, false);
+        back.generatePlane();
+        const front = new HalfEdge(wall, true);
+        front.generatePlane();
+        orphanWalls.push(wall);
+      }
+    });
   }
 }

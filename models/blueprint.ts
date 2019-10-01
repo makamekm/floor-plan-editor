@@ -1,16 +1,13 @@
-import { FloorplanController } from "./floorplan-controller";
 import { Callback } from "../utils/callback";
-import { FloorplanDto } from "./floor.dto";
-import { FloorplanMode } from "./floorplan-mode.enum";
-import { ItemEnum } from "./floorplan-entities/item.enum";
-import { FloorplanModel } from "./floorplan-model";
 import { Utils } from "../utils/operations";
+import { FloorplanDto } from "./floor.dto";
+import { FloorplanController } from "./floorplan-controller";
+import { ItemEnum } from "./floorplan-entities/item.enum";
+import { FloorplanMode } from "./floorplan-mode.enum";
+import { FloorplanModel } from "./floorplan-model";
 
 /** Blueprint core application. */
 export class Blueprint {
-
-  private floorplanner: FloorplanController;
-  private floorplan: FloorplanModel;
 
   public onModeChange = new Callback<string>();
   public onSelectedItemChange = new Callback<number>();
@@ -20,31 +17,34 @@ export class Blueprint {
     y: number;
   }>();
 
+  private floorplanner: FloorplanController;
+  private floorplan: FloorplanModel;
+
   /** Creates an instance.
    */
   constructor(canvas: HTMLCanvasElement) {
     this.floorplan = new FloorplanModel();
     this.floorplanner = new FloorplanController(canvas, this.floorplan);
 
-    this.floorplanner.onModeChange.add(mode => {
+    this.floorplanner.onModeChange.add((mode) => {
       switch (mode) {
         case FloorplanMode.MOVE:
-          this.onModeChange.fire('move');
+          this.onModeChange.fire("move");
           break;
         case FloorplanMode.DRAW:
-          this.onModeChange.fire('draw');
+          this.onModeChange.fire("draw");
           break;
         case FloorplanMode.DELETE:
-          this.onModeChange.fire('delete');
+          this.onModeChange.fire("delete");
           break;
       }
     });
 
-    this.floorplanner.onModelChange.add(model => {
+    this.floorplanner.onModelChange.add((model) => {
       this.onModelChange.fire(model);
     });
 
-    this.floorplan.onSelectedItemChange.add(index => {
+    this.floorplan.onSelectedItemChange.add((index) => {
       this.onSelectedItemChange.fire(index);
     });
   }
@@ -74,19 +74,24 @@ export class Blueprint {
 
   public changeMode(mode: string) {
     switch (mode) {
-      case 'read':
+      case "read":
         this.floorplanner.setMode(null);
         break;
-      case 'move':
+      case "move":
         this.floorplanner.setMode(FloorplanMode.MOVE);
         break;
-      case 'draw':
+      case "draw":
         this.floorplanner.setMode(FloorplanMode.DRAW);
         break;
-      case 'delete':
+      case "delete":
         this.floorplanner.setMode(FloorplanMode.DELETE);
         break;
     }
+  }
+
+  public setDemoMode(value: boolean) {
+    this.floorplan.setDemoMode(value);
+    this.floorplanner.draw();
   }
 
   public addItem(type: ItemEnum) {
@@ -96,11 +101,13 @@ export class Blueprint {
       y,
       {
         id: Utils.guid(),
-        description: '',
-        name: '',
+        description: "",
+        name: "",
         type,
         r: 0,
-      }
+        height: 0,
+        width: 0,
+      },
     );
     this.floorplanner.fireChanges();
     this.floorplanner.draw();

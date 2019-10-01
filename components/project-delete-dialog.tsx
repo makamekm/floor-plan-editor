@@ -3,8 +3,8 @@ import { useObservable } from "mobx-react-lite";
 import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
-import List from "./list";
 import WindowPanel from "./window-panel";
+import ListItem from "./list-item";
 
 const ProjectDeleteDialog = ({
   children,
@@ -31,27 +31,15 @@ const ProjectDeleteDialog = ({
     <WindowPanel
       active={data.isOpen}
       onClickOutside={onClickOutside}>
-      <List borderRadius="5px">
-        {
-          [
-            {
-              key: "header",
-              body: "Delete Project",
-              isHeader: true,
-            },
-            {
-              key: "description",
-              body: "The project will be removed completely and the changes can't be reverted",
-            },
-            {
-              key: "action",
-              body: "Yes, Remove",
-              onClick: onDeleteProject,
-              isClickable: true,
-            },
-          ]
-        }
-      </List>
+      <ListItem isHeader borderRadius="5px">
+        Delete Project
+      </ListItem>
+      <ListItem borderRadius="5px">
+        The project will be removed completely and the changes can't be reverted
+      </ListItem>
+      <ListItem borderRadius="5px" onClick={onDeleteProject}>
+        Yes, Remove
+      </ListItem>
     </WindowPanel>
   </>;
 };

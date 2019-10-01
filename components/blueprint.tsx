@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { useObservable } from "mobx-react-lite";
-import React, { memo, useEffect, useRef } from "react";
+import React, { memo, useEffect, useRef, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import Sidebar from "react-sidebar";
 import { Blueprint } from "../models/blueprint";
@@ -10,9 +10,9 @@ import { BlueprintService } from "../services/blueprint.service";
 import FloorPanel from "./floor-panel";
 import InlineTextEdit from "./inline-text-edit";
 import InlineTextareaEdit from "./inline-textarea-edit";
-import List from "./list";
 import Panel from "./panel";
 import ToggleButtonType from "./toggle-type";
+import ListItem from "./list-item";
 
 const itemTypeList = [
   {
@@ -42,6 +42,11 @@ const BlueprintView = () => {
     };
   }, []);
 
+  const onAddItem = useCallback((key: ItemEnum) => {
+    blueprintService.addItem(key);
+    isToolbarOpen.value = false;
+  }, []);
+
   return (
     <Sidebar
       pullRight
@@ -59,16 +64,14 @@ const BlueprintView = () => {
       open={isToolbarOpen.value}
       onSetOpen={(open: boolean) => isToolbarOpen.value = open}
       sidebar={
-        <List onClick={(item) => {
-          blueprintService.addItem(item.key as ItemEnum);
-          isToolbarOpen.value = false;
-        }}>
-          {ItemArray.map((key) => ({
-            key,
-            body: (<>+ &nbsp;{ItemNameDict[key]}</>),
-            isClickable: true,
-          }))}
-        </List>
+        <>
+          {ItemArray.map((key) => <ListItem
+            key={key}
+            metadata={key}
+            onClick={onAddItem}>
+            + &nbsp;{ItemNameDict[key]}
+          </ListItem>)}
+        </>
       }
     >
       <div className="view">
@@ -87,64 +90,46 @@ const BlueprintView = () => {
         <div className="items-panel">
           <Panel>
             <div className="list-overflow">
-              <List borderRadius="5px" onClick={(item) => {
-                blueprintService.addItem(item.key as ItemEnum);
-              }}>
-                {ItemArray.map((item) => ({
-                  key: item,
-                  body: (<>+ &nbsp;{ItemNameDict[item]}</>),
-                  isClickable: true,
-                }))}
-              </List>
+              {ItemArray.map((key) => <ListItem
+                key={key}
+                borderRadius="5px"
+                metadata={key}
+                onClick={onAddItem}>
+                + &nbsp;{ItemNameDict[key]}
+              </ListItem>)}
             </div>
           </Panel>
         </div>
 
         <div className="property-panel">
           {blueprintService.selected ? <Panel>
-            <List borderRadius="5px">
-              {[
-                {
-                  key: "header",
-                  body: ItemNameDict[blueprintService.selected.type as ItemEnum],
-                  isHeader: true,
-                },
-                {
-                  key: "name",
-                  body: (
-                    <InlineTextEdit
-                      placeholder="Write Name..."
-                      value={blueprintService.selected.name}
-                      onChange={(value) => {
-                        blueprintService.selected.name = value;
-                        blueprintService.applyChanges();
-                      }}
-                    />
-                  ),
-                  isField: true,
-                },
-                {
-                  key: "header-description",
-                  body: "Description",
-                  isHeader: true,
-                },
-                {
-                  key: "description",
-                  body: (
-                    <InlineTextareaEdit
-                      borderRadius="0 0 5px 5px"
-                      placeholder="Write Description..."
-                      value={blueprintService.selected.description}
-                      onChange={(value) => {
-                        blueprintService.selected.description = value;
-                        blueprintService.applyChanges();
-                      }}
-                    />
-                  ),
-                  isField: true,
-                },
-              ]}
-            </List>
+            <ListItem borderRadius="5px" isHeader>
+              {ItemNameDict[blueprintService.selected.type as ItemEnum]}
+            </ListItem>
+            <ListItem borderRadius="5px" isField>
+              <InlineTextEdit
+                placeholder="Write Name..."
+                value={blueprintService.selected.name}
+                onChange={(value) => {
+                  blueprintService.selected.name = value;
+                  blueprintService.applyChanges();
+                }}
+              />
+            </ListItem>
+            <ListItem borderRadius="5px" isHeader>
+              Description
+            </ListItem>
+            <ListItem borderRadius="5px" isField>
+              <InlineTextareaEdit
+                borderRadius="0 0 5px 5px"
+                placeholder="Write Description..."
+                value={blueprintService.selected.description}
+                onChange={(value) => {
+                  blueprintService.selected.description = value;
+                  blueprintService.applyChanges();
+                }}
+              />
+            </ListItem>
           </Panel> : null}
         </div>
 

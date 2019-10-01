@@ -4,9 +4,9 @@ import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
 import { ProjectService } from "../services/project.service";
 import InlineTextEdit from "./inline-text-edit";
-import List from "./list";
 import ProjectDeleteDialog from "./project-delete-dialog";
 import WindowPanel from "./window-panel";
+import ListItem from "./list-item";
 
 const ProjectEditDialog = ({
   children,
@@ -21,7 +21,7 @@ const ProjectEditDialog = ({
     data.isOpen = false;
   }, []);
 
-  const onDeleteProject = useCallback((value: string) => {
+  const onChangeProjectName = useCallback((value: string) => {
     if (value.length > 0) {
       projectService.data.project.name = value;
       projectService.saveProject();
@@ -36,39 +36,24 @@ const ProjectEditDialog = ({
       active={data.isOpen}
       onClickOutside={onClickOutside}>
       <ProjectDeleteDialog>
-        {(open) => <List borderRadius="5px">
-          {
-            [
-              {
-                key: "name-header",
-                body: "Project name",
-                isHeader: true,
-              },
-              {
-                key: "name",
-                body: (
-                  <InlineTextEdit
-                    placeholder="Write project name..."
-                    value={projectName}
-                    onChange={onDeleteProject}
-                  />
-                ),
-                isField: true,
-              },
-              {
-                key: "operations",
-                body: "Operations",
-                isHeader: true,
-              },
-              {
-                key: "delete",
-                body: "Delete",
-                onClick: open,
-                isClickable: true,
-              },
-            ]
-          }
-        </List>}
+        {(open) => <>
+          <ListItem isHeader borderRadius="5px">
+            Project name
+          </ListItem>
+          <ListItem isField borderRadius="5px">
+            <InlineTextEdit
+              placeholder="Write project name..."
+              value={projectName}
+              onChange={onChangeProjectName}
+            />
+          </ListItem>
+          <ListItem isHeader borderRadius="5px">
+            Operations
+          </ListItem>
+          <ListItem borderRadius="5px" onClick={open}>
+            Delete
+          </ListItem>
+        </>}
       </ProjectDeleteDialog>
     </WindowPanel>
   </>;

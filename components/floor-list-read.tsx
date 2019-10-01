@@ -6,8 +6,8 @@ import { FloorListService } from "../services/floor-list.service";
 import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { copyTextToClipboard } from "../utils/clipboard";
-import List, { Item } from "./list";
 import WithIcon from "./with-icon";
+import ListItem from "./list-item";
 
 const FloorListRead = () => {
   const floorService = useInstance(FloorService);
@@ -24,42 +24,25 @@ const FloorListRead = () => {
   }, []);
 
   return <>
-    <List borderRadius="5px">
-      {[
-        {
-          key: "link",
-          body: (
-            <WithIcon icon={CopyIcon}>
-              Copy Public Link
-            </WithIcon>
-          ),
-          onClick: onCopy,
-          isClickable: true,
-          isHidden: floorService.floor.id == null,
-          hasDivider: true,
-        },
-        {
-          key: "projects",
-          body: (
-            <WithIcon icon={BackIcon}>
-              Get Home
-            </WithIcon>
-          ),
-          onClick: onGetHome,
-          isClickable: true,
-        },
-        ...floorListService.list.map<Item<string | number>>(({id, data: {name}}) => {
-          return {
-            key: id,
-            body: name,
-            isClickable: true,
-            onClick: onOpenPublicFloor,
-            isActive: id === floorService.floor.id,
-            metadata: id,
-          };
-        }),
-      ]}
-    </List>
+    <ListItem borderRadius="5px" onClick={onCopy} isHidden={floorService.floor.id == null}>
+      <WithIcon icon={CopyIcon}>
+        Copy Public Link
+      </WithIcon>
+    </ListItem>
+    <ListItem borderRadius="5px" onClick={onGetHome} hasDivider>
+      <WithIcon icon={BackIcon}>
+        Get Home
+      </WithIcon>
+    </ListItem>
+    {...floorListService.list.map(({id, data: {name}}) => {
+      return <ListItem
+        key={id}
+        metadata={id}
+        onClick={onOpenPublicFloor}
+        isActive={id === floorService.floor.id}>
+        {name}
+      </ListItem>;
+    })}
   </>;
 };
 

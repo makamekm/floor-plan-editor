@@ -5,8 +5,8 @@ import { LogoutIcon } from "../icons/icon";
 import { FloorRouterService } from "../services/floor-router.service";
 import { ProjectListService } from "../services/project-list.service";
 import { UserService } from "../services/user.service";
-import List, { Item } from "./list";
 import WithIcon from "./with-icon";
+import ListItem from "./list-item";
 
 const ProjectList = () => {
   const userService = useInstance(UserService);
@@ -21,30 +21,19 @@ const ProjectList = () => {
 
   return (
     <>
-      <List borderRadius="5px">
-        {[
-          {
-            key: "logout",
-            body: (
-              <WithIcon icon={LogoutIcon}>
-                Logout
-              </WithIcon>
-            ),
-            onClick: onLogout,
-            isClickable: true,
-            hasDivider: true,
-          },
-          ...projectListService.list.map<Item<string | number>>(({id, name}) => {
-            return {
-              key: id,
-              body: name,
-              isClickable: true,
-              metadata: id,
-              onClick: onOpenProject,
-            };
-          }),
-        ]}
-      </List>
+      <ListItem borderRadius="5px" onClick={onLogout} hasDivider>
+        <WithIcon icon={LogoutIcon}>
+          Logout
+        </WithIcon>
+      </ListItem>
+      {...projectListService.list.map(({id, name}) => {
+        return <ListItem
+          key={id}
+          metadata={id}
+          onClick={onOpenProject}>
+          {name}
+        </ListItem>;
+      })}
     </>
   );
 };

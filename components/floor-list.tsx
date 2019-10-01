@@ -7,9 +7,9 @@ import { FloorRouterService } from "../services/floor-router.service";
 import { FloorService } from "../services/floor.service";
 import { ProjectService } from "../services/project.service";
 import { copyTextToClipboard } from "../utils/clipboard";
-import List, { Item } from "./list";
 import ProjectEditDialog from "./project-edit-dialog";
 import WithIcon from "./with-icon";
+import ListItem from "./list-item";
 
 const FloorList = () => {
   const floorService = useInstance(FloorService);
@@ -38,63 +38,35 @@ const FloorList = () => {
   return (
     <ProjectEditDialog>
       {(open) => <>
-        <List borderRadius="5px">
-          {[
-            {
-              key: "edit",
-              body: (
-                <WithIcon icon={EditIcon}>
-                  Edit Project
-                </WithIcon>
-              ),
-              onClick: open,
-              isClickable: true,
-            },
-            {
-              key: "link",
-              body: (
-                <WithIcon icon={CopyIcon}>
-                  Copy Public Link
-                </WithIcon>
-              ),
-              onClick: onCopy,
-              isClickable: true,
-              isHidden: floorService.floor.id == null,
-            },
-            {
-              key: "projects",
-              body: (
-                <WithIcon icon={BackIcon}>
-                  Get Home
-                </WithIcon>
-              ),
-              onClick: onGetHome,
-              isClickable: true,
-            },
-            {
-              key: "create",
-              body: (
-                <WithIcon icon={AddIcon}>
-                  Create Plan
-                </WithIcon>
-              ),
-              onClick: onCreatePlan,
-              isClickable: true,
-              hasDivider: true,
-              isActive: floorService.floor.id == null,
-            },
-            ...floorListService.list.map<Item<string | number>>(({id, data: {name}}) => {
-              return {
-                key: id,
-                body: name,
-                isClickable: true,
-                onClick: onOpenFloor,
-                isActive: id === floorService.floor.id,
-                metadata: id,
-              };
-            }),
-          ]}
-        </List>
+        <ListItem borderRadius="5px" onClick={open}>
+          <WithIcon icon={EditIcon}>
+            Edit Project
+          </WithIcon>
+        </ListItem>
+        <ListItem borderRadius="5px" onClick={onCopy} isHidden={floorService.floor.id == null}>
+          <WithIcon icon={CopyIcon}>
+            Copy Public Link
+          </WithIcon>
+        </ListItem>
+        <ListItem borderRadius="5px" onClick={onGetHome}>
+          <WithIcon icon={BackIcon}>
+            Get Home
+          </WithIcon>
+        </ListItem>
+        <ListItem borderRadius="5px" onClick={onCreatePlan} isActive={floorService.floor.id == null} hasDivider>
+          <WithIcon icon={AddIcon}>
+            Create Plan
+          </WithIcon>
+        </ListItem>
+        {...floorListService.list.map(({id, data: {name}}) => {
+          return <ListItem
+            key={id}
+            metadata={id}
+            onClick={onOpenFloor}
+            isActive={id === floorService.floor.id}>
+            {name}
+          </ListItem>;
+        })}
       </>}
     </ProjectEditDialog>
   );

@@ -8,8 +8,6 @@ import { FloorListService } from "../services/floor-list.service";
 import { FloorRouterService } from "../services/floor-router.service";
 import { FloorProvider } from "../services/floor.provider";
 import { FloorService } from "../services/floor.service";
-import { ProjectListService } from "../services/project-list.service";
-import { ProjectService } from "../services/project.service";
 import { IRootService } from "../services/root-sevice.interface";
 import { UserService } from "../services/user.service";
 import Loading from "./loading";
@@ -22,8 +20,6 @@ const services: Array<
   FloorRouterService,
   FloorProvider,
   FloorListService,
-  ProjectListService,
-  ProjectService,
   FloorService,
   FloorEditService,
 ];

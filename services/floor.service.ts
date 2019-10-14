@@ -8,8 +8,8 @@ import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
 import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
-import { ProjectService } from "./project.service";
 import { IRootService } from "./root-sevice.interface";
+import { FloorListService } from "./floor-list.service";
 
 export class FloorService implements IRootService {
   @observable public loading: boolean = false;
@@ -40,15 +40,15 @@ export class FloorService implements IRootService {
   private router: NextRouter;
   private floorProvider: FloorProvider;
   private floorRouterService: FloorRouterService;
-  private projectService: ProjectService;
   private blueprintService: BlueprintService;
+  private floorListService: FloorListService;
 
   public useHook() {
     this.router = useRouter();
     this.floorProvider = useInstance(FloorProvider);
     this.floorRouterService = useInstance(FloorRouterService);
-    this.projectService = useInstance(ProjectService);
     this.blueprintService = useInstance(BlueprintService);
+    this.floorListService = useInstance(FloorListService);
     useRouterChange(this.onRouterChange);
     useCallback(this.blueprintService.onStateChange, () => {
       this.saveState();
@@ -66,9 +66,8 @@ export class FloorService implements IRootService {
 
   public async loadFloor(id: string | number) {
     this.setLoading(true);
-    await this.projectService.loadProject(this.projectService.project.id);
     try {
-      const floor = await this.floorProvider.getFloorplan(this.projectService.project.id, id);
+      const floor = await this.floorProvider.getFloorplan(id);
       this.floor = floor;
       this.blueprintService.setFloorplan(floor.plan);
     } catch (error) {
@@ -83,13 +82,13 @@ export class FloorService implements IRootService {
     // this.setLoading(true);
     try {
       await this.floorProvider.saveFloorplan(
-        this.projectService.project.id,
         floor.id,
         {
           data: floor.data,
           plan: floor.plan,
         },
       );
+      await this.floorListService.loadList();
     } catch (error) {
       // tslint:disable-next-line
       console.error(error);
@@ -104,7 +103,6 @@ export class FloorService implements IRootService {
       const plan = this.blueprintService.getFloorplan();
       if (plan) {
         const data = await this.floorProvider.createFloorplan(
-          this.projectService.project.id,
           {
             data: {
               name,
@@ -112,6 +110,7 @@ export class FloorService implements IRootService {
             plan,
           },
         );
+        await this.floorListService.loadList();
         this.floorRouterService.openFloor(data.id);
       } else {
         alert("Please draw something");
@@ -128,15 +127,12 @@ export class FloorService implements IRootService {
     this.setLoading(true);
     try {
       const result = await this.floorProvider.deleteFloorplan(
-        this.projectService.project.id,
         id,
       );
       if (result) {
-        await this.projectService.loadProject(this.projectService.project.id);
+        await this.floorListService.loadList();
         if (this.floor.id === id) {
-          this.floorRouterService.openProject(
-            this.projectService.project.id,
-          );
+          this.floorRouterService.openHome();
           this.floor.id = null;
           this.floor.data = null;
         }

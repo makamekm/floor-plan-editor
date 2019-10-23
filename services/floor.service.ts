@@ -6,10 +6,10 @@ import { FloorDto, FloorplanDataDto } from "../models/floor.dto";
 import { useCallback } from "../utils/callback";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
+import { FloorListService } from "./floor-list.service";
 import { FloorRouterService } from "./floor-router.service";
 import { FloorProvider } from "./floor.provider";
 import { IRootService } from "./root-sevice.interface";
-import { FloorListService } from "./floor-list.service";
 
 export class FloorService implements IRootService {
   @observable public loading: boolean = false;
@@ -56,6 +56,8 @@ export class FloorService implements IRootService {
   }
 
   public onRouterChange = () => {
+    this.floorListService.loadList();
+
     if (this.router.query.id != null) {
       this.loadFloor(String(this.router.query.id));
     } else {

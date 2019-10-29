@@ -3,7 +3,6 @@ import { observable } from "mobx";
 import { NextRouter, useRouter } from "next/router";
 import { useInstance } from "react-ioc";
 import { FloorDto, FloorplanDataDto } from "../models/floor.dto";
-import { useCallback } from "../utils/callback";
 import { useRouterChange } from "../utils/router-hook";
 import { BlueprintService } from "./blueprint.service";
 import { FloorListService } from "./floor-list.service";
@@ -50,9 +49,6 @@ export class FloorService implements IRootService {
     this.blueprintService = useInstance(BlueprintService);
     this.floorListService = useInstance(FloorListService);
     useRouterChange(this.onRouterChange);
-    useCallback(this.blueprintService.onStateChange, () => {
-      this.saveState();
-    });
   }
 
   public onRouterChange = () => {

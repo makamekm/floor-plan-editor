@@ -23,8 +23,7 @@ export class FloorProvider implements IRootService {
       }
 
       const res = await response.json();
-      console.log(`Single plan`);
-      console.log(res);
+
       return this.deserializeFloorPlan(res);
 
     } catch (error) {
@@ -45,8 +44,6 @@ export class FloorProvider implements IRootService {
     });
 
     const updatedPlan = this.serializeFloorPlan(floorplan);
-    console.log(`Updated plan`);
-    console.log(updatedPlan);
 
     try {
       const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {

@@ -23,9 +23,9 @@ export class FloorProvider implements IRootService {
       }
 
       const res = await response.json();
+      const desRes = this.deserializeFloorPlan(res);
 
-      return this.deserializeFloorPlan(res);
-
+      return desRes;
     } catch (error) {
       return {
         data: null,
@@ -141,9 +141,9 @@ export class FloorProvider implements IRootService {
       floorPlanCopy.plan.items[i] = {
         ...floorPlanCopy.plan.items[i],
         id: i,
+        action_type: 0,
       };
     }
-
     floorPlanCopy = {
       ...floorPlanCopy,
       plan: {

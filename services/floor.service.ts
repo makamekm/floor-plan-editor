@@ -21,17 +21,6 @@ export class FloorService implements IRootService {
     data: null,
   };
 
-  public saveState = debounce(() => {
-    if (this.floor.id != null) {
-      const floor: FloorDto = {
-        id: this.floor.id,
-        data: this.floor.data,
-        plan: this.blueprintService.getFloorplan(),
-      };
-      this.saveFloor(floor);
-    }
-  }, 1000);
-
   private setLoading = debounce<(value: boolean) => void>((value) => {
     this.loading = value;
   }, 50);
@@ -41,6 +30,19 @@ export class FloorService implements IRootService {
   private floorRouterService: FloorRouterService;
   private blueprintService: BlueprintService;
   private floorListService: FloorListService;
+
+  public saveState = () => {
+    if (this.floor.id != null) {
+      const floor: FloorDto = {
+        id: this.floor.id,
+        data: this.floor.data,
+        plan: this.blueprintService.getFloorplan(),
+      };
+      if (floor.plan !== null) {
+        this.saveFloor(floor);
+      }
+    }
+  }
 
   public useHook() {
     this.router = useRouter();
@@ -77,21 +79,18 @@ export class FloorService implements IRootService {
   }
 
   public async saveFloor(floor: FloorDto) {
-    // this.setLoading(true);
+    this.setLoading(true);
     try {
-      await this.floorProvider.saveFloorplan(
-        floor.id,
-        {
-          data: floor.data,
-          plan: floor.plan,
-        },
-      );
+      await this.floorProvider.saveFloorplan(floor.id, {
+        data: floor.data,
+        plan: floor.plan,
+      });
       await this.floorListService.loadList();
     } catch (error) {
       // tslint:disable-next-line
       console.error(error);
     } finally {
-      // this.setLoading(false);
+      this.setLoading(false);
     }
   }
 
@@ -100,14 +99,12 @@ export class FloorService implements IRootService {
     try {
       const plan = this.blueprintService.getFloorplan();
       if (plan) {
-        const data = await this.floorProvider.createFloorplan(
-          {
-            data: {
-              name,
-            },
-            plan,
+        const data = await this.floorProvider.createFloorplan({
+          data: {
+            name,
           },
-        );
+          plan,
+        });
         await this.floorListService.loadList();
         this.floorRouterService.openFloor(data.id);
       } else {
@@ -124,9 +121,7 @@ export class FloorService implements IRootService {
   public async deleteFloor(id: number | string = this.floor.id) {
     this.setLoading(true);
     try {
-      const result = await this.floorProvider.deleteFloorplan(
-        id,
-      );
+      const result = await this.floorProvider.deleteFloorplan(id);
       if (result) {
         await this.floorListService.loadList();
         if (this.floor.id === id) {

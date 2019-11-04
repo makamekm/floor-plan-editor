@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useInstance } from "react-ioc";
 import { FloorDto } from "../models/floor.dto";
 import "../utils/firebase";
@@ -8,15 +9,26 @@ const endpoint = "https://table-management-3-unsecure.herokuapp.com";
 
 export class FloorProvider implements IRootService {
   public userService: UserService;
+  private accessToken: string;
 
   public useHook() {
     this.userService = useInstance(UserService);
+
+    useEffect(() => {
+      this.accessToken = localStorage.getItem("access_token");
+    });
   }
 
   // Get single plan
   public async getFloorplan(id: number | string): Promise<FloorDto> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
     try {
-      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`);
+      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
+        headers,
+      });
 
       if (!response.ok) {
         throw Error(response.statusText);
@@ -41,6 +53,7 @@ export class FloorProvider implements IRootService {
   ): Promise<FloorDto> {
     const headers = new Headers({
       "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
     });
 
     const updatedPlan = this.serializeFloorPlan(floorplan);
@@ -67,8 +80,14 @@ export class FloorProvider implements IRootService {
 
   // Get
   public async getFloorplanList(): Promise<FloorDto[]> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
     try {
-      const response = await fetch(`${endpoint}/floors/floorPlanList`);
+      const response = await fetch(`${endpoint}/floors/floorPlanList`, {
+        headers,
+      });
 
       if (!response.ok) {
         throw Error(response.statusText);
@@ -82,9 +101,14 @@ export class FloorProvider implements IRootService {
 
   // Remove
   public async deleteFloorplan(id: number | string): Promise<boolean> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
     try {
       const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
         method: "DELETE",
+        headers,
       });
 
       if (!response.ok) {
@@ -101,6 +125,7 @@ export class FloorProvider implements IRootService {
   public async createFloorplan(floorplan: FloorDto): Promise<FloorDto> {
     const headers = new Headers({
       "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
     });
 
     const serializedPlan = this.serializeFloorPlan(floorplan);

@@ -26,7 +26,8 @@
     "next-offline": "4.0.5",
     "react-sidebar": "3.0.2",
     "firebase": "6.6.2",
-    "react-firebaseui": "4.0.0"
+    "react-firebaseui": "4.0.0",
+    "react-google-login": "^5.0.7"
   },
   "devDependencies": {
     "@types/node": "12.7.5",

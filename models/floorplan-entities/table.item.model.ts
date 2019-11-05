@@ -7,7 +7,7 @@ import { Item, ItemMetadata } from "./item.model";
 const tableHeight = 60;
 const tableWidth = 30;
 const tableColorFree = "#10e04e";
-const tableColorAssigned = "#f2d349";
+const tableColorAssigned = "#fce303";
 const tableColorHover = "#F1FCFF";
 const tableColorActive = "#F1FCFF";
 const tableEdgeColor = "#888888";
@@ -135,9 +135,20 @@ export class TableItem extends Item {
         );
       });
     }
-    if (this.metadata.name) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
+
+    // TO CHANGE
+
+    if (this.metadata.name && !this.metadata.description) {
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name), tableColorAssigned);
+    } else {
+      view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name), tableColorAssigned);
     }
+    if (!this.metadata.name && this.metadata.description) {
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.description), tableColorAssigned);
+    } else {
+      view.drawLabel(this.x, this.y - 15, this.limitText(this.metadata.description), tableColorAssigned);
+    }
+
   }
 
   public limitText(text: string) {

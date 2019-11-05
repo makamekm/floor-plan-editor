@@ -201,13 +201,13 @@ export class FloorplanView {
     );
   }
 
-  public drawLabel(x: number, y: number, text: string) {
-    this.context.font = "normal 12px Arial";
+  public drawLabel(x: number, y: number, text: string, textColor?: string) {
+    this.context.font = "normal 13px Arial";
     this.context.fillStyle = "#000000";
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
-    this.context.strokeStyle = "#F1FCFF";
-    this.context.lineWidth = 4;
+    this.context.strokeStyle = "#ffffff";
+    this.context.lineWidth = 2;
 
     this.context.strokeText(text,
       this.viewmodel.convertX(x),

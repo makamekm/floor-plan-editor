@@ -34,7 +34,7 @@ const ItemProperty = () => {
         />
       </ListItem>
       <ListItem borderRadius="5px" isHeader>
-        Description
+        Table id
       </ListItem>
       <ListItem borderRadius="5px" isField>
         <InlineTextareaEdit

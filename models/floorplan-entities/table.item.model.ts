@@ -6,7 +6,8 @@ import { Item, ItemMetadata } from "./item.model";
 
 const tableHeight = 60;
 const tableWidth = 30;
-const tableColor = "#ffffff";
+const tableColorFree = "#10e04e";
+const tableColorAssigned = "#f2d349";
 const tableColorHover = "#F1FCFF";
 const tableColorActive = "#F1FCFF";
 const tableEdgeColor = "#888888";
@@ -86,7 +87,9 @@ export class TableItem extends Item {
     mode: FloorplanMode,
     view: FloorplanView,
   ): void {
-    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : tableColor);
+
+    // tslint:disable-next-line: max-line-length
+    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : this.metadata.name ? tableColorAssigned : tableColorFree);
     const edgeColor = hover ? tableEdgeColorHover : (selected ? tableEdgeColorActive : tableEdgeColor);
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);

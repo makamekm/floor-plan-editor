@@ -16,6 +16,9 @@ const gridColor = "#f1f1f1";
 // room config
 const roomColor = "#f9f9f9";
 
+// item name bg color
+const itemNameBg = "#db2f23";
+
 // wall config
 const wallWidth = 5;
 const wallWidthHover = 7;
@@ -203,7 +206,7 @@ export class FloorplanView {
     this.context.fillStyle = "#000000";
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
-    this.context.strokeStyle = "#ffffff";
+    this.context.strokeStyle = "#F1FCFF";
     this.context.lineWidth = 4;
 
     this.context.strokeText(text,

@@ -28,7 +28,7 @@ const ItemProperty = () => {
       </ListItem>
       <ListItem borderRadius="5px" isField>
         <InlineTextEdit
-          placeholder="Write Name..."
+          placeholder="Write person name..."
           value={blueprintService.selected.name}
           onChange={onChangeItemName}
         />
@@ -39,7 +39,7 @@ const ItemProperty = () => {
       <ListItem borderRadius="5px" isField>
         <InlineTextareaEdit
           borderRadius="0 0 5px 5px"
-          placeholder="Write Description..."
+          placeholder="Write table id..."
           value={blueprintService.selected.description}
           onChange={onChangeItemDescription}
         />

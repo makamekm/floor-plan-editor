@@ -257,13 +257,20 @@ export class FloorplanController {
     this.view.draw();
   }
 
+  private calculateMouseMoveDistance(mouseX: number, lastX: number, mouseY: number, lastY: number) {
+    return Math.sqrt(Math.pow((mouseX - lastX), 2) + Math.pow((mouseY - lastY), 2));
+  }
+
   private mousemove(clientX: number, clientY: number) {
-    this.mouseMoved = true;
 
     // update mouse
-
     this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel;
     this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel;
+
+    if (this.calculateMouseMoveDistance(this.mouseX, this.lastX, this.mouseY, this.lastY) < 3) {
+      return;
+    }
+    this.mouseMoved = true;
 
     const selectedItem = this.floorplan.getSelectedItem();
 

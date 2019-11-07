@@ -12,6 +12,7 @@ import ItemProperty from "./item-property";
 import ListItem from "./list-item";
 import Panel from "./panel";
 import ToggleButtonType from "./toggle-type";
+import { LabelItem } from "../models/floorplan-entities/label.item.model";
 
 const itemTypeList = [
   {

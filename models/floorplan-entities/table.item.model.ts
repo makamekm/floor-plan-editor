@@ -139,14 +139,14 @@ export class TableItem extends Item {
     // TO CHANGE
 
     if (this.metadata.name && !this.metadata.description) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name), tableColorAssigned);
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
     } else {
-      view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name), tableColorAssigned);
+      view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name));
     }
     if (!this.metadata.name && this.metadata.description) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.description), tableColorAssigned);
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.description));
     } else {
-      view.drawLabel(this.x, this.y - 15, this.limitText(this.metadata.description), tableColorAssigned);
+      view.drawLabel(this.x, this.y - 15, this.limitText(this.metadata.description));
     }
 
   }

@@ -36,6 +36,8 @@ export class FloorProvider implements IRootService {
 
       const res = await response.json();
       const desRes = this.deserializeFloorPlan(res);
+      console.log("SINGLE:");
+      console.log(desRes);
 
       return desRes;
     } catch (error) {
@@ -57,6 +59,8 @@ export class FloorProvider implements IRootService {
     });
 
     const updatedPlan = this.serializeFloorPlan(floorplan);
+    console.log("UPDATE:");
+    console.log(updatedPlan);
 
     try {
       const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
@@ -106,7 +110,7 @@ export class FloorProvider implements IRootService {
       "Authorization": "Bearer " + this.accessToken,
     });
     try {
-      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
+      const response = await fetch(`${endpoint}/floors/floorlan/${id}`, {
         method: "DELETE",
         headers,
       });
@@ -131,7 +135,7 @@ export class FloorProvider implements IRootService {
     const serializedPlan = this.serializeFloorPlan(floorplan);
 
     try {
-      const response = await fetch(`${endpoint}/floors/floorPlan`, {
+      const response = await fetch(`${endpoint}/floors/floorlan`, {
         method: "POST",
         headers,
         body: JSON.stringify(serializedPlan),
@@ -167,6 +171,7 @@ export class FloorProvider implements IRootService {
         ...floorPlanCopy.plan.items[i],
         id: i,
         action_type: 0,
+        type: 0,
       };
     }
     floorPlanCopy = {

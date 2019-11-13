@@ -12,8 +12,6 @@ import ItemProperty from "./item-property";
 import ListItem from "./list-item";
 import Panel from "./panel";
 import ToggleButtonType from "./toggle-type";
-import { LabelItem } from "../models/floorplan-entities/label.item.model";
-
 const itemTypeList = [
   {
     key: "move",
@@ -26,6 +24,22 @@ const itemTypeList = [
   {
     key: "delete",
     name: "Delete",
+  },
+  {
+    key: "zoomIn",
+    name: "Zoom in",
+    onClick: function() {
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      const context = canvas.getContext("2d");
+    }
+  },
+  {
+    key: "zoomOut",
+    name: "Zoom out",
+    onClick: function() {
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      const contex = canvas.getContext("2d");
+    }
   },
 ];
 
@@ -84,7 +98,7 @@ const BlueprintView = () => {
     >
       <div className="view">
         <canvas
-          ref={canvasRef}
+          ref={canvasRef} id="canvas"
         />
 
         <div className="mode-panel">
@@ -160,7 +174,7 @@ const BlueprintView = () => {
             left: 50%;
             transform: translateX(-50%);
             max-width: calc(100vw - 40px);
-            width: 230px;
+            width: 270px;
           }
 
           @media (max-width: 900px) {

@@ -81,7 +81,6 @@ export class UserService implements IRootService {
   }
 
   public onAuthCallback = (response: any) => {
-    console.log(response);
     localStorage.setItem("access_token", response.Zi.access_token);
     localStorage.setItem("user_object", JSON.stringify(response.profileObj));
     this.data.user = response.profileObj;

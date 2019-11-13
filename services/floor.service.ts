@@ -1,4 +1,5 @@
 import debounce from "debounce";
+import { saveAs } from "file-saver";
 import { observable } from "mobx";
 import { NextRouter, useRouter } from "next/router";
 import { useInstance } from "react-ioc";
@@ -137,4 +138,21 @@ export class FloorService implements IRootService {
       this.setLoading(false);
     }
   }
+
+  public saveCanvasToFile() {
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    const filename = prompt("Please enter filename");
+    if (filename !== null) {
+      canvas.toBlob((blob) => {
+      saveAs(blob, filename);
+    });
+    }
+
+    // const saveBtn = document.getElementById("saveToFileBtn") as HTMLElement;
+    // const dataToSave = canvas.toDataURL("image/png", "image/octet-stream");
+    // if (saveBtn) {
+    //   saveBtn.setAttribute("href", dataToSave);
+    // }
+  }
+
 }

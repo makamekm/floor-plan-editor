@@ -75,7 +75,7 @@ export class LabelItem extends Item {
     }
   }
 
-  public render(x: number, y: number, hover: boolean, selected: boolean, mode: FloorplanMode, view: FloorplanView): void {
+  public render(x: number, y: number,scale: number, hover: boolean, selected: boolean, mode: FloorplanMode, view: FloorplanView): void {
 
     const fillColor = hover ? tableColorHover : selected ? tableColorActive : "#000000";
 
@@ -97,6 +97,7 @@ export class LabelItem extends Item {
   public overlapped(
     rawX: number,
     rawY: number,
+    scale: number,
     selected: boolean,
     mode: FloorplanMode,
   ) {

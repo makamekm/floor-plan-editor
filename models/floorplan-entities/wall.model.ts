@@ -105,11 +105,11 @@ export class Wall {
     this.end = corner;
   }
 
-  public distanceFrom(x: number, y: number): number {
+  public distanceFrom(x: number, y: number, scale: number): number {
     return Utils.pointDistanceFromLine(
       x, y,
-      this.getStartX(), this.getStartY(),
-      this.getEndX(), this.getEndY(),
+      this.getStartX() / scale, this.getStartY() / scale,
+      this.getEndX() / scale, this.getEndY()/ scale,
     );
   }
 

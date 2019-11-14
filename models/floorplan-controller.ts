@@ -53,6 +53,7 @@ export class FloorplanController {
 
   public originX = 0;
   public originY = 0;
+  public originScale = 1;
 
   /** drawing state */
   public targetX = 0;
@@ -132,6 +133,10 @@ export class FloorplanController {
       this.mouseleave();
     });
 
+    window.addEventListener("wheel", (event) => {
+      this.wheel(event);
+    });
+
     document.addEventListener("keyup", (e) => {
       if (e.keyCode === 27) {
         this.escapeKey();
@@ -186,8 +191,8 @@ export class FloorplanController {
 
   /** Gets the center of the view */
   public getCenter() {
-    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
-    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
+    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0 / this.originScale;
+    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0 / this.originScale;
     return {
       x: (this.originX + centerX) * cmPerPixel,
       y: (this.originY + centerY) * cmPerPixel,
@@ -196,12 +201,12 @@ export class FloorplanController {
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertX(x: number): number {
-    return (x - this.originX * cmPerPixel) * pixelsPerCm;
+    return (x - this.originX * cmPerPixel) * pixelsPerCm / this.originScale;
   }
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertY(y: number): number {
-    return (y - this.originY * cmPerPixel) * pixelsPerCm;
+    return (y - this.originY * cmPerPixel) * pixelsPerCm / this.originScale;
   }
 
   private escapeKey() {
@@ -250,7 +255,7 @@ export class FloorplanController {
       }
     } else {
       if (selectedItem) {
-        selectedItem.mousedown(this.mouseX, this.mouseY, this.mode);
+        selectedItem.mousedown(this.mouseX, this.mouseY,this.originScale, this.mode);
       }
     }
 
@@ -264,8 +269,8 @@ export class FloorplanController {
   private mousemove(clientX: number, clientY: number) {
 
     // update mouse
-    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel;
-    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel;
+    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel /this.originScale;
+    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel /this.originScale;
 
     if (this.calculateMouseMoveDistance(this.mouseX, this.lastX, this.mouseY, this.lastY) < 3) {
       return;
@@ -286,7 +291,7 @@ export class FloorplanController {
     // update object target
     if (this.mode !== FloorplanMode.DRAW && !this.mouseDown) {
       let draw = false;
-      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY, this.mode);
+      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY, this.originScale, this.mode);
       if (hoverItem !== this.activeItem) {
         draw = true;
       }
@@ -296,8 +301,8 @@ export class FloorplanController {
         this.activeWall = null;
       } else {
         this.activeItem = null;
-        const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY);
-        const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY);
+        const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY, this.originScale);
+        const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY, this.originScale);
         if (hoverCorner !== this.activeCorner) {
           this.activeCorner = hoverCorner;
           draw = true;
@@ -371,16 +376,26 @@ export class FloorplanController {
     }
   }
 
+  private wheel(event: WheelEvent) {
+    const delta = Math.sign(event.deltaY);
+    this.originScale += delta / 10;
+    this.originScale = Math.max(this.originScale, 1);
+    this.originScale = Math.min(this.originScale, 3);
+    console.log(this.originScale)
+
+    this.view.draw();
+  }
+
   private mouseup(clientX: number, clientY: number) {
     this.mouseDown = false;
 
-    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel;
-    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel;
+    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel / this.originScale;
+    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel /this.originScale;
 
     const selectedItem = this.floorplan.getSelectedItem();
 
     if (selectedItem) {
-      if (selectedItem.mouseup(this.mouseX, this.mouseY, this.mode)) {
+      if (selectedItem.mouseup(this.mouseX, this.mouseY, this.originScale , this.mode)) {
         this.view.draw();
         this.emitChanges();
       }
@@ -450,6 +465,7 @@ export class FloorplanController {
   private resetOrigin() {
     const centerX = this.canvasElement.getBoundingClientRect().width / 2.0;
     const centerY = this.canvasElement.getBoundingClientRect().height / 2.0;
+    this.originScale = 1;
     const centerFloorplan = this.floorplan.getCenter();
     this.originX = centerFloorplan.x * pixelsPerCm - centerX;
     this.originY = centerFloorplan.z * pixelsPerCm - centerY;

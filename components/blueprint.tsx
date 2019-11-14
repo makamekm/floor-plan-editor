@@ -12,6 +12,7 @@ import ItemProperty from "./item-property";
 import ListItem from "./list-item";
 import Panel from "./panel";
 import ToggleButtonType from "./toggle-type";
+
 const itemTypeList = [
   {
     key: "move",
@@ -24,22 +25,6 @@ const itemTypeList = [
   {
     key: "delete",
     name: "Delete",
-  },
-  {
-    key: "zoomIn",
-    name: "Zoom in",
-    onClick: function() {
-      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-      const context = canvas.getContext("2d");
-    }
-  },
-  {
-    key: "zoomOut",
-    name: "Zoom out",
-    onClick: function() {
-      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-      const contex = canvas.getContext("2d");
-    }
   },
 ];
 

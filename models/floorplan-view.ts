@@ -223,6 +223,7 @@ export class FloorplanView {
     item.render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
+      this.viewmodel.originScale,
       hover,
       true,
       this.viewmodel.mode,
@@ -235,6 +236,7 @@ export class FloorplanView {
     item.render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
+      this.viewmodel.originScale,
       hover,
       false,
       this.viewmodel.mode,

@@ -39,8 +39,8 @@ export class TableItem extends Item {
     this.metadata.width = this.metadata.width || 0;
   }
 
-  public mousedown(x: number, y: number) {
-    const isRotating = this.overlappedRotate(x, y);
+  public mousedown(x: number, y: number, scale: number) {
+    const isRotating = this.overlappedRotate(x, y, scale);
     if (isRotating !== this.isRotating) {
       this.isRotating = isRotating;
     }
@@ -82,6 +82,7 @@ export class TableItem extends Item {
   public render(
     x: number,
     y: number,
+    scale: number,
     hover: boolean,
     selected: boolean,
     mode: FloorplanMode,
@@ -95,29 +96,29 @@ export class TableItem extends Item {
       ctx.translate(x, y);
       ctx.rotate(this.getClosestAngle() * Math.PI / 180);
       view.drawPolygon([
-        -tableWidth / 2,
-        tableWidth / 2,
-        tableWidth / 2,
-        -tableWidth / 2,
+        -tableWidth / 2/scale,
+        tableWidth / 2/scale,
+        tableWidth / 2/scale,
+        -tableWidth / 2/scale,
       ], [
-        -tableHeight / 2,
-        -tableHeight / 2,
-        tableHeight / 2,
-        tableHeight / 2,
+        -tableHeight / 2/scale,
+        -tableHeight / 2/scale,
+        tableHeight / 2/scale,
+        tableHeight / 2/scale,
       ], true, fillColor, true, edgeColor, tableEdgeWidth);
       view.drawLine(
-        -tableWidth / 2,
-        -tableHeight / 2,
-        tableWidth / 2,
-        tableHeight / 2,
+        -tableWidth / 2/scale,
+        -tableHeight / 2/scale,
+        tableWidth / 2/scale,
+        tableHeight / 2/scale,
         tableEdgeWidth,
         edgeColor,
       );
       view.drawLine(
-        tableWidth / 2,
-        -tableHeight / 2,
-        -tableWidth / 2,
-        tableHeight / 2,
+        tableWidth / 2/scale,
+        -tableHeight / 2/scale,
+        -tableWidth / 2/scale,
+        tableHeight / 2/scale,
         tableEdgeWidth,
         edgeColor,
       );
@@ -172,23 +173,24 @@ export class TableItem extends Item {
   public overlapped(
     rawX: number,
     rawY: number,
+    scale: number,
     selected: boolean,
     mode: FloorplanMode,
   ) {
-    const { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
+    let { x, y } = this.rotateVector(rawX - this.x / scale, rawY - this.y / scale, this.metadata.r);
     const sens = 5;
     const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
       && y <= (tableHeight + sens) && y >= (-tableHeight - sens);
     if (selected && mode === FloorplanMode.MOVE) {
-      this.isRotatingHover = this.overlappedRotate(rawX, rawY);
+      this.isRotatingHover = this.overlappedRotate(rawX, rawY, scale);
       return isMainHover || this.isRotatingHover;
     } else {
       return isMainHover;
     }
   }
 
-  private overlappedRotate(x: number, y: number): boolean {
-    const dist = Utils.pointDistance(this.x, this.y, x, y);
+  private overlappedRotate(x: number, y: number, scale: number): boolean {
+    const dist = Utils.pointDistance(this.x / scale, this.y / scale, x, y);
     return dist > rotateRadius * 2 - rotateLineWidth
       && dist < rotateRadius * 2 + rotateLineWidth;
   }

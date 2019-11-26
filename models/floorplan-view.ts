@@ -16,6 +16,9 @@ const gridColor = "#f1f1f1";
 // room config
 const roomColor = "#f9f9f9";
 
+// item name bg color
+const itemNameBg = "#db2f23";
+
 // wall config
 const wallWidth = 5;
 const wallWidthHover = 7;
@@ -198,13 +201,13 @@ export class FloorplanView {
     );
   }
 
-  public drawLabel(x: number, y: number, text: string) {
-    this.context.font = "normal 12px Arial";
+  public drawLabel(x: number, y: number, text: string, textColor?: string) {
+    this.context.font = "normal 13px Arial";
     this.context.fillStyle = "#000000";
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
     this.context.strokeStyle = "#ffffff";
-    this.context.lineWidth = 4;
+    this.context.lineWidth = 2;
 
     this.context.strokeText(text,
       this.viewmodel.convertX(x),

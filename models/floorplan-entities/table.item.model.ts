@@ -6,7 +6,8 @@ import { Item, ItemMetadata } from "./item.model";
 
 const tableHeight = 60;
 const tableWidth = 30;
-const tableColor = "#ffffff";
+const tableColorFree = "#10e04e";
+const tableColorAssigned = "#fce303";
 const tableColorHover = "#F1FCFF";
 const tableColorActive = "#F1FCFF";
 const tableEdgeColor = "#888888";
@@ -86,7 +87,9 @@ export class TableItem extends Item {
     mode: FloorplanMode,
     view: FloorplanView,
   ): void {
-    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : tableColor);
+
+    // tslint:disable-next-line: max-line-length
+    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : this.metadata.name ? tableColorAssigned : tableColorFree);
     const edgeColor = hover ? tableEdgeColorHover : (selected ? tableEdgeColorActive : tableEdgeColor);
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);
@@ -132,9 +135,20 @@ export class TableItem extends Item {
         );
       });
     }
-    if (this.metadata.name) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
+
+    // TO CHANGE
+
+    if (this.metadata.name && !this.metadata.description) {
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name), tableColorAssigned);
+    } else {
+      view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name), tableColorAssigned);
     }
+    if (!this.metadata.name && this.metadata.description) {
+      view.drawLabel(this.x, this.y, this.limitText(this.metadata.description), tableColorAssigned);
+    } else {
+      view.drawLabel(this.x, this.y - 15, this.limitText(this.metadata.description), tableColorAssigned);
+    }
+
   }
 
   public limitText(text: string) {

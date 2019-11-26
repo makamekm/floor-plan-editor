@@ -39,5 +39,3 @@ const LoginPanel = () => {
     </>
   );
 };
-
-export default memo(observer(LoginPanel));

@@ -1,18 +1,16 @@
 import debounce from "debounce";
-import firebase from "firebase/app";
 import { computed, observable, reaction } from "mobx";
 import { useDisposable } from "mobx-react-lite";
 import { NextRouter, useRouter } from "next/router";
 import { useEffect } from "react";
-import "../utils/firebase";
-import { useRouterChange } from "../utils/router-hook";
+import { UserProfile } from "../models/userProfile.interface";
 import { IRootService } from "./root-sevice.interface";
 
 export class UserService implements IRootService {
-  @observable public loading: boolean = true;
+  @observable public loading: boolean = false;
   @observable public askToLogIn: boolean = false;
   @observable private data: {
-    user: firebase.User;
+    user: UserProfile;
   } = {
     user: null,
   };
@@ -32,7 +30,7 @@ export class UserService implements IRootService {
     this.loading = value;
   }, 50);
 
-  public useUserChange(callback: (user: firebase.User) => void) {
+  public useUserChange(callback: (user: UserProfile) => void) {
     useDisposable(() =>
       reaction(
         () => this.data.user,
@@ -43,24 +41,16 @@ export class UserService implements IRootService {
 
   public useHook() {
     this.router = useRouter();
-    useRouterChange(this.onRouterChange);
     useEffect(() => {
-      this.setLoading(true);
-      const unregisterAuthObserver = firebase.auth().onAuthStateChanged(
-        (user) => {
-          this.data.user = user;
-          this.setLoading(false);
-          if (user) {
-            this.askToLogIn = false;
-            if (this.router.query.mode === "select") {
-              this.changeModeTo();
-            }
-          }
-        },
-      );
-      return () => {
-        unregisterAuthObserver();
-      };
+      const cachedUser = localStorage.getItem("user_object");
+      if (cachedUser) {
+        try {
+          this.data.user = JSON.parse(cachedUser);
+        } catch (e) {
+          // tslint:disable-next-line: no-console
+          console.error(e);
+        }
+      }
     }, []);
   }
 
@@ -76,17 +66,12 @@ export class UserService implements IRootService {
     });
   }
 
-  public onRouterChange = () => {
-    if (this.router.query.mode === "select") {
-      this.askToLogIn = true;
-    }
-  }
-
   public async logout() {
     this.setLoading(true);
     try {
-      await this.auth.signOut();
-      window.location.reload(false); // monkey fix
+      this.data.user = null;
+      localStorage.setItem("access_token", null);
+      localStorage.setItem("user_object", null);
     } catch (e) {
       // tslint:disable-next-line
       console.error(e);
@@ -95,20 +80,9 @@ export class UserService implements IRootService {
     }
   }
 
-  public get auth() {
-    return firebase.auth();
-  }
-
-  public get uiConfig() {
-    return {
-      signInFlow: "popup",
-      signInOptions: [
-        firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      ],
-      callbacks: {
-        signInSuccessWithAuthResult: () => false,
-      },
-    };
+  public onAuthCallback = (response: any) => {
+    localStorage.setItem("access_token", response.Zi.access_token);
+    localStorage.setItem("user_object", JSON.stringify(response.profileObj));
+    this.data.user = response.profileObj;
   }
 }

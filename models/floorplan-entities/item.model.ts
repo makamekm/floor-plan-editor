@@ -41,10 +41,10 @@ export abstract class Item {
   public abstract endActive(): void;
 
   /** Reset the state */
-  public abstract mousedown(x: number, y: number, mode: FloorplanMode): void;
+  public abstract mousedown(x: number, y: number, scale: number, mode: FloorplanMode): void;
 
   /** Reset the state */
-  public abstract mouseup(x: number, y: number, mode: FloorplanMode): boolean | void;
+  public abstract mouseup(x: number, y: number, scale: number, mode: FloorplanMode): boolean | void;
 
   /** Reset the state */
   public abstract mousemove(
@@ -56,6 +56,7 @@ export abstract class Item {
   public abstract render(
     x: number,
     y: number,
+    scale: number,
     hover: boolean,
     selected: boolean,
     mode: FloorplanMode,
@@ -65,6 +66,7 @@ export abstract class Item {
   public abstract overlapped(
     x: number,
     y: number,
+    scale: number,
     selected: boolean,
     mode: FloorplanMode,
   ): boolean;

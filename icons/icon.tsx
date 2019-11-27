@@ -21,3 +21,9 @@ export const SearchIcon = _SearchIcon;
 
 import _UserIcon from "./user.svg";
 export const UserIcon = _UserIcon;
+
+import _SaveIcon from "./save.svg";
+export const SaveIcon = _SaveIcon;
+
+import _DownloadIcon from "./download.svg";
+export const DownloadIcon = _DownloadIcon;

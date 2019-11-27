@@ -4,4 +4,5 @@ import AuthProtect from '../components/auth-protect';
 
 export default () => {
   return <AuthProtect><BlueprintView/></AuthProtect>;
+  // return <BlueprintView/>;
 };

@@ -198,13 +198,13 @@ export class FloorplanView {
     );
   }
 
-  public drawLabel(x: number, y: number, text: string) {
-    this.context.font = "normal 12px Arial";
-    this.context.fillStyle = "#000000";
+  public drawLabel(x: number, y: number, text: string, textColor?: string, font?: string) {
+    this.context.font = font || "normal 13px Arial";
+    this.context.fillStyle = textColor || "#000000";
     this.context.textBaseline = "middle";
     this.context.textAlign = "center";
     this.context.strokeStyle = "#ffffff";
-    this.context.lineWidth = 4;
+    this.context.lineWidth = 2;
 
     this.context.strokeText(text,
       this.viewmodel.convertX(x),
@@ -223,6 +223,7 @@ export class FloorplanView {
     item.render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
+      this.viewmodel.originScale,
       hover,
       true,
       this.viewmodel.mode,
@@ -235,6 +236,7 @@ export class FloorplanView {
     item.render(
       this.viewmodel.convertX(item.x),
       this.viewmodel.convertY(item.y),
+      this.viewmodel.originScale,
       hover,
       false,
       this.viewmodel.mode,

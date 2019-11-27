@@ -24,7 +24,6 @@ const rotateActiveColor = "#2196F3";
 const tableTextLimit = 14;
 
 export class TableItem extends Item {
-
   public isRotating = false;
   public isRotatingHover = false;
 
@@ -62,18 +61,14 @@ export class TableItem extends Item {
   }
 
   public mousemove(
-    mouseX: number, mouseY: number,
-    lastMouseX: number, lastMouseY: number,
+    mouseX: number,
+    mouseY: number,
+    lastMouseX: number,
+    lastMouseY: number,
   ) {
     if (this.isRotating) {
-      const rLast = Math.atan2(
-        lastMouseY - this.y,
-        lastMouseX - this.x,
-      );
-      const rNew = Math.atan2(
-        mouseY - this.y,
-        mouseX - this.x,
-      );
+      const rLast = Math.atan2(lastMouseY - this.y, lastMouseX - this.x);
+      const rNew = Math.atan2(mouseY - this.y, mouseX - this.x);
       this.relativeRotate(rNew - rLast);
       return true;
     }
@@ -88,50 +83,75 @@ export class TableItem extends Item {
     mode: FloorplanMode,
     view: FloorplanView,
   ): void {
-
     // tslint:disable-next-line: max-line-length
-    const fillColor = hover ? tableColorHover : (selected ? tableColorActive : this.metadata.name ? tableColorAssigned : tableColorFree);
-    const edgeColor = hover ? tableEdgeColorHover : (selected ? tableEdgeColorActive : tableEdgeColor);
+    const fillColor = hover
+      ? tableColorHover
+      : selected
+      ? tableColorActive
+      : this.metadata.name
+      ? tableColorAssigned
+      : tableColorFree;
+    const edgeColor = hover
+      ? tableEdgeColorHover
+      : selected
+      ? tableEdgeColorActive
+      : tableEdgeColor;
     view.drawTransaction((ctx) => {
       ctx.translate(x, y);
-      ctx.rotate(this.getClosestAngle() * Math.PI / 180);
-      view.drawPolygon([
-        -tableWidth / 2/scale,
-        tableWidth / 2/scale,
-        tableWidth / 2/scale,
-        -tableWidth / 2/scale,
-      ], [
-        -tableHeight / 2/scale,
-        -tableHeight / 2/scale,
-        tableHeight / 2/scale,
-        tableHeight / 2/scale,
-      ], true, fillColor, true, edgeColor, tableEdgeWidth);
+      ctx.rotate((this.getClosestAngle() * Math.PI) / 180);
+      view.drawPolygon(
+        [
+          -tableWidth / 2 / scale,
+          tableWidth / 2 / scale,
+          tableWidth / 2 / scale,
+          -tableWidth / 2 / scale,
+        ],
+        [
+          -tableHeight / 2 / scale,
+          -tableHeight / 2 / scale,
+          tableHeight / 2 / scale,
+          tableHeight / 2 / scale,
+        ],
+        true,
+        fillColor,
+        true,
+        edgeColor,
+        tableEdgeWidth,
+      );
       view.drawLine(
-        -tableWidth / 2/scale,
-        -tableHeight / 2/scale,
-        tableWidth / 2/scale,
-        tableHeight / 2/scale,
+        -tableWidth / 2 / scale,
+        -tableHeight / 2 / scale,
+        tableWidth / 2 / scale,
+        tableHeight / 2 / scale,
         tableEdgeWidth,
         edgeColor,
       );
       view.drawLine(
-        tableWidth / 2/scale,
-        -tableHeight / 2/scale,
-        -tableWidth / 2/scale,
-        tableHeight / 2/scale,
+        tableWidth / 2 / scale,
+        -tableHeight / 2 / scale,
+        -tableWidth / 2 / scale,
+        tableHeight / 2 / scale,
         tableEdgeWidth,
         edgeColor,
       );
     });
     if (selected && mode === FloorplanMode.MOVE) {
       view.drawTransaction((ctx) => {
-        ctx.globalAlpha = this.isRotating ? 1 : (this.isRotatingHover ? 0.8 : 0.3);
+        ctx.globalAlpha = this.isRotating
+          ? 1
+          : this.isRotatingHover
+          ? 0.8
+          : 0.3;
         ctx.translate(x, y);
         view.drawCircleStroke(
           0,
           0,
           rotateRadius,
-          this.isRotating ? rotateActiveColor : (this.isRotatingHover ? rotateHoverColor : rotateColor),
+          this.isRotating
+            ? rotateActiveColor
+            : this.isRotatingHover
+            ? rotateHoverColor
+            : rotateColor,
           rotateLineWidth / 2,
         );
       });
@@ -139,17 +159,26 @@ export class TableItem extends Item {
 
     // TO CHANGE
 
-    if (this.metadata.name && !this.metadata.description) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
-    } else {
-      view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name));
+    if (scale < 1.5) {
+      if (this.metadata.name && !this.metadata.description) {
+        view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
+      } else {
+        view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name));
+      }
+      if (!this.metadata.name && this.metadata.description) {
+        view.drawLabel(
+          this.x,
+          this.y,
+          this.limitText(this.metadata.description),
+        );
+      } else {
+        view.drawLabel(
+          this.x,
+          this.y - 15,
+          this.limitText(this.metadata.description),
+        );
+      }
     }
-    if (!this.metadata.name && this.metadata.description) {
-      view.drawLabel(this.x, this.y, this.limitText(this.metadata.description));
-    } else {
-      view.drawLabel(this.x, this.y - 15, this.limitText(this.metadata.description));
-    }
-
   }
 
   public limitText(text: string) {
@@ -165,8 +194,8 @@ export class TableItem extends Item {
     const cos = Math.cos(ang);
     const sin = Math.sin(ang);
     return {
-      x: (x * cos - y * sin),
-      y: (x * sin + y * cos),
+      x: x * cos - y * sin,
+      y: x * sin + y * cos,
     };
   }
 
@@ -177,10 +206,17 @@ export class TableItem extends Item {
     selected: boolean,
     mode: FloorplanMode,
   ) {
-    let { x, y } = this.rotateVector(rawX - this.x / scale, rawY - this.y / scale, this.metadata.r);
+    const { x, y } = this.rotateVector(
+      rawX - this.x / scale,
+      rawY - this.y / scale,
+      this.metadata.r,
+    );
     const sens = 5;
-    const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
-      && y <= (tableHeight + sens) && y >= (-tableHeight - sens);
+    const isMainHover =
+      x <= tableWidth + sens &&
+      x >= -tableWidth - sens &&
+      y <= tableHeight + sens &&
+      y >= -tableHeight - sens;
     if (selected && mode === FloorplanMode.MOVE) {
       this.isRotatingHover = this.overlappedRotate(rawX, rawY, scale);
       return isMainHover || this.isRotatingHover;
@@ -191,8 +227,10 @@ export class TableItem extends Item {
 
   private overlappedRotate(x: number, y: number, scale: number): boolean {
     const dist = Utils.pointDistance(this.x / scale, this.y / scale, x, y);
-    return dist > rotateRadius * 2 - rotateLineWidth
-      && dist < rotateRadius * 2 + rotateLineWidth;
+    return (
+      dist > rotateRadius * 2 - rotateLineWidth &&
+      dist < rotateRadius * 2 + rotateLineWidth
+    );
   }
 
   private getClosestAngle(sens = 5) {

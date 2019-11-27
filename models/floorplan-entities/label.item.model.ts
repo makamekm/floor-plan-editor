@@ -13,7 +13,6 @@ const rotateActiveColor = "#2196F3";
 const tableColorHover = "#888888";
 const tableColorActive = "#888888";
 
-
 const tableHeight = 60;
 const tableWidth = 30;
 
@@ -21,7 +20,6 @@ export class LabelItem extends Item {
 
   public isRotating = false;
   public isRotatingHover = false;
-  
 
   constructor(
     floorplan: FloorplanModel,
@@ -75,13 +73,16 @@ export class LabelItem extends Item {
     }
   }
 
-  public render(x: number, y: number,scale: number, hover: boolean, selected: boolean, mode: FloorplanMode, view: FloorplanView): void {
+  // tslint:disable-next-line: max-line-length
+  public render(x: number, y: number, scale: number, hover: boolean, selected: boolean, mode: FloorplanMode, view: FloorplanView): void {
 
     const fillColor = hover ? tableColorHover : selected ? tableColorActive : "#000000";
 
     const text = this.metadata.name.toUpperCase() || "Write text...";
 
-    view.drawLabel(this.x, this.y, text , fillColor, `bold 15px Arial`);
+    const fontSize = 15 / scale;
+
+    view.drawLabel(this.x, this.y, text , fillColor, `bold ${fontSize}px Arial`);
   }
 
   public rotateVector(x: number, y: number, ang: number) {
@@ -101,7 +102,7 @@ export class LabelItem extends Item {
     selected: boolean,
     mode: FloorplanMode,
   ) {
-    const { x, y } = this.rotateVector(rawX - this.x, rawY - this.y, this.metadata.r);
+    const { x, y } = this.rotateVector(rawX - this.x / scale, rawY - this.y / scale, this.metadata.r);
     const sens = 5;
     const isMainHover = x <= (tableWidth + sens) && x >= (-tableWidth - sens)
       && y <= (tableHeight + sens) && y >= (-tableHeight - sens);

@@ -5,7 +5,7 @@ import "../utils/firebase";
 import { IRootService } from "./root-sevice.interface";
 import { UserService } from "./user.service";
 
-const endpoint = "https://table-management-3-unsecure.herokuapp.com";
+const endpoint = "https://table-management-staging.herokuapp.com";
 
 export class FloorProvider implements IRootService {
   public userService: UserService;
@@ -106,7 +106,7 @@ export class FloorProvider implements IRootService {
       "Authorization": "Bearer " + this.accessToken,
     });
     try {
-      const response = await fetch(`${endpoint}/floors/floorlan/${id}`, {
+      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
         method: "DELETE",
         headers,
       });
@@ -131,7 +131,7 @@ export class FloorProvider implements IRootService {
     const serializedPlan = this.serializeFloorPlan(floorplan);
 
     try {
-      const response = await fetch(`${endpoint}/floors/floorlan`, {
+      const response = await fetch(`${endpoint}/floors/floorPlan`, {
         method: "POST",
         headers,
         body: JSON.stringify(serializedPlan),
@@ -167,7 +167,7 @@ export class FloorProvider implements IRootService {
         ...floorPlanCopy.plan.items[i],
         id: i,
         action_type: 0,
-        type: 0,
+        // type: 0,
       };
     }
     floorPlanCopy = {

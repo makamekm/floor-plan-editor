@@ -378,7 +378,7 @@ export class FloorplanController {
 
   private wheel(event: WheelEvent) {
     const delta = Math.sign(event.deltaY);
-    this.originScale += delta / 10;
+    this.originScale += delta / 100;
     this.originScale = Math.max(this.originScale, 1);
     this.originScale = Math.min(this.originScale, 3);
     console.log(this.originScale)
@@ -389,7 +389,9 @@ export class FloorplanController {
   private mouseup(clientX: number, clientY: number) {
     this.mouseDown = false;
 
+    // tslint:disable-next-line: max-line-length
     this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel / this.originScale;
+    // tslint:disable-next-line: max-line-length
     this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel /this.originScale;
 
     const selectedItem = this.floorplan.getSelectedItem();

@@ -26,6 +26,10 @@ const itemTypeList = [
     key: "delete",
     name: "Delete",
   },
+  {
+    key: "lock",
+    name: "Lock",
+  },
 ];
 
 const BlueprintView = () => {
@@ -89,6 +93,7 @@ const BlueprintView = () => {
         <div className="mode-panel">
           <ToggleButtonType
             activeState={blueprintService.mode}
+            isWallLocked={blueprintService.isWallLocked}
             items={itemTypeList}
             onToggle={onToggleMode}
           />

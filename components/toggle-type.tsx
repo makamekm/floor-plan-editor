@@ -3,11 +3,13 @@ import React, { memo } from "react";
 const ToggleButtonType = ({
   onToggle,
   activeState,
+  isWallLocked,
   items,
   responsive,
 }: {
   onToggle: (key: string | number) => void;
   activeState?: string | number;
+  isWallLocked?: boolean;
   items: Array<{
     key: string | number;
     name: string | JSX.Element;
@@ -22,8 +24,9 @@ const ToggleButtonType = ({
           items.map(({key, name, onClick}) => {
             return (
               <div key={key} onClick={onClick || (() => onToggle(key))}
-                className={"toggle-type-button" + (activeState === key ? " active" : "")}>
-                {name}
+                className={"toggle-type-button" + (activeState === key ? " active" : "")
+                  + " toggle-type-button" + (key === "lock" && isWallLocked ? " locked" : "")}>
+                {key === "lock" ? `Walls ${isWallLocked ? "Locked" : "Unlocked"}` : name}
               </div>
             );
           })
@@ -82,7 +85,7 @@ const ToggleButtonType = ({
           border-right-width: 1px;
         }
 
-        .toggle-type-button:active, .toggle-type-button.active {
+        .toggle-type-button:active, .toggle-type-button.active, .toggle-type-button.locked {
           background-color: #2196F3;
           border-color: #2196F3;
           color: #FFFFFF;

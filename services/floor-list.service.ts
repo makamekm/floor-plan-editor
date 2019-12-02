@@ -26,10 +26,10 @@ export class FloorListService implements IRootService {
     this.opened = false;
   }
 
-  public async loadList(projectId: number | string) {
+  public async loadList() {
     this.setLoading(true);
     try {
-      const list = await this.floorProvider.getFloorplanList(projectId);
+      const list = await this.floorProvider.getFloorplanList();
       this.list.replace(list);
     } catch (error) {
       // tslint:disable-next-line

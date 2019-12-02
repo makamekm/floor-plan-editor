@@ -166,11 +166,12 @@ export class FloorplanModel {
     return this.items;
   }
 
-  public overlappedItem(x: number, y: number, mode: FloorplanMode): Item {
+  public overlappedItem(x: number, y: number, scale: number, mode: FloorplanMode): Item {
     for (const item of this.items) {
       if (item.overlapped(
         x,
         y,
+        scale,
         this.getSelectedItem() === item,
         mode,
       )) {
@@ -180,20 +181,20 @@ export class FloorplanModel {
     return null;
   }
 
-  public overlappedCorner(x: number, y: number, tolerance?: number): Corner {
+  public overlappedCorner(x: number, y: number, scale: number, tolerance?: number): Corner {
     tolerance = tolerance || defaultFloorPlanTolerance;
     for (const corner of this.corners) {
-      if (corner.distanceFrom(x, y) < tolerance) {
+      if (corner.distanceFrom(x, y, scale) < tolerance) {
         return corner;
       }
     }
     return null;
   }
 
-  public overlappedWall(x: number, y: number, tolerance?: number): Wall {
+  public overlappedWall(x: number, y: number, scale: number, tolerance?: number): Wall {
     tolerance = tolerance || defaultFloorPlanTolerance;
     for (const wall of this.walls) {
-      if (wall.distanceFrom(x, y) < tolerance) {
+      if (wall.distanceFrom(x, y, scale) < tolerance) {
         return wall;
       }
     }

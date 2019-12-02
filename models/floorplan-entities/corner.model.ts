@@ -95,8 +95,8 @@ export class Corner {
   /**
    *
    */
-  public distanceFrom(x: number, y: number): number {
-    const distance = Utils.distance(x, y, this.x, this.y);
+  public distanceFrom(x: number, y: number, scale: number): number {
+    const distance = Utils.distance(x, y, this.x / scale, this.y / scale);
     // console.log('x,y ' + x + ',' + y + ' to ' + this.getX() + ',' + this.getY() + ' is ' + distance);
     return distance;
   }
@@ -106,7 +106,7 @@ export class Corner {
    * @returns The distance.
    */
   public distanceFromWall(wall: Wall): number {
-    return wall.distanceFrom(this.x, this.y);
+    return wall.distanceFrom(this.x, this.y, 1);
   }
 
   /** Gets the distance from a corner.
@@ -114,7 +114,7 @@ export class Corner {
    * @returns The distance.
    */
   public distanceFromCorner(corner: Corner): number {
-    return this.distanceFrom(corner.x, corner.y);
+    return this.distanceFrom(corner.x, corner.y, 1);
   }
 
   /** Detaches a wall.

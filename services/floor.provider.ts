@@ -1,31 +1,44 @@
-import firebase from "firebase/app";
+import { useEffect } from "react";
 import { useInstance } from "react-ioc";
 import { FloorDto } from "../models/floor.dto";
-import { ProjectDto, ProjectListDto } from "../models/project-list.dto";
 import "../utils/firebase";
 import { IRootService } from "./root-sevice.interface";
 import { UserService } from "./user.service";
 
+const endpoint = "https://table-management-staging.herokuapp.com";
+
 export class FloorProvider implements IRootService {
   public userService: UserService;
+  private accessToken: string;
 
   public useHook() {
     this.userService = useInstance(UserService);
+
+    useEffect(() => {
+      this.accessToken = localStorage.getItem("access_token");
+    });
   }
 
-  public async getFloorplan(projectId: number | string, id: number | string): Promise<FloorDto> {
-    const db = firebase.firestore();
-    const floorplanRef = db.collection("floorplan");
+  // Get single plan
+  public async getFloorplan(id: number | string): Promise<FloorDto> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
+    try {
+      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
+        headers,
+      });
 
-    const floorplan = await floorplanRef
-      .doc(String(id)).get();
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
 
-    if (floorplan.exists) {
-      return {
-        id: floorplan.id,
-        ...floorplan.data() as FloorDto,
-      };
-    } else {
+      const res = await response.json();
+      const desRes = this.deserializeFloorPlan(res);
+
+      return desRes;
+    } catch (error) {
       return {
         data: null,
         plan: null,
@@ -33,117 +46,167 @@ export class FloorProvider implements IRootService {
     }
   }
 
-  public async saveFloorplan(projectId: number | string, id: number | string, floorplan: FloorDto): Promise<FloorDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("floorplan");
+  // Update
+  public async saveFloorplan(
+    id: number | string,
+    floorplan: FloorDto,
+  ): Promise<FloorDto> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
 
-    await projectRef
-      .doc(String(id))
-      .update({
-        projectId,
-        userId: this.userService.user.uid,
-        ...floorplan,
+    const updatedPlan = this.serializeFloorPlan(floorplan);
+
+    try {
+      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(updatedPlan),
       });
 
-    return floorplan;
-  }
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
 
-  public async getFloorplanList(projectId: number | string): Promise<FloorDto[]> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("floorplan");
-
-    const project = await projectRef
-      .where("projectId", "==", projectId)
-      .get();
-
-    return project.docs.map((d) => ({
-      id: d.id,
-      ...d.data() as FloorDto,
-    }));
-  }
-
-  public async deleteFloorplan(projectId: number | string, id: number | string): Promise<boolean> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("floorplan");
-    await projectRef.doc(String(id)).delete();
-    return true;
-  }
-
-  public async createFloorplan(projectId: number | string, floorplan: FloorDto): Promise<FloorDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("floorplan");
-    const ref = await projectRef.add({
-      projectId,
-      userId: this.userService.user.uid,
-      ...floorplan,
-    });
-    return {
-      ...floorplan,
-      id: ref.id,
-    };
-  }
-
-  public async getProject(projectId: number | string): Promise<ProjectDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("project");
-
-    const project = await projectRef
-      .doc(String(projectId)).get();
-
-    if (project.exists) {
+      return await response.json();
+    } catch (error) {
       return {
-        id: project.id,
-        ...project.data() as ProjectDto,
+        data: null,
+        plan: null,
       };
-    } else {
-      return null;
     }
   }
 
-  public async getProjectList(): Promise<ProjectListDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("project");
-
-    const project = await projectRef
-      .where("userId", "==", this.userService.user.uid)
-      .get();
-    return project.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    } as any));
-  }
-
-  public async deleteProject(projectId: number | string): Promise<boolean> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("project");
-    await projectRef.doc(String(projectId)).delete();
-    return true;
-  }
-
-  public async saveProject(project: ProjectDto): Promise<ProjectDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("project");
-
-    await projectRef
-      .doc(String(project.id))
-      .update({
-        userId: this.userService.user.uid,
-        ...project,
+  // Get
+  public async getFloorplanList(): Promise<FloorDto[]> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
+    try {
+      const response = await fetch(`${endpoint}/floors/floorPlanList`, {
+        headers,
       });
 
-    return project;
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+
+      return await response.json();
+    } catch (error) {
+      return [];
+    }
   }
 
-  public async createProject(name: string): Promise<ProjectDto> {
-    const db = firebase.firestore();
-    const projectRef = db.collection("project");
-    const ref = await projectRef.add({
-      userId: this.userService.user.uid,
-      name,
+  // Remove
+  public async deleteFloorplan(id: number | string): Promise<boolean> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
     });
-    return {
-      name,
-      id: ref.id,
+    try {
+      const response = await fetch(`${endpoint}/floors/floorPlan/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Post
+  public async createFloorplan(floorplan: FloorDto): Promise<FloorDto> {
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + this.accessToken,
+    });
+
+    const serializedPlan = this.serializeFloorPlan(floorplan);
+
+    try {
+      const response = await fetch(`${endpoint}/floors/floorPlan`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(serializedPlan),
+      });
+
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+
+      return await response.json();
+    } catch (error) {
+      return {
+        data: null,
+        plan: null,
+      };
+    }
+  }
+
+  private serializeFloorPlan(floorPlan: FloorDto): FloorDto {
+    let floorPlanCopy = JSON.parse(JSON.stringify(floorPlan));
+    const cornersArray: any[] = [];
+
+    Object.keys(floorPlanCopy.plan.corners).forEach((key) => {
+      floorPlanCopy.plan.corners[key] = {
+        id: key,
+        ...floorPlanCopy.plan.corners[key],
+      };
+      cornersArray.push(floorPlanCopy.plan.corners[key]);
+    });
+
+    for (let i = 0; i < floorPlanCopy.plan.items.length; i++) {
+      floorPlanCopy.plan.items[i] = {
+        ...floorPlanCopy.plan.items[i],
+        id: i,
+        action_type: 0,
+        // type: 0,
+      };
+    }
+    floorPlanCopy = {
+      ...floorPlanCopy,
+      plan: {
+        ...floorPlanCopy.plan,
+        corners: cornersArray,
+      },
     };
+
+    return floorPlanCopy;
+  }
+
+  private arrayToObject(array: {
+    [x: string]: { x: number; y: number };
+    reduce?: any;
+  }) {
+    return array.reduce(
+      (obj: { [x: string]: any }, item: { id: string | number }) => {
+        obj[item.id] = item;
+        return obj;
+      },
+      {},
+    );
+  }
+
+  private deserializeFloorPlan(floorPlan: FloorDto): FloorDto {
+    const cornersObject = this.arrayToObject(floorPlan.plan.corners);
+
+    let floorPlanCopy = JSON.parse(JSON.stringify(floorPlan));
+
+    floorPlanCopy = {
+      ...floorPlanCopy,
+      plan: {
+        ...floorPlanCopy.plan,
+        corners: cornersObject,
+      },
+    };
+
+    return floorPlanCopy;
   }
 }

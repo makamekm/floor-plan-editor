@@ -86,6 +86,11 @@ export class Blueprint {
       case "delete":
         this.floorplanner.setMode(FloorplanMode.DELETE);
         break;
+      case "zoomIn":
+        this.floorplanner.setMode(FloorplanMode.ZOOM_IN);
+        break;
+      case "zoomOut":
+        this.floorplanner.setMode(FloorplanMode.ZOOM_OUT);
     }
   }
 

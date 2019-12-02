@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
-import { EditIcon, SearchIcon } from "../icons/icon";
+import { DownloadIcon, EditIcon, SaveIcon, SearchIcon } from "../icons/icon";
 import { FloorEditService } from "../services/floor-edit.service";
 import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
@@ -51,7 +51,17 @@ const FloorPanel = () => {
               }, {
                 key: "menu",
                 name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
-              }].filter((s) => !!s)}
+              }, !isCreate && {
+                key: "updatePlan",
+                name: <div onClick={floorService.saveState} style={{lineHeight: 0}}><img src={SaveIcon} alt=""/></div>,
+                onClick: floorService.saveState,
+              }, !isCreate && {
+                key: "saveToFile",
+                // tslint:disable-next-line: max-line-length
+                name: <a id="saveToFileBtn" download="canvas.png" style={{lineHeight: 0}}><img src={DownloadIcon} alt=""/></a>,
+                onClick: floorService.saveCanvasToFile,
+              },
+            ].filter((s) => !!s)}
               onToggle={onToggleClick}
             />
             <WindowPanel

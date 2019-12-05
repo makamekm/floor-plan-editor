@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React, { memo, useCallback } from "react";
 import { useInstance } from "react-ioc";
-import { DownloadIcon, EditIcon, SaveIcon, SearchIcon } from "../icons/icon";
+import { DownloadIcon, EditIcon, SaveIcon, SearchIcon, NewIcon } from "../icons/icon";
 import { FloorEditService } from "../services/floor-edit.service";
 import { FloorListService } from "../services/floor-list.service";
 import { FloorService } from "../services/floor.service";
@@ -16,6 +16,7 @@ const FloorPanel = () => {
   const floorService = useInstance(FloorService);
   const floorListService = useInstance(FloorListService);
   const floorEditService = useInstance(FloorEditService);
+  
   const onToggleClick = useCallback((key: string | number) => {
     if (key === "menu") {
       floorListService.opened = true;
@@ -23,12 +24,15 @@ const FloorPanel = () => {
       floorEditService.opened = true;
     }
   }, []);
+
   const onClickOutsideFloorList = useCallback(() => {
     floorListService.opened = false;
   }, []);
+
   const onClickOutsideFloorEdit = useCallback(() => {
     floorEditService.opened = false;
   }, []);
+
 
   const id = floorService.floor && floorService.floor.id;
   const isCreate = id == null;
@@ -47,35 +51,40 @@ const FloorPanel = () => {
                 onClick: open,
               }, !isCreate && {
                 key: "edit",
-                name: <div style={{lineHeight: 0}}><img src={EditIcon} alt=""/></div>,
+                name: <div style={{ lineHeight: 0 }}><img src={EditIcon} alt="" /></div>,
               }, {
                 key: "menu",
-                name: <div style={{lineHeight: 0}}><img src={SearchIcon} alt=""/></div>,
+                name: <div style={{ lineHeight: 0 }}><img src={SearchIcon} alt="" /></div>,
               }, !isCreate && {
                 key: "updatePlan",
-                name: <div onClick={floorService.saveState} style={{lineHeight: 0}}><img src={SaveIcon} alt=""/></div>,
+                // tslint:disable-next-line: max-line-length
+                name: <div onClick={floorService.saveState} style={{ lineHeight: 0 }}><img src={SaveIcon} alt="" /></div>,
                 onClick: floorService.saveState,
               }, !isCreate && {
                 key: "saveToFile",
                 // tslint:disable-next-line: max-line-length
-                name: <a id="saveToFileBtn" download="canvas.png" style={{lineHeight: 0}}><img src={DownloadIcon} alt=""/></a>,
+                name: <a id="saveToFileBtn" download="canvas.png" style={{ lineHeight: 0 }}><img src={DownloadIcon} alt="" /></a>,
                 onClick: floorService.saveCanvasToFile,
+              }, !isCreate && {
+                key: "copy",
+                name: <div style={{ lineHeight: 0 }}><img src={NewIcon} alt="" /></div>,
+                onClick: floorService.copyProject,
               },
-            ].filter((s) => !!s)}
+              ].filter((s) => !!s)}
               onToggle={onToggleClick}
             />
             <WindowPanel
               active={floorListService.opened}
               onClickOutside={onClickOutsideFloorList}>
               <div className="list">
-                <FloorList/>
+                <FloorList />
               </div>
             </WindowPanel>
             <WindowPanel
               active={floorEditService.opened}
               onClickOutside={onClickOutsideFloorEdit}>
               <div className="list">
-                <FloorEdit/>
+                <FloorEdit />
               </div>
             </WindowPanel>
           </Panel>

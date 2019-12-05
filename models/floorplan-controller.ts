@@ -1,12 +1,12 @@
-import debounce from "debounce";
-import { Callback } from "../utils/callback";
-import { FloorplanDto } from "./floor.dto";
-import { Corner } from "./floorplan-entities/corner.model";
-import { Item } from "./floorplan-entities/item.model";
-import { Wall } from "./floorplan-entities/wall.model";
-import { FloorplanMode } from "./floorplan-mode.enum";
-import { FloorplanModel } from "./floorplan-model";
-import { FloorplanView } from "./floorplan-view";
+import debounce from 'debounce';
+import { Callback } from '../utils/callback';
+import { FloorplanDto } from './floor.dto';
+import { Corner } from './floorplan-entities/corner.model';
+import { Item } from './floorplan-entities/item.model';
+import { Wall } from './floorplan-entities/wall.model';
+import { FloorplanMode } from './floorplan-mode.enum';
+import { FloorplanModel } from './floorplan-model';
+import { FloorplanView } from './floorplan-view';
 
 /** how much will we move a corner to make a wall axis aligned (cm) */
 const snapTolerance = 25;
@@ -36,11 +36,12 @@ export class FloorplanController {
 
   public get activeItem() {
     return this.activeItemIndex != null
-    ? this.floorplan.getItems()[this.activeItemIndex]
-    : null;
+      ? this.floorplan.getItems()[this.activeItemIndex]
+      : null;
   }
 
   public mode = FloorplanMode.MOVE;
+  public isWallLocked = false;
   public activeWall: Wall | null = null;
   public activeCorner: Corner | null = null;
 
@@ -92,52 +93,57 @@ export class FloorplanController {
   /** mouse position at last click */
   private lastRawY = 0;
 
-  constructor(private canvasElement: HTMLCanvasElement, private floorplan: FloorplanModel) {
-
+  constructor(
+    private canvasElement: HTMLCanvasElement,
+    private floorplan: FloorplanModel
+  ) {
     this.view = new FloorplanView(this.floorplan, this, canvasElement);
 
     // Initialization:
 
     this.setMode(FloorplanMode.MOVE);
 
-    this.canvasElement.addEventListener("mousedown", (event) => {
+    this.canvasElement.addEventListener('mousedown', event => {
       this.mousedown(event.clientX, event.clientY);
     });
-    this.canvasElement.addEventListener("touchstart", (event) => {
+    this.canvasElement.addEventListener('touchstart', event => {
       event.preventDefault();
       this.mousemove(event.touches[0].clientX, event.touches[0].clientY);
       this.mousedown(event.touches[0].clientX, event.touches[0].clientY);
     });
 
-    this.canvasElement.addEventListener("mousemove", (event) => {
+    this.canvasElement.addEventListener('mousemove', event => {
       this.mousemove(event.clientX, event.clientY);
     });
-    this.canvasElement.addEventListener("touchmove", (event) => {
+    this.canvasElement.addEventListener('touchmove', event => {
       this.mousemove(event.touches[0].clientX, event.touches[0].clientY);
     });
 
-    this.canvasElement.addEventListener("mouseup", (event) => {
+    this.canvasElement.addEventListener('mouseup', event => {
       this.mouseup(event.clientX, event.clientY);
     });
 
-    this.canvasElement.addEventListener("touchend", (event) => {
+    this.canvasElement.addEventListener('touchend', event => {
       event.preventDefault();
-      this.mouseup(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      this.mouseup(
+        event.changedTouches[0].clientX,
+        event.changedTouches[0].clientY
+      );
     });
 
-    this.canvasElement.addEventListener("mouseleave", () => {
+    this.canvasElement.addEventListener('mouseleave', () => {
       this.mouseleave();
     });
-    this.canvasElement.addEventListener("touchleave", () => {
+    this.canvasElement.addEventListener('touchleave', () => {
       event.preventDefault();
       this.mouseleave();
     });
 
-    window.addEventListener("wheel", (event) => {
+    window.addEventListener('wheel', event => {
       this.wheel(event);
     });
 
-    document.addEventListener("keyup", (e) => {
+    document.addEventListener('keyup', e => {
       if (e.keyCode === 27) {
         this.escapeKey();
       }
@@ -152,7 +158,7 @@ export class FloorplanController {
     return {
       x: this.originX,
       y: this.originY,
-      floorplan: this.floorplan.exportFloorplan(),
+      floorplan: this.floorplan.exportFloorplan()
     };
   }
 
@@ -160,7 +166,7 @@ export class FloorplanController {
     this.onModelChange.fire({
       x: this.originX,
       y: this.originY,
-      floorplan: this.floorplan.exportFloorplan(),
+      floorplan: this.floorplan.exportFloorplan()
     });
   }
 
@@ -189,24 +195,32 @@ export class FloorplanController {
     this.view.draw();
   }
 
+  public changeIsWallLocked(isLocked: boolean) {
+    this.isWallLocked = isLocked;
+  }
+
   /** Gets the center of the view */
   public getCenter() {
-    const centerX = this.canvasElement.getBoundingClientRect().width / 2.0 / this.originScale;
-    const centerY = this.canvasElement.getBoundingClientRect().height / 2.0 / this.originScale;
+    const centerX =
+      this.canvasElement.getBoundingClientRect().width / 2.0 / this.originScale;
+    const centerY =
+      this.canvasElement.getBoundingClientRect().height /
+      2.0 /
+      this.originScale;
     return {
       x: (this.originX + centerX) * cmPerPixel,
-      y: (this.originY + centerY) * cmPerPixel,
+      y: (this.originY + centerY) * cmPerPixel
     };
   }
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertX(x: number): number {
-    return (x - this.originX * cmPerPixel) * pixelsPerCm / this.originScale;
+    return ((x - this.originX * cmPerPixel) * pixelsPerCm) / this.originScale;
   }
 
   /** Convert from THREEjs coords to canvas coords. */
   public convertY(y: number): number {
-    return (y - this.originY * cmPerPixel) * pixelsPerCm / this.originScale;
+    return ((y - this.originY * cmPerPixel) * pixelsPerCm) / this.originScale;
   }
 
   private escapeKey() {
@@ -255,24 +269,46 @@ export class FloorplanController {
       }
     } else {
       if (selectedItem) {
-        selectedItem.mousedown(this.mouseX, this.mouseY,this.originScale, this.mode);
+        selectedItem.mousedown(
+          this.mouseX,
+          this.mouseY,
+          this.originScale,
+          this.mode
+        );
       }
     }
 
     this.view.draw();
   }
 
-  private calculateMouseMoveDistance(mouseX: number, lastX: number, mouseY: number, lastY: number) {
-    return Math.sqrt(Math.pow((mouseX - lastX), 2) + Math.pow((mouseY - lastY), 2));
+  private calculateMouseMoveDistance(
+    mouseX: number,
+    lastX: number,
+    mouseY: number,
+    lastY: number
+  ) {
+    return Math.sqrt(Math.pow(mouseX - lastX, 2) + Math.pow(mouseY - lastY, 2));
   }
 
   private mousemove(clientX: number, clientY: number) {
-
     // update mouse
-    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel /this.originScale;
-    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel /this.originScale;
+    // tslint:disable-next-line: max-line-length
+    this.mouseX =
+      (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel +
+      (this.originX * cmPerPixel) / this.originScale;
+    // tslint:disable-next-line: max-line-length
+    this.mouseY =
+      (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel +
+      (this.originY * cmPerPixel) / this.originScale;
 
-    if (this.calculateMouseMoveDistance(this.mouseX, this.lastX, this.mouseY, this.lastY) < 3) {
+    if (
+      this.calculateMouseMoveDistance(
+        this.mouseX,
+        this.lastX,
+        this.mouseY,
+        this.lastY
+      ) < 3
+    ) {
       return;
     }
     this.mouseMoved = true;
@@ -281,8 +317,8 @@ export class FloorplanController {
 
     // update target (snapped position of actual mouse)
     if (
-      this.mode === FloorplanMode.DRAW
-      || (this.mode === FloorplanMode.MOVE && this.mouseDown)
+      this.mode === FloorplanMode.DRAW ||
+      (this.mode === FloorplanMode.MOVE && this.mouseDown)
     ) {
       this.updateTarget();
       this.view.draw();
@@ -291,7 +327,12 @@ export class FloorplanController {
     // update object target
     if (this.mode !== FloorplanMode.DRAW && !this.mouseDown) {
       let draw = false;
-      const hoverItem = this.floorplan.overlappedItem(this.mouseX, this.mouseY, this.originScale, this.mode);
+      const hoverItem = this.floorplan.overlappedItem(
+        this.mouseX,
+        this.mouseY,
+        this.originScale,
+        this.mode
+      );
       if (hoverItem !== this.activeItem) {
         draw = true;
       }
@@ -301,8 +342,16 @@ export class FloorplanController {
         this.activeWall = null;
       } else {
         this.activeItem = null;
-        const hoverCorner = this.floorplan.overlappedCorner(this.mouseX, this.mouseY, this.originScale);
-        const hoverWall = this.floorplan.overlappedWall(this.mouseX, this.mouseY, this.originScale);
+        const hoverCorner = this.floorplan.overlappedCorner(
+          this.mouseX,
+          this.mouseY,
+          this.originScale
+        );
+        const hoverWall = this.floorplan.overlappedWall(
+          this.mouseX,
+          this.mouseY,
+          this.originScale
+        );
         if (hoverCorner !== this.activeCorner) {
           this.activeCorner = hoverCorner;
           draw = true;
@@ -323,7 +372,12 @@ export class FloorplanController {
     }
 
     // panning
-    if (this.mouseDown && !this.activeCorner && !this.activeWall && !this.activeItem) {
+    if (
+      this.mouseDown &&
+      !this.activeCorner &&
+      !this.activeWall &&
+      !this.activeItem
+    ) {
       this.originX -= clientX - this.lastRawX;
       this.originY -= clientY - this.lastRawY;
       this.lastRawX = clientX;
@@ -334,33 +388,34 @@ export class FloorplanController {
     // dragging
     if (this.mouseDown) {
       if (
-        selectedItem
-        && selectedItem === this.activeItem
-        && selectedItem.mousemove(
+        selectedItem &&
+        selectedItem === this.activeItem &&
+        selectedItem.mousemove(
           this.mouseX,
           this.mouseY,
           this.lastX,
           this.lastY,
-          this.mode,
+          this.mode
         )
       ) {
         this.emitChanges();
         this.lastX = this.mouseX;
         this.lastY = this.mouseY;
         this.view.draw();
+        // } else if (this.mode === FloorplanMode.MOVE) {
       } else if (this.mode === FloorplanMode.MOVE) {
         if (this.activeItem) {
           this.activeItem.relativeMove(
             this.mouseX - this.lastX,
-            this.mouseY - this.lastY,
+            this.mouseY - this.lastY
           );
           this.emitChanges();
-        } else if (this.activeCorner) {
+        } else if (this.activeCorner && !this.isWallLocked) {
           this.activeCorner.move(this.mouseX, this.mouseY);
           this.activeCorner.snapToAxis(snapTolerance);
           this.checkWallDuplicates();
           this.emitChanges();
-        } else if (this.activeWall) {
+        } else if (this.activeWall && !this.isWallLocked) {
           this.activeWall.relativeMove(
             this.mouseX - this.lastX,
             this.mouseY - this.lastY,
@@ -381,7 +436,6 @@ export class FloorplanController {
     this.originScale += delta / 100;
     this.originScale = Math.max(this.originScale, 1);
     this.originScale = Math.min(this.originScale, 3);
-    console.log(this.originScale)
 
     this.view.draw();
   }
@@ -390,14 +444,25 @@ export class FloorplanController {
     this.mouseDown = false;
 
     // tslint:disable-next-line: max-line-length
-    this.mouseX = (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel + this.originX * cmPerPixel / this.originScale;
+    this.mouseX =
+      (clientX - this.canvasElement.getBoundingClientRect().left) * cmPerPixel +
+      (this.originX * cmPerPixel) / this.originScale;
     // tslint:disable-next-line: max-line-length
-    this.mouseY = (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel + this.originY * cmPerPixel /this.originScale;
+    this.mouseY =
+      (clientY - this.canvasElement.getBoundingClientRect().top) * cmPerPixel +
+      (this.originY * cmPerPixel) / this.originScale;
 
     const selectedItem = this.floorplan.getSelectedItem();
 
     if (selectedItem) {
-      if (selectedItem.mouseup(this.mouseX, this.mouseY, this.originScale , this.mode)) {
+      if (
+        selectedItem.mouseup(
+          this.mouseX,
+          this.mouseY,
+          this.originScale,
+          this.mode
+        )
+      ) {
         this.view.draw();
         this.emitChanges();
       }
@@ -416,7 +481,10 @@ export class FloorplanController {
       this.checkWallDuplicates();
       this.view.draw();
       this.emitChanges();
-    } else if (!this.mouseMoved && this.mode === FloorplanMode.MOVE || this.mode == null) {
+    } else if (
+      (!this.mouseMoved && this.mode === FloorplanMode.MOVE) ||
+      this.mode == null
+    ) {
       if (this.activeItem) {
         this.floorplan.setSelectedItem(this.activeItem, true);
       } else {
@@ -435,11 +503,10 @@ export class FloorplanController {
         const wallCheck = walls[k];
         if (
           wall !== wallCheck &&
-          (
-            (wall.getEnd() === wallCheck.getEnd() && wall.getStart() === wallCheck.getStart())
-            ||
-            (wall.getEnd() === wallCheck.getStart() && wall.getStart() === wallCheck.getEnd())
-          )
+          ((wall.getEnd() === wallCheck.getEnd() &&
+            wall.getStart() === wallCheck.getStart()) ||
+            (wall.getEnd() === wallCheck.getStart() &&
+              wall.getStart() === wallCheck.getEnd()))
         ) {
           duplicates.push(wallCheck);
         }

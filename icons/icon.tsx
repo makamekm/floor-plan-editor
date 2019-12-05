@@ -27,3 +27,6 @@ export const SaveIcon = _SaveIcon;
 
 import _DownloadIcon from "./download.svg";
 export const DownloadIcon = _DownloadIcon;
+
+import _NewIcon from "./document.svg";
+export const NewIcon = _NewIcon;

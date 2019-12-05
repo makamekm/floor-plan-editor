@@ -26,6 +26,10 @@ const itemTypeList = [
     key: "delete",
     name: "Delete",
   },
+  {
+    key: "lock",
+    name: "Lock",
+  },
 ];
 
 const BlueprintView = () => {
@@ -89,6 +93,7 @@ const BlueprintView = () => {
         <div className="mode-panel">
           <ToggleButtonType
             activeState={blueprintService.mode}
+            isWallLocked={blueprintService.isWallLocked}
             items={itemTypeList}
             onToggle={onToggleMode}
           />
@@ -159,7 +164,7 @@ const BlueprintView = () => {
             left: 50%;
             transform: translateX(-50%);
             max-width: calc(100vw - 40px);
-            width: 270px;
+            width: 320px;
           }
 
           @media (max-width: 900px) {

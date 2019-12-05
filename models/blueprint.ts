@@ -72,7 +72,7 @@ export class Blueprint {
     this.floorplanner.reset();
   }
 
-  public changeMode(mode: string) {
+  public changeMode(mode: string, isWallLocked?: boolean) {
     switch (mode) {
       case "read":
         this.floorplanner.setMode(null);
@@ -86,11 +86,9 @@ export class Blueprint {
       case "delete":
         this.floorplanner.setMode(FloorplanMode.DELETE);
         break;
-      case "zoomIn":
-        this.floorplanner.setMode(FloorplanMode.ZOOM_IN);
+      case "lock":
+        this.floorplanner.changeIsWallLocked(isWallLocked);
         break;
-      case "zoomOut":
-        this.floorplanner.setMode(FloorplanMode.ZOOM_OUT);
     }
   }
 

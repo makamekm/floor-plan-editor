@@ -20,11 +20,14 @@ export interface IModel {
 const historyLimit = 50;
 
 export class BlueprintService implements IRootService {
-
   @computed public get selected() {
-    return this.model.changeState
-      && this.model.changeState.selectedItem != null
-      && this.model.changeState.floorplan.items[this.model.changeState.selectedItem];
+    return (
+      this.model.changeState &&
+      this.model.changeState.selectedItem != null &&
+      this.model.changeState.floorplan.items[
+        this.model.changeState.selectedItem
+      ]
+    );
   }
 
   @computed public get hasPlan() {
@@ -34,6 +37,7 @@ export class BlueprintService implements IRootService {
   public onStateChange = new Callback<FloorplanDto>();
 
   @observable public mode: string = "move";
+  @observable public isWallLocked: boolean = false;
 
   public applyChanges = debounce(() => {
     this.pushHistory();
@@ -114,7 +118,12 @@ export class BlueprintService implements IRootService {
       this.model.history.push(this.model.state);
       Utils.limitArray(this.model.history, historyLimit);
       this.model.state = state;
-      this.blueprint.setState(state.floorplan, state.x, state.y, state.selectedItem);
+      this.blueprint.setState(
+        state.floorplan,
+        state.x,
+        state.y,
+        state.selectedItem,
+      );
       this.onStateChange.fire(this.getFloorplan());
     }
   }
@@ -125,13 +134,21 @@ export class BlueprintService implements IRootService {
       this.model.revert.push(this.model.state);
       Utils.limitArray(this.model.revert, historyLimit);
       this.model.state = state;
-      this.blueprint.setState(state.floorplan, state.x, state.y, state.selectedItem);
+      this.blueprint.setState(
+        state.floorplan,
+        state.x,
+        state.y,
+        state.selectedItem,
+      );
       this.onStateChange.fire(this.getFloorplan());
     }
   }
 
   public changeMode(mode: string) {
-    this.blueprint.changeMode(mode);
+    if (mode === "lock") {
+      this.isWallLocked = !this.isWallLocked;
+    }
+    this.blueprint.changeMode(mode, this.isWallLocked);
   }
 
   public setDemoMode(value: boolean) {

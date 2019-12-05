@@ -164,7 +164,7 @@ const BlueprintView = () => {
             left: 50%;
             transform: translateX(-50%);
             max-width: calc(100vw - 40px);
-            width: 270px;
+            width: 320px;
           }
 
           @media (max-width: 900px) {

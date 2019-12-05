@@ -1,15 +1,15 @@
-import debounce from "debounce";
-import { saveAs } from "file-saver";
-import { observable } from "mobx";
-import { NextRouter, useRouter } from "next/router";
-import { useInstance } from "react-ioc";
-import { FloorDto, FloorplanDataDto } from "../models/floor.dto";
-import { useRouterChange } from "../utils/router-hook";
-import { BlueprintService } from "./blueprint.service";
-import { FloorListService } from "./floor-list.service";
-import { FloorRouterService } from "./floor-router.service";
-import { FloorProvider } from "./floor.provider";
-import { IRootService } from "./root-sevice.interface";
+import debounce from 'debounce';
+import { saveAs } from 'file-saver';
+import { observable } from 'mobx';
+import { NextRouter, useRouter } from 'next/router';
+import { useInstance } from 'react-ioc';
+import { FloorDto, FloorplanDataDto } from '../models/floor.dto';
+import { useRouterChange } from '../utils/router-hook';
+import { BlueprintService } from './blueprint.service';
+import { FloorListService } from './floor-list.service';
+import { FloorRouterService } from './floor-router.service';
+import { FloorProvider } from './floor.provider';
+import { IRootService } from './root-sevice.interface';
 
 export class FloorService implements IRootService {
   @observable public loading: boolean = false;
@@ -19,10 +19,10 @@ export class FloorService implements IRootService {
     data: FloorplanDataDto;
   } = {
     id: null,
-    data: null,
+    data: null
   };
 
-  private setLoading = debounce<(value: boolean) => void>((value) => {
+  private setLoading = debounce<(value: boolean) => void>(value => {
     this.loading = value;
   }, 50);
 
@@ -33,17 +33,18 @@ export class FloorService implements IRootService {
   private floorListService: FloorListService;
 
   public saveState = () => {
+    console.log(this);
     if (this.floor.id != null) {
       const floor: FloorDto = {
         id: this.floor.id,
         data: this.floor.data,
-        plan: this.blueprintService.getFloorplan(),
+        plan: this.blueprintService.getFloorplan()
       };
       if (floor.plan !== null) {
         this.saveFloor(floor);
       }
     }
-  }
+  };
 
   public useHook() {
     this.router = useRouter();
@@ -63,7 +64,7 @@ export class FloorService implements IRootService {
       this.floor.id = null;
       this.blueprintService.setFloorplan(null);
     }
-  }
+  };
 
   public async loadFloor(id: string | number) {
     this.setLoading(true);
@@ -84,7 +85,7 @@ export class FloorService implements IRootService {
     try {
       await this.floorProvider.saveFloorplan(floor.id, {
         data: floor.data,
-        plan: floor.plan,
+        plan: floor.plan
       });
       await this.floorListService.loadList();
     } catch (error) {
@@ -102,14 +103,14 @@ export class FloorService implements IRootService {
       if (plan) {
         const data = await this.floorProvider.createFloorplan({
           data: {
-            name,
+            name
           },
-          plan,
+          plan
         });
         await this.floorListService.loadList();
         this.floorRouterService.openFloor(data.id);
       } else {
-        alert("Please draw something");
+        alert('Please draw something');
       }
     } catch (error) {
       // tslint:disable-next-line
@@ -118,6 +119,34 @@ export class FloorService implements IRootService {
       this.setLoading(false);
     }
   }
+
+  public copyProject = async () => {
+    const filename = prompt('Please enter new project name');
+
+    if (filename) {
+      this.setLoading(true);
+      try {
+        const plan = this.blueprintService.getFloorplan();
+        if (plan) {
+          const data = await this.floorProvider.createFloorplan({
+            data: {
+              name: filename
+            },
+            plan
+          });
+          await this.floorListService.loadList();
+          this.floorRouterService.openFloor(data.id);
+        } else {
+          alert('Please draw something');
+        }
+      } catch (error) {
+        // tslint:disable-next-line
+        console.error(error);
+      } finally {
+        this.setLoading(false);
+      }
+    }
+  };
 
   public async deleteFloor(id: number | string = this.floor.id) {
     this.setLoading(true);
@@ -140,19 +169,12 @@ export class FloorService implements IRootService {
   }
 
   public saveCanvasToFile() {
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const filename = prompt("Please enter filename");
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const filename = prompt('Please enter filename');
     if (filename !== null) {
-      canvas.toBlob((blob) => {
-      saveAs(blob, filename);
-    });
+      canvas.toBlob(blob => {
+        saveAs(blob, filename);
+      });
     }
-
-    // const saveBtn = document.getElementById("saveToFileBtn") as HTMLElement;
-    // const dataToSave = canvas.toDataURL("image/png", "image/octet-stream");
-    // if (saveBtn) {
-    //   saveBtn.setAttribute("href", dataToSave);
-    // }
   }
-
 }

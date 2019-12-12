@@ -198,7 +198,7 @@ export class FloorplanView {
     );
   }
 
-  public drawLabel(x: number, y: number, text: string, textColor?: string, font?: string) {
+  public drawLabel(x: number, y: number, text: string, font?: string, textColor?: string) {
     this.context.font = font || "normal 13px Arial";
     this.context.fillStyle = textColor || "#000000";
     this.context.textBaseline = "middle";

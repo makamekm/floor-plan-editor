@@ -21,7 +21,7 @@ const rotateColor = "#888888";
 const rotateHoverColor = "#2196F3";
 const rotateActiveColor = "#2196F3";
 
-const tableTextLimit = 14;
+let tableTextLimit: number;
 
 export class TableItem extends Item {
   public isRotating = false;
@@ -157,26 +157,35 @@ export class TableItem extends Item {
       });
     }
 
-    // TO CHANGE
+    const smallFont = "normal 11px Arial";
+    const name = this.metadata.name;
+    const id = this.metadata.description;
+    const labelsSpace = 15;
+    tableTextLimit = scale < 1.5 ? 14 : 8;
+
+    if (name && !id) {
+      view.drawLabel(
+        this.x,
+        this.y,
+        this.limitText(name),
+        scale < 1.5 ? "" : smallFont,
+      );
+    } else {
+      scale < 1.5
+        ? view.drawLabel(this.x, this.y + labelsSpace, this.limitText(name))
+        : view.drawLabel(
+            this.x,
+            scale < 1.5 ? this.y + labelsSpace : this.y,
+            this.limitText(name),
+            smallFont,
+          );
+    }
 
     if (scale < 1.5) {
-      if (this.metadata.name && !this.metadata.description) {
-        view.drawLabel(this.x, this.y, this.limitText(this.metadata.name));
+      if (!name && id) {
+        view.drawLabel(this.x, this.y, this.limitText(id));
       } else {
-        view.drawLabel(this.x, this.y + 15, this.limitText(this.metadata.name));
-      }
-      if (!this.metadata.name && this.metadata.description) {
-        view.drawLabel(
-          this.x,
-          this.y,
-          this.limitText(this.metadata.description),
-        );
-      } else {
-        view.drawLabel(
-          this.x,
-          this.y - 15,
-          this.limitText(this.metadata.description),
-        );
+        view.drawLabel(this.x, this.y - labelsSpace, this.limitText(id));
       }
     }
   }

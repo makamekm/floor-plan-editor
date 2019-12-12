@@ -82,7 +82,7 @@ export class LabelItem extends Item {
 
     const fontSize = 15 / scale;
 
-    view.drawLabel(this.x, this.y, text , fillColor, `bold ${fontSize}px Arial`);
+    view.drawLabel(this.x, this.y, text , `bold ${fontSize}px Arial` , fillColor);
   }
 
   public rotateVector(x: number, y: number, ang: number) {

@@ -28,8 +28,6 @@ export class LabelItem extends Item {
     metadata: ItemMetadata,
   ) {
     super(floorplan, x, y, metadata);
-    // this.metadata.height = this.metadata.height || 0;
-    // this.metadata.width = this.metadata.width || 0;
   }
 
   public startActive(): void {}
@@ -45,10 +43,6 @@ export class LabelItem extends Item {
       this.isRotating = isRotating;
     }
   }
-
-  //  private roundAngle() {
-  //   this.metadata.r = this.getClosestAngle();
-  // }
 
   public mouseup(x: number, y: number, mode: FloorplanMode): boolean | void {
     if (this.isRotating) {

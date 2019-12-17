@@ -21,7 +21,7 @@ const ItemProperty = () => {
     blueprintService.applyChanges();
   }, []);
 
-  switch (ItemNameDict[blueprintService.selected.type as ItemEnum]){
+  switch (ItemNameDict[blueprintService.selected.type as ItemEnum]) {
     case "Label": {
       return (
         <>
@@ -66,59 +66,5 @@ const ItemProperty = () => {
       );
     }
   }
-  // (ItemNameDict[blueprintService.selected.type as ItemEnum] == "Label") {
-  //   return (
-  //     <>
-  //       <ListItem borderRadius="5px" isHeader>
-  //         {ItemNameDict[blueprintService.selected.type as ItemEnum]}
-  //       </ListItem>
-  //       <ListItem borderRadius="5px" isField>
-  //         <InlineTextEdit
-  //           placeholder="Write person name..."
-  //           value={blueprintService.selected.name}
-  //           onChange={onChangeItemName}
-  //         />
-  //       </ListItem>
-  //       <ListItem borderRadius="5px" isHeader>
-  //         Table id
-  //       </ListItem>
-  //       <ListItem borderRadius="5px" isField>
-  //         <InlineTextareaEdit
-  //           borderRadius="0 0 5px 5px"
-  //           placeholder="Write table id..."
-  //           value={blueprintService.selected.description}
-  //           onChange={onChangeItemDescription}
-  //         />
-  //       </ListItem>
-  //     </>
-  //   );
-  }
-
-  // return (
-  //   <>
-  //     <ListItem borderRadius="5px" isHeader>
-  //       {ItemNameDict[blueprintService.selected.type as ItemEnum]}
-  //     </ListItem>
-  //     <ListItem borderRadius="5px" isField>
-  //       <InlineTextEdit
-  //         placeholder="Write person name..."
-  //         value={blueprintService.selected.name}
-  //         onChange={onChangeItemName}
-  //       />
-  //     </ListItem>
-  //     <ListItem borderRadius="5px" isHeader>
-  //       Table id
-  //     </ListItem>
-  //     <ListItem borderRadius="5px" isField>
-  //       <InlineTextareaEdit
-  //         borderRadius="0 0 5px 5px"
-  //         placeholder="Write table id..."
-  //         value={blueprintService.selected.description}
-  //         onChange={onChangeItemDescription}
-  //       />
-  //     </ListItem>
-  //   </>
-  // );
-
-
+};
 export default memo(observer(ItemProperty));

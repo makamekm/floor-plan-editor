@@ -1,14 +1,14 @@
-import debounce from "debounce";
-import { computed, observable, reaction, toJS } from "mobx";
-import { useDisposable } from "mobx-react-lite";
-import { useEffect } from "react";
-import { Blueprint } from "../models/blueprint";
-import { FloorplanDto } from "../models/floor.dto";
-import { ItemEnum } from "../models/floorplan-entities/item.enum";
-import { Callback } from "../utils/callback";
-import { Utils } from "../utils/operations";
-import { useRouterChange } from "../utils/router-hook";
-import { IRootService } from "./root-sevice.interface";
+import debounce from 'debounce';
+import { computed, observable, reaction, toJS } from 'mobx';
+import { useDisposable } from 'mobx-react-lite';
+import { useEffect } from 'react';
+import { Blueprint } from '../models/blueprint';
+import { FloorplanDto } from '../models/floor.dto';
+import { ItemEnum } from '../models/floorplan-entities/item.enum';
+import { Callback } from '../utils/callback';
+import { Utils } from '../utils/operations';
+import { useRouterChange } from '../utils/router-hook';
+import { IRootService } from './root-sevice.interface';
 
 export interface IModel {
   x: number;
@@ -36,23 +36,22 @@ export class BlueprintService implements IRootService {
 
   public onStateChange = new Callback<FloorplanDto>();
 
-  @observable public mode: string = "move";
+  @observable public mode: string = 'move';
   @observable public isWallLocked: boolean = false;
 
   public applyChanges = debounce(() => {
     this.pushHistory();
     this.model.state = {
       ...this.model.state,
-      ...toJS(this.model.changeState),
+      ...toJS(this.model.changeState)
     };
     this.blueprint.setState(
       this.model.state.floorplan,
-      this.model.state.x,
-      this.model.state.y,
-      this.model.state.selectedItem,
+      this.model.state.selectedItem
     );
     this.onStateChange.fire(this.getFloorplan());
   }, 100);
+
   private isDemoMode = false;
   @observable private model: {
     history: IModel[];
@@ -63,7 +62,7 @@ export class BlueprintService implements IRootService {
     history: [],
     revert: [],
     changeState: null,
-    state: null,
+    state: null
   };
   private floorplan: FloorplanDto;
   private blueprint: Blueprint;
@@ -93,7 +92,7 @@ export class BlueprintService implements IRootService {
         this.pushHistory();
         this.model.state = {
           ...model,
-          selectedItem: this.model.state && this.model.state.selectedItem,
+          selectedItem: this.model.state && this.model.state.selectedItem
         };
       } else {
         this.blueprint.reset();
@@ -120,9 +119,9 @@ export class BlueprintService implements IRootService {
       this.model.state = state;
       this.blueprint.setState(
         state.floorplan,
-        state.x,
-        state.y,
         state.selectedItem,
+        state.x,
+        state.y
       );
       this.onStateChange.fire(this.getFloorplan());
     }
@@ -136,16 +135,16 @@ export class BlueprintService implements IRootService {
       this.model.state = state;
       this.blueprint.setState(
         state.floorplan,
-        state.x,
-        state.y,
         state.selectedItem,
+        state.x,
+        state.y
       );
       this.onStateChange.fire(this.getFloorplan());
     }
   }
 
   public changeMode(mode: string) {
-    if (mode === "lock") {
+    if (mode === 'lock') {
       this.isWallLocked = !this.isWallLocked;
     }
     this.blueprint.changeMode(mode, this.isWallLocked);
@@ -175,10 +174,10 @@ export class BlueprintService implements IRootService {
     useDisposable(() =>
       reaction(
         () => this.model.state,
-        (state) => {
+        state => {
           this.model.changeState = toJS(state);
-        },
-      ),
+        }
+      )
     );
   }
 
@@ -186,7 +185,7 @@ export class BlueprintService implements IRootService {
     if (this.blueprint) {
       this.blueprint.reset();
     }
-  }
+  };
 
   public destructor() {
     this.unsetBlueprint();
@@ -194,7 +193,7 @@ export class BlueprintService implements IRootService {
 
   private onModeChange = (mode: string) => {
     this.mode = mode;
-  }
+  };
 
   private pushHistory() {
     if (this.model.state) {
@@ -212,18 +211,18 @@ export class BlueprintService implements IRootService {
     this.pushHistory();
     this.model.state = {
       ...model,
-      selectedItem: this.model.state && this.model.state.selectedItem,
+      selectedItem: this.model.state && this.model.state.selectedItem
     };
     this.onStateChange.fire(this.getFloorplan());
-  }
+  };
 
   private onSelectedItemChange = (index: number) => {
     this.pushHistory();
     this.model.state = {
       ...this.model.state,
-      selectedItem: index,
+      selectedItem: index
     };
-  }
+  };
 
   private attachListeners() {
     this.blueprint.onModeChange.add(this.onModeChange);
@@ -238,21 +237,21 @@ export class BlueprintService implements IRootService {
   }
 
   private setUndoListener() {
-    document.addEventListener("keydown", this.onKeyDown);
+    document.addEventListener('keydown', this.onKeyDown);
   }
 
   private unsetUndoListener() {
-    document.removeEventListener("keydown", this.onKeyDown);
+    document.removeEventListener('keydown', this.onKeyDown);
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
     if (event.currentTarget === document && this.blueprint) {
-      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
         this.undo();
       }
-      if ((event.metaKey || event.ctrlKey) && event.key === "y") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'y') {
         this.redo();
       }
     }
-  }
+  };
 }

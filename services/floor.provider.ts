@@ -1,3 +1,4 @@
+import getConfig from "next/config";
 import { useEffect } from "react";
 import { useInstance } from "react-ioc";
 import { FloorDto } from "../models/floor.dto";
@@ -5,7 +6,7 @@ import "../utils/firebase";
 import { IRootService } from "./root-sevice.interface";
 import { UserService } from "./user.service";
 
-const endpoint = process.env.REACT_APP_ENDPOINT
+const endpoint = process.env.API_URL;
 
 export class FloorProvider implements IRootService {
   public userService: UserService;
